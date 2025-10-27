@@ -68,11 +68,11 @@ export default function DashboardPage() {
       {/* Header */}
       <div className="space-y-4">
         <h1 className="text-2xl lg:text-3xl font-bold text-blue-700 dark:text-blue-400">
-          Dashboard - Auditor-IA
+          Dashboard - BPO
         </h1>
         <p className="text-gray-600 dark:text-gray-300 text-base leading-relaxed max-w-3xl">
-          Bienvenido al sistema de auditoría inteligente. Aquí puedes monitorear el estado general
-          de todos los procesos de auditoría en tiempo real.
+          Bienvenido al sistema de gestión de procesos empresariales. Aquí puedes monitorear el estado general
+          de todos los procesos de auditoría y contabilidad en tiempo real.
         </p>
       </div>
 

@@ -8,9 +8,9 @@ import { AuthInitializer } from "@/components/providers/auth-initializer"
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "Auditor-IA | Sistema de Auditoría Inteligente",
-  description: "Transformando la auditoría contable con inteligencia artificial para mayor precisión y eficiencia.",
-  keywords: ["auditoría", "contabilidad", "inteligencia artificial", "análisis financiero"],
+  title: "BPO | Business Process Outsourcing",
+  description: "Soluciones integrales de externalización de procesos empresariales para optimizar tu operación contable y administrativa.",
+  keywords: ["BPO", "outsourcing", "contabilidad", "procesos empresariales", "análisis financiero"],
   authors: [{ name: "Louis Frontend Team" }],
 }
 

@@ -31,9 +31,9 @@ export function Header({ onMenuToggle, isSidebarOpen }: HeaderProps) {
           </div>
           <div className="hidden sm:block">
             <h1 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-              Auditor-IA
+              BPO
             </h1>
-            <p className="text-xs text-muted-foreground">Sistema de Auditoría Inteligente</p>
+            <p className="text-xs text-muted-foreground">Business Process Outsourcing</p>
           </div>
         </div>
       </div>
@@ -44,7 +44,7 @@ export function Header({ onMenuToggle, isSidebarOpen }: HeaderProps) {
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <input
             type="text"
-            placeholder="Buscar en auditorías..."
+            placeholder="Buscar en procesos..."
             className="w-full pl-10 pr-4 py-2 rounded-lg border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
         </div>

@@ -99,7 +99,7 @@ export class ExcelExportService {
   private static async loadTemplateFile(): Promise<XLSX.WorkBook> {
     try {
       // Intentar cargar el archivo template
-      const templatePath = 'C:\\Users\\ANDRES BAYONA\\Documents\\LOUIS FRONTEND\\auditor-ia\\Formato clientes proveedores Pomelo.xlsx'
+      const templatePath = 'C:\\Users\\ANDRES BAYONA\\Documents\\LOUIS FRONTEND\\bpo-business-process-outsourcing\\Formato clientes proveedores BPO.xlsx'
 
       // Para el navegador, necesitaremos copiar el template manualmente o crear uno básico
       // Por ahora, crearemos la estructura básica
@@ -173,7 +173,7 @@ export class ExcelExportService {
 
       // Generar nombre de archivo con timestamp
       const timestamp = new Date().toISOString().slice(0, 19).replace(/[:.]/g, '-')
-      const fileName = `Clientes_Proveedores_Pomelo_${timestamp}.xlsx`
+      const fileName = `Gestion_Terceros_BPO_${timestamp}.xlsx`
 
       // Exportar el archivo
       XLSX.writeFile(workbook, fileName)

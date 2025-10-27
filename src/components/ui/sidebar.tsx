@@ -72,10 +72,10 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
             </div>
             <div>
               <h2 className="text-lg font-semibold text-sidebar-foreground">
-                Auditor-IA
+                BPO
               </h2>
               <p className="text-xs text-sidebar-foreground/70">
-                Sistema de Auditoría
+                Business Process Outsourcing
               </p>
             </div>
           </div>

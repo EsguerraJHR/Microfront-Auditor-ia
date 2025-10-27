@@ -31,15 +31,15 @@ export function Footer() {
               </div>
               <div>
                 <h3 className="font-bold text-lg bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-                  Auditor-IA
+                  BPO
                 </h3>
                 <p className="text-sm text-muted-foreground">
-                  Sistema de Auditoría Inteligente
+                  Business Process Outsourcing
                 </p>
               </div>
             </div>
             <p className="text-sm text-muted-foreground max-w-sm">
-              Transformando la auditoría contable con inteligencia artificial para mayor precisión y eficiencia.
+              Soluciones integrales de externalización de procesos empresariales para optimizar tu operación contable y administrativa.
             </p>
           </div>
 
@@ -82,7 +82,7 @@ export function Footer() {
         <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
           <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <span>&copy; {currentYear} Louis Frontend - Auditor-IA.</span>
+              <span>&copy; {currentYear} Louis Frontend - BPO.</span>
               <span className="hidden sm:inline">Todos los derechos reservados.</span>
             </div>
 
