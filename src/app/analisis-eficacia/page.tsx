@@ -1,18 +1,19 @@
 "use client"
 
 import React, { useState } from "react"
-import { Upload, FileText, Loader2, X, Building, CheckCircle, AlertTriangle, Calendar, Clock, Users, BarChart3 } from "lucide-react"
+import { Upload, FileText, Loader2, X, Building, CheckCircle, AlertTriangle, Calendar, Clock, Users, DollarSign } from "lucide-react"
 import { FileUpload } from "@/components/ui/file-upload"
-import { declarationService, DeclarationExtractionResponse, UploadProgress } from "@/lib/api/declaration-service"
+import { declarationService, DetailedDeclarationResponse, UploadProgress, PagoDetalle } from "@/lib/api/declaration-service"
 import { taxCalendarService, GranContribuyenteResponse, PersonaJuridicaResponse } from "@/lib/api/tax-calendar-service"
 import { TaxCalendarModal } from "@/components/ui/tax-calendar-modal"
 
 export default function AnalisisEficaciaPage() {
   const [showUploadModal, setShowUploadModal] = useState(false)
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
+  const [paymentFiles, setPaymentFiles] = useState<File[]>([])
   const [isUploading, setIsUploading] = useState(false)
   const [uploadProgress, setUploadProgress] = useState<UploadProgress | null>(null)
-  const [extractionResult, setExtractionResult] = useState<DeclarationExtractionResponse | null>(null)
+  const [extractionResult, setExtractionResult] = useState<DetailedDeclarationResponse | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [taxCalendar, setTaxCalendar] = useState<GranContribuyenteResponse | PersonaJuridicaResponse | null>(null)
   const [isLoadingCalendar, setIsLoadingCalendar] = useState(false)
@@ -28,9 +29,14 @@ export default function AnalisisEficaciaPage() {
     }
   }
 
+  const handlePaymentFilesChange = (files: File[]) => {
+    setPaymentFiles(files)
+    setError(null)
+  }
+
   const handleExtractDeclaration = async () => {
     if (!selectedFile) {
-      setError('Por favor selecciona un archivo para procesar.')
+      setError('Por favor selecciona un archivo de declaración para procesar.')
       return
     }
 
@@ -39,19 +45,19 @@ export default function AnalisisEficaciaPage() {
     setError(null)
 
     try {
-      const response = await declarationService.extractDeclarationWithProgress(
+      const response = await declarationService.extractDetailedDeclaration(
         selectedFile,
-        (progress) => {
-          setUploadProgress(progress)
-        }
+        paymentFiles.length > 0 ? paymentFiles : undefined,
+        (progress) => setUploadProgress(progress)
       )
 
       setExtractionResult(response)
       setShowUploadModal(false)
       setSelectedFile(null)
+      setPaymentFiles([])
 
       // Load tax calendar after successful extraction
-      await loadTaxCalendar(response)
+      await loadTaxCalendar(response.declaracion, response.es_gran_contribuyente)
     } catch (error) {
       console.error('Error extracting declaration:', error)
       setError(error instanceof Error ? error.message : 'Error desconocido durante la extracción')
@@ -65,22 +71,20 @@ export default function AnalisisEficaciaPage() {
     if (!isUploading) {
       setShowUploadModal(false)
       setSelectedFile(null)
+      setPaymentFiles([])
       setError(null)
       setUploadProgress(null)
     }
   }
 
-  const loadTaxCalendar = async (declarationData: DeclarationExtractionResponse) => {
+  const loadTaxCalendar = async (declarationData: any, esGranContribuyente?: boolean) => {
     if (!declarationData.nit || !declarationData.ano_gravable) return
 
     setIsLoadingCalendar(true)
     try {
-      // Get last digit of NIT
       const ultimoDigitoNit = parseInt(declarationData.nit.slice(-1))
       const anoGravable = declarationData.ano_gravable
-
-      // Determine if it's gran contribuyente
-      const isGranContribuyente = declarationData.es_gran_contribuyente
+      const isGranContribuyente = esGranContribuyente ?? declarationData.es_gran_contribuyente
 
       let calendarResponse
       if (isGranContribuyente) {
@@ -92,13 +96,13 @@ export default function AnalisisEficaciaPage() {
       setTaxCalendar(calendarResponse)
     } catch (error) {
       console.error('Error loading tax calendar:', error)
-      // Don't show error for calendar, it's optional
     } finally {
       setIsLoadingCalendar(false)
     }
   }
 
-  const formatCurrency = (value: number) => {
+  const formatCurrency = (value?: number) => {
+    if (value === undefined || value === null) return 'N/A'
     return new Intl.NumberFormat('es-CO', {
       style: 'currency',
       currency: 'COP',
@@ -107,11 +111,15 @@ export default function AnalisisEficaciaPage() {
     }).format(value)
   }
 
-  const isGranContribuyente = () => {
-    return extractionResult?.es_gran_contribuyente &&
-           extractionResult.contribuyente_info &&
-           typeof extractionResult.contribuyente_info === 'object' &&
-           'clasificacion' in extractionResult.contribuyente_info
+  const formatDate = (dateString: string) => {
+    if (!dateString) return 'N/A'
+    const [year, month, day] = dateString.split('-').map(Number)
+    const date = new Date(year, month - 1, day)
+    return date.toLocaleDateString('es-CO', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit'
+    })
   }
 
   const handleViewCompleteGrandesContribuyentes = async () => {
@@ -146,6 +154,7 @@ export default function AnalisisEficaciaPage() {
     }
   }
 
+  const declaracion = extractionResult?.declaracion
 
   return (
     <div className="space-y-6">
@@ -170,7 +179,6 @@ export default function AnalisisEficaciaPage() {
           Extraer Declaración de Renta
         </button>
 
-
         <button
           onClick={handleViewCompleteGrandesContribuyentes}
           className="flex items-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors font-medium"
@@ -188,44 +196,7 @@ export default function AnalisisEficaciaPage() {
         </button>
       </div>
 
-      {/* Gran Contribuyente Badge */}
-      {extractionResult && isGranContribuyente() && (
-        <div className="bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 rounded-xl p-6 border border-purple-200 dark:border-purple-800">
-          <div className="flex items-center gap-3 mb-3">
-            <div className="p-2 bg-purple-100 dark:bg-purple-900/30 rounded-full">
-              <Building className="h-6 w-6 text-purple-600" />
-            </div>
-            <div>
-              <h3 className="text-lg font-bold text-purple-700 dark:text-purple-300">
-                Gran Contribuyente
-              </h3>
-              <p className="text-sm text-purple-600 dark:text-purple-400">
-                Clasificación especial DIAN
-              </p>
-            </div>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 text-sm">
-            <div>
-              <span className="text-purple-600 dark:text-purple-400 font-medium">Clasificación:</span>
-              <p className="font-semibold">{(extractionResult.contribuyente_info as any).clasificacion}</p>
-            </div>
-            <div>
-              <span className="text-purple-600 dark:text-purple-400 font-medium">Vigencia:</span>
-              <p className="font-semibold">{(extractionResult.contribuyente_info as any).vigencia_periodo}</p>
-            </div>
-            <div>
-              <span className="text-purple-600 dark:text-purple-400 font-medium">Consecutivo:</span>
-              <p className="font-semibold">{(extractionResult.contribuyente_info as any).numero_consecutivo}</p>
-            </div>
-            <div>
-              <span className="text-purple-600 dark:text-purple-400 font-medium">Razón Social:</span>
-              <p className="font-semibold">{(extractionResult.contribuyente_info as any).razon_social_oficial}</p>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Tax Calendar Table */}
+      {/* Tax Calendar Section */}
       {extractionResult && taxCalendar && (
         <div className="bg-white dark:bg-gray-900 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
           {/* Calendar Header */}
@@ -236,11 +207,11 @@ export default function AnalisisEficaciaPage() {
               </div>
               <div>
                 <h3 className="text-xl font-bold text-orange-700 dark:text-orange-300">
-                  Calendario Tributario {extractionResult.ano_gravable}
+                  Calendario Tributario {declaracion?.ano_gravable}
                 </h3>
                 <p className="text-sm text-orange-600 dark:text-orange-400">
                   {extractionResult.es_gran_contribuyente ? 'Grandes Contribuyentes' : 'Personas Jurídicas'}
-                  {' '}| Último dígito NIT: {extractionResult.nit.slice(-1)}
+                  {' '}| Último dígito NIT: {declaracion?.nit.slice(-1)}
                 </p>
               </div>
               {isLoadingCalendar && (
@@ -277,7 +248,7 @@ export default function AnalisisEficaciaPage() {
                               <td className="py-3 px-4">
                                 <div className="flex items-center gap-2">
                                   <Clock className="h-4 w-4 text-gray-500" />
-                                  {new Date(calendar.fecha_pago_primera_cuota).toLocaleDateString('es-CO')}
+                                  {formatDate(calendar.fecha_pago_primera_cuota)}
                                 </div>
                               </td>
                             </tr>
@@ -286,7 +257,7 @@ export default function AnalisisEficaciaPage() {
                               <td className="py-3 px-4">
                                 <div className="flex items-center gap-2">
                                   <Clock className="h-4 w-4 text-gray-500" />
-                                  {new Date(calendar.fecha_declaracion_segunda_cuota).toLocaleDateString('es-CO')}
+                                  {formatDate(calendar.fecha_declaracion_segunda_cuota)}
                                 </div>
                               </td>
                             </tr>
@@ -295,7 +266,7 @@ export default function AnalisisEficaciaPage() {
                               <td className="py-3 px-4">
                                 <div className="flex items-center gap-2">
                                   <Clock className="h-4 w-4 text-gray-500" />
-                                  {new Date(calendar.fecha_pago_tercera_cuota).toLocaleDateString('es-CO')}
+                                  {formatDate(calendar.fecha_pago_tercera_cuota)}
                                 </div>
                               </td>
                             </tr>
@@ -312,7 +283,7 @@ export default function AnalisisEficaciaPage() {
                               <td className="py-3 px-4">
                                 <div className="flex items-center gap-2">
                                   <Clock className="h-4 w-4 text-gray-500" />
-                                  {new Date(calendar.fecha_declaracion_primera_cuota).toLocaleDateString('es-CO')}
+                                  {formatDate(calendar.fecha_declaracion_primera_cuota)}
                                 </div>
                               </td>
                             </tr>
@@ -321,7 +292,7 @@ export default function AnalisisEficaciaPage() {
                               <td className="py-3 px-4">
                                 <div className="flex items-center gap-2">
                                   <Clock className="h-4 w-4 text-gray-500" />
-                                  {new Date(calendar.fecha_pago_segunda_cuota).toLocaleDateString('es-CO')}
+                                  {formatDate(calendar.fecha_pago_segunda_cuota)}
                                 </div>
                               </td>
                             </tr>
@@ -353,403 +324,188 @@ export default function AnalisisEficaciaPage() {
         </div>
       )}
 
-      {/* Declaration Form */}
-      {extractionResult && (
+      {/* Payment Analysis Section */}
+      {extractionResult?.tiene_pagos && extractionResult?.analisis_pagos && (
         <div className="bg-white dark:bg-gray-900 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
-          {/* Form Header */}
-          <div className="bg-gradient-to-r from-green-50 to-blue-50 dark:from-green-900/20 dark:to-blue-900/20 px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+          {/* Header */}
+          <div className="bg-gradient-to-r from-blue-50 to-green-50 dark:from-blue-900/20 dark:to-green-900/20 px-6 py-4 border-b border-gray-200 dark:border-gray-700">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-green-100 dark:bg-green-900/30 rounded-full">
-                <FileText className="h-6 w-6 text-green-600" />
+              <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-full">
+                <DollarSign className="h-6 w-6 text-blue-600" />
               </div>
               <div>
-                <h3 className="text-xl font-bold text-green-700 dark:text-green-300">
-                  Declaración de Renta - {extractionResult.ano_gravable}
+                <h3 className="text-xl font-bold text-blue-700 dark:text-blue-300">
+                  Análisis de Pagos
                 </h3>
-                <p className="text-sm text-green-600 dark:text-green-400">
-                  {extractionResult.razon_social} | NIT: {extractionResult.nit}
+                <p className="text-sm text-blue-600 dark:text-blue-400">
+                  Comparación entre lo declarado y lo pagado
                 </p>
-              </div>
-              <div className="ml-auto">
-                <span className="px-3 py-1 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 rounded-full text-sm font-medium">
-                  Extraído exitosamente
-                </span>
               </div>
             </div>
           </div>
 
-          {/* Form Content */}
-          <div className="p-6">
-            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-              {/* Información General */}
-              <div className="space-y-4">
-                <h4 className="font-semibold text-lg text-gray-800 dark:text-gray-200 border-b border-gray-200 dark:border-gray-700 pb-2">
-                  Información General
-                </h4>
-                <div className="space-y-3">
-                  <div>
-                    <label className="text-sm font-medium text-gray-600 dark:text-gray-400">Año Gravable</label>
-                    <p className="text-lg font-semibold">{extractionResult.ano_gravable}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-gray-600 dark:text-gray-400">Número de Formulario</label>
-                    <p className="font-medium">{extractionResult.numero_formulario}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-gray-600 dark:text-gray-400">Actividad Económica Principal</label>
-                    <p className="font-medium">{extractionResult.actividad_economica_principal}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-gray-600 dark:text-gray-400">Fecha de Presentación</label>
-                    <p className="font-medium">{extractionResult.fecha_presentacion}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-gray-600 dark:text-gray-400">Hora de Presentación</label>
-                    <p className="font-medium">{extractionResult.hora_presentacion || 'No especificada'}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-gray-600 dark:text-gray-400">Código Dirección Seccional</label>
-                    <p className="font-medium">{extractionResult.codigo_direccion_seccional}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-gray-600 dark:text-gray-400">Tipo de Liquidación</label>
-                    <p className="font-medium">{extractionResult.liquidacion_tipo}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-gray-600 dark:text-gray-400">Código Contador/Revisor</label>
-                    <p className="font-medium">{extractionResult.codigo_contador_revisor || 'No especificado'}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-gray-600 dark:text-gray-400">Tarjeta Profesional</label>
-                    <p className="font-medium">{extractionResult.numero_tarjeta_profesional || 'No especificada'}</p>
-                  </div>
+          {/* Content */}
+          <div className="p-6 space-y-6">
+            {/* Summary Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-900/30 p-4 rounded-lg border border-purple-200 dark:border-purple-800">
+                <div className="flex items-center gap-2 mb-2">
+                  <FileText className="h-5 w-5 text-purple-600" />
+                  <span className="text-sm font-medium text-purple-700 dark:text-purple-300">Saldo a Pagar</span>
                 </div>
+                <p className="text-2xl font-bold text-purple-900 dark:text-purple-100">
+                  {formatCurrency(extractionResult.declaracion.saldo_pagar_impuesto)}
+                </p>
               </div>
 
-              {/* Patrimonio y Activos */}
-              <div className="space-y-4">
-                <h4 className="font-semibold text-lg text-gray-800 dark:text-gray-200 border-b border-gray-200 dark:border-gray-700 pb-2">
-                  Patrimonio y Activos
-                </h4>
-                <div className="space-y-3">
-                  <div>
-                    <label className="text-sm font-medium text-gray-600 dark:text-gray-400">Efectivo y Equivalentes</label>
-                    <p className="font-medium">{formatCurrency(extractionResult.efectivo_equivalentes)}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-gray-600 dark:text-gray-400">Inversiones</label>
-                    <p className="font-medium">{formatCurrency(extractionResult.inversiones_instrumentos_financieros)}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-gray-600 dark:text-gray-400">Cuentas y Documentos por Cobrar</label>
-                    <p className="font-medium">{formatCurrency(extractionResult.cuentas_documentos_arrendamientos)}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-gray-600 dark:text-gray-400">Inventarios</label>
-                    <p className="font-medium">{formatCurrency(extractionResult.inventarios)}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-gray-600 dark:text-gray-400">Activos Intangibles</label>
-                    <p className="font-medium">{formatCurrency(extractionResult.activos_intangibles)}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-gray-600 dark:text-gray-400">Activos Biológicos</label>
-                    <p className="font-medium">{formatCurrency(extractionResult.activos_biologicos)}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-gray-600 dark:text-gray-400">Propiedades, Planta y Equipo</label>
-                    <p className="font-medium">{formatCurrency(extractionResult.propiedades_planta_equipo)}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-gray-600 dark:text-gray-400">Otros Activos</label>
-                    <p className="font-medium">{formatCurrency(extractionResult.otros_activos)}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-gray-600 dark:text-gray-400">Patrimonio Bruto</label>
-                    <p className="font-semibold text-lg text-blue-600">{formatCurrency(extractionResult.patrimonio_bruto)}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-gray-600 dark:text-gray-400">Deudas</label>
-                    <p className="font-medium text-red-600">{formatCurrency(extractionResult.deudas)}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-gray-600 dark:text-gray-400">Patrimonio Líquido</label>
-                    <p className="font-semibold text-lg text-green-600">{formatCurrency(extractionResult.patrimonio_liquido)}</p>
-                  </div>
+              <div className="bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-900/30 p-4 rounded-lg border border-green-200 dark:border-green-800">
+                <div className="flex items-center gap-2 mb-2">
+                  <CheckCircle className="h-5 w-5 text-green-600" />
+                  <span className="text-sm font-medium text-green-700 dark:text-green-300">Total Pagado</span>
                 </div>
+                <p className="text-2xl font-bold text-green-900 dark:text-green-100">
+                  {formatCurrency(extractionResult.analisis_pagos.total_pagado)}
+                </p>
               </div>
 
-              {/* Ingresos */}
-              <div className="space-y-4">
-                <h4 className="font-semibold text-lg text-gray-800 dark:text-gray-200 border-b border-gray-200 dark:border-gray-700 pb-2">
-                  Ingresos
-                </h4>
-                <div className="space-y-3">
-                  <div>
-                    <label className="text-sm font-medium text-gray-600 dark:text-gray-400">Ingresos Brutos Ordinarios</label>
-                    <p className="font-medium">{formatCurrency(extractionResult.ingresos_brutos_actividades_ordinarias)}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-gray-600 dark:text-gray-400">Ingresos Financieros</label>
-                    <p className="font-medium">{formatCurrency(extractionResult.ingresos_financieros)}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-gray-600 dark:text-gray-400">Otros Ingresos</label>
-                    <p className="font-medium">{formatCurrency(extractionResult.otros_ingresos)}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Ingresos Brutos</label>
-                    <p className="font-semibold text-lg text-green-600">{formatCurrency(extractionResult.total_ingresos_brutos)}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-gray-600 dark:text-gray-400">Devoluciones, Rebajas y Descuentos</label>
-                    <p className="font-medium text-red-600">{formatCurrency(extractionResult.devoluciones_rebajas_descuentos)}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-gray-600 dark:text-gray-400">Ingresos No Constitutivos de Renta</label>
-                    <p className="font-medium">{formatCurrency(extractionResult.ingresos_no_constitutivos_renta)}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-gray-600 dark:text-gray-400">Ingresos Netos</label>
-                    <p className="font-semibold text-lg text-blue-600">{formatCurrency(extractionResult.ingresos_netos)}</p>
-                  </div>
+              <div className="bg-gradient-to-br from-orange-50 to-orange-100 dark:from-orange-900/20 dark:to-orange-900/30 p-4 rounded-lg border border-orange-200 dark:border-orange-800">
+                <div className="flex items-center gap-2 mb-2">
+                  <AlertTriangle className="h-5 w-5 text-orange-600" />
+                  <span className="text-sm font-medium text-orange-700 dark:text-orange-300">Pendiente</span>
                 </div>
+                <p className="text-2xl font-bold text-orange-900 dark:text-orange-100">
+                  {formatCurrency(extractionResult.analisis_pagos.saldo_pendiente)}
+                </p>
               </div>
 
-              {/* Costos y Gastos */}
-              <div className="space-y-4">
-                <h4 className="font-semibold text-lg text-gray-800 dark:text-gray-200 border-b border-gray-200 dark:border-gray-700 pb-2">
-                  Costos y Gastos
-                </h4>
-                <div className="space-y-3">
-                  <div>
-                    <label className="text-sm font-medium text-gray-600 dark:text-gray-400">Costos</label>
-                    <p className="font-medium">{formatCurrency(extractionResult.costos)}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-gray-600 dark:text-gray-400">Gastos de Administración</label>
-                    <p className="font-medium">{formatCurrency(extractionResult.gastos_administracion)}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-gray-600 dark:text-gray-400">Gastos de Ventas</label>
-                    <p className="font-medium">{formatCurrency(extractionResult.gastos_distribucion_ventas)}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-gray-600 dark:text-gray-400">Gastos Financieros</label>
-                    <p className="font-medium">{formatCurrency(extractionResult.gastos_financieros)}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-gray-600 dark:text-gray-400">Otros Gastos y Deducciones</label>
-                    <p className="font-medium">{formatCurrency(extractionResult.otros_gastos_deducciones)}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Costos y Gastos</label>
-                    <p className="font-semibold text-lg text-red-600">{formatCurrency(extractionResult.total_costos_gastos)}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Costos y Gastos Nómina</label>
-                    <p className="font-medium">{formatCurrency(extractionResult.total_costos_gastos_nomina)}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-gray-600 dark:text-gray-400">Aportes Sistema Seguridad Social</label>
-                    <p className="font-medium">{formatCurrency(extractionResult.aportes_sistema_seguridad_social)}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-gray-600 dark:text-gray-400">Aportes SENA, ICBF, Cajas</label>
-                    <p className="font-medium">{formatCurrency(extractionResult.aportes_sena_icbf_cajas)}</p>
-                  </div>
+              <div className={`bg-gradient-to-br p-4 rounded-lg border ${
+                extractionResult.analisis_pagos.estado_pago === 'PAGADO_COMPLETO'
+                  ? 'from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-900/30 border-green-200 dark:border-green-800'
+                  : extractionResult.analisis_pagos.estado_pago === 'PAGO_PARCIAL'
+                  ? 'from-yellow-50 to-yellow-100 dark:from-yellow-900/20 dark:to-yellow-900/30 border-yellow-200 dark:border-yellow-800'
+                  : 'from-red-50 to-red-100 dark:from-red-900/20 dark:to-red-900/30 border-red-200 dark:border-red-800'
+              }`}>
+                <div className="flex items-center gap-2 mb-2">
+                  {extractionResult.analisis_pagos.estado_pago === 'PAGADO_COMPLETO' ? (
+                    <CheckCircle className="h-5 w-5 text-green-600" />
+                  ) : (
+                    <AlertTriangle className={`h-5 w-5 ${
+                      extractionResult.analisis_pagos.estado_pago === 'PAGO_PARCIAL' ? 'text-yellow-600' : 'text-red-600'
+                    }`} />
+                  )}
+                  <span className={`text-sm font-medium ${
+                    extractionResult.analisis_pagos.estado_pago === 'PAGADO_COMPLETO'
+                      ? 'text-green-700 dark:text-green-300'
+                      : extractionResult.analisis_pagos.estado_pago === 'PAGO_PARCIAL'
+                      ? 'text-yellow-700 dark:text-yellow-300'
+                      : 'text-red-700 dark:text-red-300'
+                  }`}>Estado</span>
                 </div>
-              </div>
-
-              {/* Renta Líquida */}
-              <div className="space-y-4">
-                <h4 className="font-semibold text-lg text-gray-800 dark:text-gray-200 border-b border-gray-200 dark:border-gray-700 pb-2">
-                  Renta Líquida
-                </h4>
-                <div className="space-y-3">
-                  <div>
-                    <label className="text-sm font-medium text-gray-600 dark:text-gray-400">Inversiones Efectuadas en el Año</label>
-                    <p className="font-medium">{formatCurrency(extractionResult.inversiones_efectuadas_ano)}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-gray-600 dark:text-gray-400">Inversiones Liquidadas Períodos Anteriores</label>
-                    <p className="font-medium">{formatCurrency(extractionResult.inversiones_liquidadas_periodos_anteriores)}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-gray-600 dark:text-gray-400">Renta por Recuperación de Deducciones</label>
-                    <p className="font-medium">{formatCurrency(extractionResult.renta_recuperacion_deducciones)}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-gray-600 dark:text-gray-400">Renta Pasiva ECE</label>
-                    <p className="font-medium">{formatCurrency(extractionResult.renta_pasiva_ece)}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-gray-600 dark:text-gray-400">Renta Líquida Ordinaria del Ejercicio</label>
-                    <p className="font-medium">{formatCurrency(extractionResult.renta_liquida_ordinaria_ejercicio)}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-gray-600 dark:text-gray-400">Compensaciones</label>
-                    <p className="font-medium">{formatCurrency(extractionResult.compensaciones)}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-gray-600 dark:text-gray-400">Renta Líquida</label>
-                    <p className="font-medium">{formatCurrency(extractionResult.renta_liquida)}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-gray-600 dark:text-gray-400">Renta Presuntiva</label>
-                    <p className="font-medium">{formatCurrency(extractionResult.renta_presuntiva)}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-gray-600 dark:text-gray-400">Renta Exenta</label>
-                    <p className="font-medium">{formatCurrency(extractionResult.renta_exenta)}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-gray-600 dark:text-gray-400">Rentas Gravables</label>
-                    <p className="font-medium">{formatCurrency(extractionResult.rentas_gravables)}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-gray-600 dark:text-gray-400">Renta Líquida Gravable</label>
-                    <p className="font-semibold text-lg text-purple-600">{formatCurrency(extractionResult.renta_liquida_gravable)}</p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Impuestos */}
-              <div className="space-y-4">
-                <h4 className="font-semibold text-lg text-gray-800 dark:text-gray-200 border-b border-gray-200 dark:border-gray-700 pb-2">
-                  Impuestos
-                </h4>
-                <div className="space-y-3">
-                  <div>
-                    <label className="text-sm font-medium text-gray-600 dark:text-gray-400">Ingresos por Ganancias Ocasionales</label>
-                    <p className="font-medium">{formatCurrency(extractionResult.ingresos_ganancias_ocasionales)}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-gray-600 dark:text-gray-400">Costos por Ganancias Ocasionales</label>
-                    <p className="font-medium">{formatCurrency(extractionResult.costos_ganancias_ocasionales)}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-gray-600 dark:text-gray-400">Ganancias Ocasionales No Gravadas</label>
-                    <p className="font-medium">{formatCurrency(extractionResult.ganancias_ocasionales_no_gravadas)}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-gray-600 dark:text-gray-400">Ganancias Ocasionales Gravables</label>
-                    <p className="font-medium">{formatCurrency(extractionResult.ganancias_ocasionales_gravables)}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-gray-600 dark:text-gray-400">Subtotal Renta e Impuesto</label>
-                    <p className="font-medium">{formatCurrency(extractionResult.subtotal_renta_impuesto)}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-gray-600 dark:text-gray-400">Impuesto de Renta Líquida</label>
-                    <p className="font-medium">{formatCurrency(extractionResult.impuesto_renta_liquida)}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-gray-600 dark:text-gray-400">Valor a Adicionar (VAA)</label>
-                    <p className="font-medium">{formatCurrency(extractionResult.valor_adicionar_vaa)}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-gray-600 dark:text-gray-400">Descuentos Tributarios</label>
-                    <p className="font-medium">{formatCurrency(extractionResult.descuentos_tributarios)}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-gray-600 dark:text-gray-400">Impuesto Neto de Renta (Sin Adicionado)</label>
-                    <p className="font-medium">{formatCurrency(extractionResult.impuesto_neto_renta_sin_adicionado)}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-gray-600 dark:text-gray-400">Impuesto a Adicionar (IA)</label>
-                    <p className="font-medium">{formatCurrency(extractionResult.impuesto_adicionar_ia)}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-gray-600 dark:text-gray-400">Impuesto Neto de Renta (Con Adicionado)</label>
-                    <p className="font-medium">{formatCurrency(extractionResult.impuesto_neto_renta_con_adicionado)}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-gray-600 dark:text-gray-400">Impuesto sobre Ganancias Ocasionales</label>
-                    <p className="font-medium">{formatCurrency(extractionResult.impuesto_ganancias_ocasionales)}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-gray-600 dark:text-gray-400">Descuento Impuestos del Exterior</label>
-                    <p className="font-medium">{formatCurrency(extractionResult.descuento_impuestos_exterior_ganancias)}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Impuesto a Cargo</label>
-                    <p className="font-semibold text-lg text-orange-600">{formatCurrency(extractionResult.total_impuesto_cargo)}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-gray-600 dark:text-gray-400">Valor Inversión en Obras e Impuestos (50%)</label>
-                    <p className="font-medium">{formatCurrency(extractionResult.valor_inversion_obras_impuestos_50)}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-gray-600 dark:text-gray-400">Descuento Efectivo por Inversión en Obras</label>
-                    <p className="font-medium">{formatCurrency(extractionResult.descuento_efectivo_inversion_obras)}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-gray-600 dark:text-gray-400">Crédito Fiscal Artículo 256</label>
-                    <p className="font-medium">{formatCurrency(extractionResult.credito_fiscal_articulo_256)}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-gray-600 dark:text-gray-400">Anticipo de Renta Liquidado Año Anterior</label>
-                    <p className="font-medium">{formatCurrency(extractionResult.anticipo_renta_liquidado_anterior)}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-gray-600 dark:text-gray-400">Saldo a Favor del Año Anterior</label>
-                    <p className="font-medium">{formatCurrency(extractionResult.saldo_favor_anterior_sin_solicitud)}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-gray-600 dark:text-gray-400">Autorretenciones</label>
-                    <p className="font-medium">{formatCurrency(extractionResult.autorretenciones)}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-gray-600 dark:text-gray-400">Otras Retenciones</label>
-                    <p className="font-medium">{formatCurrency(extractionResult.otras_retenciones)}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Retenciones y Autorretenciones</label>
-                    <p className="font-medium">{formatCurrency(extractionResult.retenciones_autorretenciones)}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-gray-600 dark:text-gray-400">Anticipo de Renta del Año Siguiente</label>
-                    <p className="font-medium">{formatCurrency(extractionResult.anticipo_renta_ano_siguiente)}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-gray-600 dark:text-gray-400">Anticipo 3 Puntos Adicionales (Año Anterior)</label>
-                    <p className="font-medium">{formatCurrency(extractionResult.anticipo_puntos_adicionales_anterior)}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-gray-600 dark:text-gray-400">Anticipo 3 Puntos Adicionales (Año Siguiente)</label>
-                    <p className="font-medium">{formatCurrency(extractionResult.anticipo_puntos_adicionales_siguiente)}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-gray-600 dark:text-gray-400">Saldo a Pagar por Impuesto</label>
-                    <p className="font-medium">{formatCurrency(extractionResult.saldo_pagar_impuesto)}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-gray-600 dark:text-gray-400">Sanciones</label>
-                    <p className="font-medium text-red-600">{formatCurrency(extractionResult.sanciones)}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-gray-600 dark:text-gray-400">Valor a Pagar</label>
-                    <p className="font-semibold text-lg text-red-600">{formatCurrency(extractionResult.valor_pagar)}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-gray-600 dark:text-gray-400">Saldo a Favor</label>
-                    <p className="font-semibold text-lg text-green-600">{formatCurrency(extractionResult.saldo_favor)}</p>
-                  </div>
-                </div>
+                <p className={`text-xl font-bold ${
+                  extractionResult.analisis_pagos.estado_pago === 'PAGADO_COMPLETO'
+                    ? 'text-green-900 dark:text-green-100'
+                    : extractionResult.analisis_pagos.estado_pago === 'PAGO_PARCIAL'
+                    ? 'text-yellow-900 dark:text-yellow-100'
+                    : 'text-red-900 dark:text-red-100'
+                }`}>
+                  {extractionResult.analisis_pagos.estado_pago.replace('_', ' ')}
+                </p>
               </div>
             </div>
 
-            {/* Extraction Info */}
-            <div className="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
-              <div className="flex items-center justify-between text-sm text-gray-600 dark:text-gray-400">
-                <span>Extraído el: {new Date(extractionResult.extraction_timestamp).toLocaleString('es-CO')}</span>
-                <span className="flex items-center gap-2">
-                  <CheckCircle className="h-4 w-4 text-green-600" />
-                  {extractionResult.message}
-                </span>
+            {/* Payment Details Table */}
+            {extractionResult.analisis_pagos.pagos_detalle && extractionResult.analisis_pagos.pagos_detalle.length > 0 && (
+              <div>
+                <h4 className="text-lg font-bold text-gray-800 dark:text-gray-200 mb-4">Detalle de Pagos</h4>
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead>
+                      <tr className="border-b-2 border-gray-200 dark:border-gray-700">
+                        <th className="text-left py-3 px-4 font-semibold text-gray-800 dark:text-gray-200">Formulario</th>
+                        <th className="text-left py-3 px-4 font-semibold text-gray-800 dark:text-gray-200">Fecha Pago</th>
+                        <th className="text-left py-3 px-4 font-semibold text-gray-800 dark:text-gray-200">Cuota</th>
+                        <th className="text-right py-3 px-4 font-semibold text-gray-800 dark:text-gray-200">Impuesto</th>
+                        <th className="text-right py-3 px-4 font-semibold text-gray-800 dark:text-gray-200">Intereses</th>
+                        <th className="text-right py-3 px-4 font-semibold text-gray-800 dark:text-gray-200">Sanción</th>
+                        <th className="text-right py-3 px-4 font-semibold text-gray-800 dark:text-gray-200">Total</th>
+                        <th className="text-left py-3 px-4 font-semibold text-gray-800 dark:text-gray-200">Concepto</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {extractionResult.analisis_pagos.pagos_detalle.map((pago: PagoDetalle, index: number) => (
+                        <tr key={index} className="border-b border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/50">
+                          <td className="py-3 px-4 font-medium">{pago.numero_formulario}</td>
+                          <td className="py-3 px-4">{formatDate(pago.fecha_pago)}</td>
+                          <td className="py-3 px-4">Cuota {pago.cuota_numero}</td>
+                          <td className="py-3 px-4 text-right">{formatCurrency(pago.valor_impuesto)}</td>
+                          <td className="py-3 px-4 text-right">{formatCurrency(pago.valor_intereses)}</td>
+                          <td className="py-3 px-4 text-right">{formatCurrency(pago.valor_sancion)}</td>
+                          <td className="py-3 px-4 text-right font-semibold">{formatCurrency(pago.total_pago)}</td>
+                          <td className="py-3 px-4 text-sm text-gray-600 dark:text-gray-400">{pago.concepto}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               </div>
-            </div>
+            )}
+
+            {/* Compliance Analysis */}
+            {extractionResult.analisis_pagos.cumplimiento_fechas?.analisis_disponible &&
+             extractionResult.analisis_pagos.cumplimiento_fechas.pagos_analizados && (
+              <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
+                <h4 className="text-lg font-bold text-gray-800 dark:text-gray-200 mb-4">Análisis de Cumplimiento de Fechas</h4>
+                <div className="space-y-4">
+                  {extractionResult.analisis_pagos.cumplimiento_fechas.pagos_analizados.map((pago, index) => (
+                    <div
+                      key={index}
+                      className={`p-4 rounded-lg border ${
+                        pago.pago_oportuno
+                          ? 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800'
+                          : 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800'
+                      }`}
+                    >
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-2">
+                            {pago.pago_oportuno ? (
+                              <CheckCircle className="h-5 w-5 text-green-600" />
+                            ) : (
+                              <AlertTriangle className="h-5 w-5 text-red-600" />
+                            )}
+                            <span className={`font-semibold ${
+                              pago.pago_oportuno
+                                ? 'text-green-700 dark:text-green-300'
+                                : 'text-red-700 dark:text-red-300'
+                            }`}>
+                              Cuota {pago.cuota}
+                            </span>
+                          </div>
+                          <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-sm">
+                            <div>
+                              <span className="text-gray-600 dark:text-gray-400">Fecha límite:</span>
+                              <p className="font-medium">{formatDate(pago.fecha_limite)}</p>
+                            </div>
+                            <div>
+                              <span className="text-gray-600 dark:text-gray-400">Fecha pago:</span>
+                              <p className="font-medium">{formatDate(pago.fecha_pago)}</p>
+                            </div>
+                            <div>
+                              <span className="text-gray-600 dark:text-gray-400">Días de mora:</span>
+                              <p className={`font-bold ${
+                                (pago.dias_mora ?? 0) > 0 ? 'text-red-600' : 'text-green-600'
+                              }`}>
+                                {pago.dias_mora ?? 0} {(pago.dias_mora ?? 0) === 1 ? 'día' : 'días'}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}
@@ -782,17 +538,30 @@ export default function AnalisisEficaciaPage() {
               )}
 
               <div className="space-y-4">
-                <FileUpload
-                  onFilesChange={handleFileChange}
-                  maxFiles={1}
-                  acceptedTypes={['application/pdf']}
-                  maxFileSize={50}
-                />
+                <div>
+                  <label className="block text-sm font-medium mb-2">Archivo de Declaración (Requerido)</label>
+                  <FileUpload
+                    onFilesChange={handleFileChange}
+                    maxFiles={1}
+                    acceptedTypes={['application/pdf']}
+                    maxFileSize={50}
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium mb-2">Archivos de Pagos (Opcional - Máximo 10)</label>
+                  <FileUpload
+                    onFilesChange={handlePaymentFilesChange}
+                    maxFiles={10}
+                    acceptedTypes={['application/pdf']}
+                    maxFileSize={50}
+                  />
+                </div>
 
                 {uploadProgress && (
                   <div className="space-y-2">
                     <div className="flex justify-between text-sm">
-                      <span>Procesando archivo...</span>
+                      <span>Procesando archivos...</span>
                       <span>{uploadProgress.percentage}%</span>
                     </div>
                     <div className="w-full bg-gray-200 rounded-full h-2">
@@ -838,7 +607,6 @@ export default function AnalisisEficaciaPage() {
         </div>
       )}
 
-
       {/* Tax Calendar Modal */}
       <TaxCalendarModal
         isOpen={showCalendarModal}
@@ -847,7 +615,6 @@ export default function AnalisisEficaciaPage() {
         type={calendarModalType}
         loading={isLoadingCalendarModal}
       />
-
     </div>
   )
 }

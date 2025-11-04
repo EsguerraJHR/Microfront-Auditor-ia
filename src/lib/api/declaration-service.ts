@@ -8,6 +8,49 @@ export interface ContribuyenteInfo {
   razon_social_oficial: string
 }
 
+export interface PagoDetalle {
+  numero_formulario: string
+  fecha_pago: string
+  cuota_numero: number
+  valor_impuesto: number
+  valor_intereses: number
+  valor_sancion: number
+  total_pago: number
+  concepto: string
+  periodo: string
+}
+
+export interface PagoAnalizado {
+  cuota: number
+  fecha_pago: string
+  fecha_limite: string
+  pago_oportuno: boolean
+  dias_mora: number | null
+}
+
+export interface CumplimientoFechas {
+  analisis_disponible: boolean
+  es_gran_contribuyente: boolean
+  tipo_contribuyente: string
+  ano_gravable: number
+  ultimo_digito_nit: number
+  pagos_analizados: PagoAnalizado[]
+  todos_pagos_oportunos: boolean
+  observaciones: string | null
+}
+
+export interface AnalisisPagos {
+  total_declarado: number
+  total_pagado: number
+  saldo_pendiente: number
+  sobrepago: number
+  estado_pago: 'PAGO_PARCIAL' | 'PAGADO_COMPLETO' | 'SOBREPAGO' | 'SIN_PAGOS'
+  porcentaje_pagado: number
+  numero_pagos: number
+  pagos_detalle: PagoDetalle[]
+  cumplimiento_fechas: CumplimientoFechas
+}
+
 export interface DeclarationExtractionResponse {
   nit: string
   razon_social: string
@@ -96,6 +139,13 @@ export interface DeclarationExtractionResponse {
   message: string
 }
 
+export interface DetailedDeclarationResponse {
+  declaracion: DeclarationExtractionResponse
+  analisis_pagos: AnalisisPagos | null
+  tiene_pagos: boolean
+  es_gran_contribuyente: boolean
+}
+
 export interface UploadProgress {
   loaded: number
   total: number
@@ -104,6 +154,87 @@ export interface UploadProgress {
 
 class DeclarationService {
   private baseUrl = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8005'}/api/v1/compliance`
+
+  async extractDetailedDeclaration(
+    declarationFile: File,
+    paymentFiles?: File[],
+    onProgress?: (progress: UploadProgress) => void
+  ): Promise<DetailedDeclarationResponse> {
+    if (!declarationFile) {
+      throw new Error('No se ha proporcionado archivo de declaración')
+    }
+
+    const formData = new FormData()
+    formData.append('declaration_file', declarationFile)
+
+    // Agregar archivos de pago opcionales
+    if (paymentFiles && paymentFiles.length > 0) {
+      paymentFiles.forEach(file => {
+        formData.append('payment_files', file)
+      })
+    }
+
+    return new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest()
+
+      // Upload progress tracking
+      xhr.upload.addEventListener('progress', (event) => {
+        if (event.lengthComputable && onProgress) {
+          const progress: UploadProgress = {
+            loaded: event.loaded,
+            total: event.total,
+            percentage: Math.round((event.loaded / event.total) * 100)
+          }
+          onProgress(progress)
+        }
+      })
+
+      xhr.addEventListener('load', () => {
+        if (xhr.status >= 200 && xhr.status < 300) {
+          try {
+            const data: DetailedDeclarationResponse = JSON.parse(xhr.responseText)
+            resolve(data)
+          } catch (error) {
+            reject(new Error('Error al procesar la respuesta del servidor'))
+          }
+        } else {
+          let errorMessage = `Error HTTP ${xhr.status}: ${xhr.statusText}`
+          try {
+            const errorResponse = JSON.parse(xhr.responseText)
+            if (errorResponse.detail) {
+              errorMessage = errorResponse.detail
+            }
+          } catch (e) {
+            // Keep default error message
+          }
+          reject(new Error(errorMessage))
+        }
+      })
+
+      xhr.addEventListener('error', () => {
+        reject(new Error('Error de conexión al servidor'))
+      })
+
+      xhr.addEventListener('timeout', () => {
+        reject(new Error('Tiempo de espera agotado (2 minutos)'))
+      })
+
+      // Setup request
+      xhr.open('POST', `${this.baseUrl}/extract/declaration/detailed`, true)
+      xhr.timeout = 120000 // 2 minutes timeout
+
+      // Add headers for CORS and Authentication
+      const authHeaders = getAuthHeaders() as Record<string, string>
+      Object.entries(authHeaders).forEach(([key, value]) => {
+        if (key !== 'Content-Type') {
+          xhr.setRequestHeader(key, value)
+        }
+      })
+
+      // Don't set Content-Type - let browser set it with boundary for multipart/form-data
+      xhr.send(formData)
+    })
+  }
 
   async extractDeclarationData(
     file: File,
