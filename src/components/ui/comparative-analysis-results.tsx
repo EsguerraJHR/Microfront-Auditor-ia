@@ -171,9 +171,9 @@ export function ComparativeAnalysisResults({ results, onClose }: ComparativeAnal
           <div className="text-center">
             <div className="flex items-center justify-center gap-2 mb-1">
               <Calendar className="h-5 w-5 text-orange-600" />
-              <span className="text-2xl font-bold text-orange-600">{results.previous_year}</span>
+              <span className="text-2xl font-bold text-orange-600">{results.current_year}</span>
             </div>
-            <p className="text-sm text-orange-700 dark:text-orange-300">Año Anterior</p>
+            <p className="text-sm text-orange-700 dark:text-orange-300">Año Actual</p>
           </div>
 
           <div className="text-center">
@@ -187,9 +187,9 @@ export function ComparativeAnalysisResults({ results, onClose }: ComparativeAnal
           <div className="text-center">
             <div className="flex items-center justify-center gap-2 mb-1">
               <Calendar className="h-5 w-5 text-orange-600" />
-              <span className="text-2xl font-bold text-orange-600">{results.current_year}</span>
+              <span className="text-2xl font-bold text-orange-600">{results.previous_year}</span>
             </div>
-            <p className="text-sm text-orange-700 dark:text-orange-300">Año Actual</p>
+            <p className="text-sm text-orange-700 dark:text-orange-300">Año Anterior</p>
           </div>
         </div>
 
