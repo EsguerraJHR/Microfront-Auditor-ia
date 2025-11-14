@@ -311,7 +311,7 @@ export class ExcelExportService {
         this.formatCurrency(variation.current_value),
         this.formatCurrency(variation.nominal_variation),
         variation.relative_variation ? variation.relative_variation.toFixed(2) + '%' : 'N/A',
-        variation.variation_percentage
+        variation.variation_percentage || 'N/A'
       ])
     })
 
