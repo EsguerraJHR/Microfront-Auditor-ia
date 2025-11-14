@@ -203,11 +203,11 @@ export function ComparativeAnalysisResults({ results, onClose }: ComparativeAnal
       {/* Tabs */}
       <div className="flex flex-wrap gap-1 bg-gray-100 dark:bg-gray-800 p-1 rounded-lg">
         {[
-          { key: 'summary', label: 'Resumen Ejecutivo' },
-          { key: 'details', label: 'Análisis Detallado' },
-          { key: 'vertical', label: 'Análisis Vertical', condition: results.analisis_vertical_declaracion_current },
-          { key: 'structure', label: 'Cambios Estructurales', condition: results.estructura_comparacion }
-        ].filter(tab => tab.condition !== false).map(tab => (
+          { key: 'summary', label: 'Resumen Ejecutivo', show: true },
+          { key: 'details', label: 'Análisis Detallado', show: true },
+          { key: 'vertical', label: 'Análisis Vertical', show: !!results.analisis_vertical_declaracion_current },
+          { key: 'structure', label: 'Cambios Estructurales', show: !!results.estructura_comparacion }
+        ].filter(tab => tab.show).map(tab => (
           <button
             key={tab.key}
             onClick={() => setSelectedTab(tab.key as any)}
