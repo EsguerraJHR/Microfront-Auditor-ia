@@ -112,6 +112,10 @@
     animation: scrollX 7s linear infinite;
   }
 
+  .animate-shimmer {
+    animation: shimmer 2s linear infinite;
+  }
+
   /* Clases para mejorar la justificación del texto */
   .text-justify-full {
     text-align: justify;
@@ -246,6 +250,15 @@
   }
   100% {
     transform: translateX(-33.333%);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
   }
 }
 

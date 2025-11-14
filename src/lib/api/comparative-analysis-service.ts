@@ -1,4 +1,11 @@
 import { getAuthHeaders } from '@/lib/utils/api-helpers'
+import { FEATURES } from '@/config/features'
+
+// Types for SSE Progress Events
+export interface SSEProgressEvent {
+  percentage: number
+  message: string
+}
 
 // Types for Comparative Analysis API response
 export interface VariationAnalysis {
@@ -94,10 +101,16 @@ export interface UploadProgress {
 class ComparativeAnalysisService {
   private baseUrl = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8005'}/api/v1/compliance`
 
+  /**
+   * Analiza declaraciones comparativas con soporte para SSE (Server-Sent Events)
+   * Si FEATURES.USE_SSE_PROGRESS está habilitado, usa el endpoint /stream
+   * Si está deshabilitado, usa el endpoint original
+   */
   async analyzeDeclarationComparative(
     currentYearFile: File,
     previousYearFile: File,
-    onProgress?: (progress: UploadProgress) => void
+    onProgress?: (progress: UploadProgress) => void,
+    onSSEProgress?: (progress: SSEProgressEvent) => void
   ): Promise<ComparativeAnalysisResponse> {
     if (!currentYearFile) {
       throw new Error('No se ha proporcionado el archivo del año actual')
@@ -111,6 +124,119 @@ class ComparativeAnalysisService {
     formData.append('current_year_file', currentYearFile)
     formData.append('previous_year_file', previousYearFile)
 
+    // Elegir endpoint según feature flag
+    if (FEATURES.USE_SSE_PROGRESS && onSSEProgress) {
+      return await this.analyzeWithSSE(formData, onSSEProgress)
+    } else {
+      return await this.analyzeWithoutSSE(formData)
+    }
+  }
+
+  /**
+   * Análisis usando SSE (Server-Sent Events) para mostrar progreso en tiempo real
+   */
+  private async analyzeWithSSE(
+    formData: FormData,
+    onProgress: (progress: SSEProgressEvent) => void
+  ): Promise<ComparativeAnalysisResponse> {
+    const authHeaders = getAuthHeaders()
+    const { 'Content-Type': _, ...headersWithoutContentType } = authHeaders as Record<string, string>
+
+    const response = await fetch(`${this.baseUrl}/analyze/declaration/comparative/stream`, {
+      method: 'POST',
+      body: formData,
+      mode: 'cors',
+      headers: headersWithoutContentType
+    })
+
+    if (!response.ok) {
+      let errorText = 'Error desconocido'
+      try {
+        const errorData = await response.json()
+        if (errorData.detail && Array.isArray(errorData.detail)) {
+          errorText = errorData.detail.map((err: any) => err.msg).join(', ')
+        } else {
+          errorText = errorData.detail || errorData.message || `HTTP ${response.status} ${response.statusText}`
+        }
+      } catch {
+        errorText = `HTTP ${response.status} ${response.statusText}`
+      }
+      throw new Error(`Error HTTP ${response.status}: ${errorText}`)
+    }
+
+    const reader = response.body!.getReader()
+    const decoder = new TextDecoder()
+    let result: ComparativeAnalysisResponse | null = null
+    let buffer = ''
+
+    try {
+      while (true) {
+        const { value, done } = await reader.read()
+        if (done) break
+
+        buffer += decoder.decode(value, { stream: true })
+        const lines = buffer.split('\n')
+
+        // Mantener la última línea incompleta en el buffer
+        buffer = lines.pop() || ''
+
+        for (let i = 0; i < lines.length; i++) {
+          const line = lines[i].trim()
+
+          if (line.startsWith('event: progress')) {
+            // La siguiente línea contiene el data
+            const dataLine = lines[i + 1]
+            if (dataLine && dataLine.startsWith('data: ')) {
+              try {
+                const data = JSON.parse(dataLine.substring(6))
+                onProgress({
+                  percentage: data.percentage,
+                  message: data.message
+                })
+              } catch (e) {
+                console.error('Error parsing progress data:', e)
+              }
+            }
+          } else if (line.startsWith('event: complete')) {
+            const dataLine = lines[i + 1]
+            if (dataLine && dataLine.startsWith('data: ')) {
+              try {
+                result = JSON.parse(dataLine.substring(6))
+              } catch (e) {
+                console.error('Error parsing complete data:', e)
+              }
+            }
+          } else if (line.startsWith('event: error')) {
+            const dataLine = lines[i + 1]
+            if (dataLine && dataLine.startsWith('data: ')) {
+              try {
+                const error = JSON.parse(dataLine.substring(6))
+                throw new Error(error.error || 'Error en el análisis')
+              } catch (e) {
+                if (e instanceof Error) throw e
+                throw new Error('Error desconocido en el análisis')
+              }
+            }
+          }
+        }
+      }
+    } finally {
+      reader.releaseLock()
+    }
+
+    if (!result) {
+      throw new Error('No se recibió resultado del análisis')
+    }
+
+    return result
+  }
+
+  /**
+   * Análisis tradicional sin SSE (endpoint original)
+   */
+  private async analyzeWithoutSSE(
+    formData: FormData
+  ): Promise<ComparativeAnalysisResponse> {
     try {
       const authHeaders = getAuthHeaders()
       const { 'Content-Type': _, ...headersWithoutContentType } = authHeaders as Record<string, string>

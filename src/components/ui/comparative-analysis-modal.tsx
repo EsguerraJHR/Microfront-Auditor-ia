@@ -2,7 +2,9 @@
 
 import React, { useState } from "react"
 import { X, Upload, FileText, Loader2, BarChart3, AlertCircle } from "lucide-react"
-import { comparativeAnalysisService, ComparativeAnalysisResponse, UploadProgress } from "@/lib/api/comparative-analysis-service"
+import { comparativeAnalysisService, ComparativeAnalysisResponse, UploadProgress, SSEProgressEvent } from "@/lib/api/comparative-analysis-service"
+import { ProgressBar } from "./progress-bar"
+import { FEATURES } from "@/config/features"
 
 interface ComparativeAnalysisModalProps {
   isOpen: boolean
@@ -15,6 +17,7 @@ export function ComparativeAnalysisModal({ isOpen, onClose, onAnalysisComplete }
   const [previousYearFile, setPreviousYearFile] = useState<File | null>(null)
   const [isAnalyzing, setIsAnalyzing] = useState(false)
   const [uploadProgress, setUploadProgress] = useState<UploadProgress | null>(null)
+  const [sseProgress, setSSEProgress] = useState<SSEProgressEvent | null>(null)
   const [error, setError] = useState<string | null>(null)
 
   const handleCurrentYearFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -50,15 +53,19 @@ export function ComparativeAnalysisModal({ isOpen, onClose, onAnalysisComplete }
 
     setIsAnalyzing(true)
     setUploadProgress(null)
+    setSSEProgress(null)
     setError(null)
 
     try {
-      const response = await comparativeAnalysisService.analyzeDeclarationComparativeWithProgress(
+      const response = await comparativeAnalysisService.analyzeDeclarationComparative(
         currentYearFile,
         previousYearFile,
         (progress) => {
           setUploadProgress(progress)
-        }
+        },
+        FEATURES.USE_SSE_PROGRESS ? (progress) => {
+          setSSEProgress(progress)
+        } : undefined
       )
 
       if (onAnalysisComplete) {
@@ -71,6 +78,7 @@ export function ComparativeAnalysisModal({ isOpen, onClose, onAnalysisComplete }
     } finally {
       setIsAnalyzing(false)
       setUploadProgress(null)
+      setSSEProgress(null)
     }
   }
 
@@ -80,6 +88,7 @@ export function ComparativeAnalysisModal({ isOpen, onClose, onAnalysisComplete }
       setPreviousYearFile(null)
       setError(null)
       setUploadProgress(null)
+      setSSEProgress(null)
       onClose()
     }
   }
@@ -230,8 +239,18 @@ export function ComparativeAnalysisModal({ isOpen, onClose, onAnalysisComplete }
             </div>
           )}
 
-          {/* Progress Bar */}
-          {isAnalyzing && uploadProgress && (
+          {/* Progress Bar - SSE Progress (si está habilitado) */}
+          {isAnalyzing && FEATURES.USE_SSE_PROGRESS && sseProgress && (
+            <div className="space-y-2">
+              <ProgressBar
+                percentage={sseProgress.percentage}
+                message={sseProgress.message}
+              />
+            </div>
+          )}
+
+          {/* Progress Bar - Upload Progress (fallback o cuando SSE está deshabilitado) */}
+          {isAnalyzing && !FEATURES.USE_SSE_PROGRESS && uploadProgress && (
             <div className="space-y-2">
               <div className="flex justify-between text-sm text-muted-foreground">
                 <span>Procesando análisis comparativo...</span>
@@ -243,6 +262,14 @@ export function ComparativeAnalysisModal({ isOpen, onClose, onAnalysisComplete }
                   style={{ width: `${uploadProgress.percentage}%` }}
                 />
               </div>
+            </div>
+          )}
+
+          {/* Mensaje genérico si no hay progreso disponible aún */}
+          {isAnalyzing && !sseProgress && !uploadProgress && (
+            <div className="flex items-center gap-3 text-sm text-muted-foreground">
+              <Loader2 className="h-4 w-4 animate-spin" />
+              <span>Iniciando análisis comparativo...</span>
             </div>
           )}
         </div>
