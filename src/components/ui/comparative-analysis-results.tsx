@@ -5,6 +5,8 @@ import { TrendingUp, TrendingDown, Minus, Building, Calendar, X, Download, FileS
 import { cn } from "@/lib/utils"
 import { ComparativeAnalysisResponse, VariationAnalysis } from "@/lib/api/comparative-analysis-service"
 import { ExcelExportService } from "@/lib/services/excel-export"
+import { VerticalAnalysisView } from "./vertical-analysis-view"
+import { StructureComparisonView } from "./structure-comparison-view"
 
 interface ComparativeAnalysisResultsProps {
   results: ComparativeAnalysisResponse
@@ -21,6 +23,7 @@ const formatCurrency = (value: number) => {
 }
 
 const formatPercentage = (percentage: string, analysis?: any) => {
+  if (!percentage) return 'N/A'
   const numValue = parseFloat(percentage)
   if (isNaN(numValue)) return percentage
   if (percentage.includes('∞') || numValue === Infinity || numValue === -Infinity) {
@@ -32,7 +35,7 @@ const formatPercentage = (percentage: string, analysis?: any) => {
   return `${numValue > 0 ? '+' : ''}${numValue.toFixed(2)}%`
 }
 
-const getVariationIcon = (variation: number, percentage?: string) => {
+const getVariationIcon = (variation: number, percentage?: string | null) => {
   if (percentage && (percentage.includes('∞') || variation === Infinity || variation === -Infinity)) {
     return <TrendingUp className="h-4 w-4 text-blue-600" />
   }
@@ -41,7 +44,7 @@ const getVariationIcon = (variation: number, percentage?: string) => {
   return <Minus className="h-4 w-4 text-gray-600" />
 }
 
-const getVariationColor = (variation: number, percentage?: string) => {
+const getVariationColor = (variation: number, percentage?: string | null) => {
   if (percentage && (percentage.includes('∞') || variation === Infinity || variation === -Infinity)) {
     return "text-blue-600"
   }
@@ -99,7 +102,7 @@ function AnalysisCard({ title, analysis, icon }: AnalysisCardProps) {
           </span>
         </div>
         <div className={cn("font-bold", getVariationColor(analysis.relative_variation, analysis.variation_percentage))}>
-          {analysis.variation_percentage.includes('∞') ? (
+          {analysis.variation_percentage && analysis.variation_percentage.includes('∞') ? (
             <div className="flex flex-col items-end">
               <span className="px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded text-xs">
                 {formatPercentage(analysis.variation_percentage, analysis)}
@@ -109,7 +112,7 @@ function AnalysisCard({ title, analysis, icon }: AnalysisCardProps) {
               </span>
             </div>
           ) : (
-            formatPercentage(analysis.variation_percentage, analysis)
+            formatPercentage(analysis.variation_percentage || '0', analysis)
           )}
         </div>
       </div>
@@ -118,7 +121,7 @@ function AnalysisCard({ title, analysis, icon }: AnalysisCardProps) {
 }
 
 export function ComparativeAnalysisResults({ results, onClose }: ComparativeAnalysisResultsProps) {
-  const [selectedTab, setSelectedTab] = useState<'summary' | 'details'>('summary')
+  const [selectedTab, setSelectedTab] = useState<'summary' | 'details' | 'vertical' | 'structure'>('summary')
   const [isExporting, setIsExporting] = useState(false)
 
   const handleExport = async () => {
@@ -198,16 +201,18 @@ export function ComparativeAnalysisResults({ results, onClose }: ComparativeAnal
       </div>
 
       {/* Tabs */}
-      <div className="flex space-x-1 bg-gray-100 dark:bg-gray-800 p-1 rounded-lg">
+      <div className="flex flex-wrap gap-1 bg-gray-100 dark:bg-gray-800 p-1 rounded-lg">
         {[
           { key: 'summary', label: 'Resumen Ejecutivo' },
-          { key: 'details', label: 'Análisis Detallado' }
-        ].map(tab => (
+          { key: 'details', label: 'Análisis Detallado' },
+          { key: 'vertical', label: 'Análisis Vertical', condition: results.analisis_vertical_declaracion_current },
+          { key: 'structure', label: 'Cambios Estructurales', condition: results.estructura_comparacion }
+        ].filter(tab => tab.condition !== false).map(tab => (
           <button
             key={tab.key}
             onClick={() => setSelectedTab(tab.key as any)}
             className={cn(
-              "flex-1 px-3 py-2 text-sm font-medium rounded-md transition-colors",
+              "flex-1 px-3 py-2 text-sm font-medium rounded-md transition-colors min-w-[120px]",
               selectedTab === tab.key
                 ? "bg-white dark:bg-gray-700 text-orange-600 dark:text-orange-400 shadow-sm"
                 : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200"
@@ -384,7 +389,7 @@ export function ComparativeAnalysisResults({ results, onClose }: ComparativeAnal
                         </div>
                       </td>
                       <td className={cn("px-4 py-3 text-right font-bold", getVariationColor(variation.relative_variation, variation.variation_percentage))}>
-                        {variation.variation_percentage.includes('∞') ? (
+                        {variation.variation_percentage && variation.variation_percentage.includes('∞') ? (
                           <div className="flex flex-col items-end">
                             <span className="px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded text-xs">
                               {formatPercentage(variation.variation_percentage, variation)}
@@ -394,7 +399,7 @@ export function ComparativeAnalysisResults({ results, onClose }: ComparativeAnal
                             </span>
                           </div>
                         ) : (
-                          formatPercentage(variation.variation_percentage, variation)
+                          formatPercentage(variation.variation_percentage || '0', variation)
                         )}
                       </td>
                     </tr>
@@ -404,6 +409,19 @@ export function ComparativeAnalysisResults({ results, onClose }: ComparativeAnal
             </div>
           </div>
         </div>
+      )}
+
+      {/* Vertical Analysis Tab */}
+      {selectedTab === 'vertical' && results.analisis_vertical_declaracion_current && (
+        <VerticalAnalysisView
+          currentYear={results.analisis_vertical_declaracion_current}
+          previousYear={results.analisis_vertical_declaracion_previous}
+        />
+      )}
+
+      {/* Structure Comparison Tab */}
+      {selectedTab === 'structure' && results.estructura_comparacion && (
+        <StructureComparisonView comparison={results.estructura_comparacion} />
       )}
 
       {/* Footer Info */}

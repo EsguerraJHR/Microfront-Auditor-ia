@@ -8,7 +8,51 @@ export interface VariationAnalysis {
   previous_value: number
   nominal_variation: number
   relative_variation: number
-  variation_percentage: string
+  variation_percentage: string | null
+}
+
+// Vertical Analysis Types
+export interface VerticalAnalysisField {
+  field_name: string
+  line_number: string
+  value: number | null
+  base_value: number | null
+  percentage: number | null
+  percentage_formatted: string | null
+  base_field: string
+}
+
+export interface VerticalAnalysisBlock {
+  block_name: string
+  base_field: string
+  base_value: number | null
+  fields: VerticalAnalysisField[]
+}
+
+export interface VerticalAnalysisYear {
+  year: number
+  nit: string
+  razon_social: string | null
+  patrimonio_block: VerticalAnalysisBlock
+  resultados_block: VerticalAnalysisBlock
+  impuestos_block: VerticalAnalysisBlock
+  pagos_saldos_block: VerticalAnalysisBlock
+  key_insights: string[]
+}
+
+export interface StructureChange {
+  campo: string
+  linea: string
+  porcentaje_actual: string
+  porcentaje_anterior: string
+  cambio_puntos_porcentuales: string
+  interpretacion: string
+}
+
+export interface StructureComparison {
+  cambios_significativos: StructureChange[]
+  total_cambios_identificados: number
+  criterio_significancia: string
 }
 
 export interface ComparativeAnalysisResponse {
@@ -23,6 +67,12 @@ export interface ComparativeAnalysisResponse {
   impuesto_analysis: VariationAnalysis
   all_variations: VariationAnalysis[]
   summary: Record<string, any>
+
+  // Vertical Analysis Fields
+  analisis_vertical_declaracion_current?: VerticalAnalysisYear
+  analisis_vertical_declaracion_previous?: VerticalAnalysisYear
+  estructura_comparacion?: StructureComparison
+
   analysis_timestamp: string
   message: string
 }
