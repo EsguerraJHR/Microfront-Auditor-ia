@@ -4,10 +4,13 @@ import { Calculator, Heart, Shield, Clock } from "lucide-react"
 import { useState, useEffect } from "react"
 
 export function Footer() {
-  const currentYear = new Date().getFullYear()
+  const [currentYear, setCurrentYear] = useState<number>(2024)
   const [currentTime, setCurrentTime] = useState<string>("")
 
   useEffect(() => {
+    // Set current year on client side to avoid hydration mismatch
+    setCurrentYear(new Date().getFullYear())
+
     const updateTime = () => {
       setCurrentTime(new Date().toLocaleTimeString())
     }
