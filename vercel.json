@@ -1,15 +1,8 @@
 {
-  "version": 2,
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
   "cleanUrls": true,
   "trailingSlash": true,
-  "rewrites": [
-    {
-      "source": "/:path*",
-      "destination": "/:path*"
-    }
-  ],
   "headers": [
     {
       "source": "/(.*)",
@@ -27,16 +20,6 @@
           "value": "1; mode=block"
         }
       ]
-    }
-  ],
-  "routes": [
-    {
-      "handle": "filesystem"
-    },
-    {
-      "src": "/(.*).txt",
-      "status": 404,
-      "dest": "/404.html"
     }
   ]
 }
