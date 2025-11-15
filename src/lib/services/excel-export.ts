@@ -338,6 +338,94 @@ export class ExcelExportService {
     return changesData
   }
 
+  /**
+   * Exporta análisis comparativo en formato Contexto.xlsx
+   * Formato: Razón Social, NIT, Año, Tabla con análisis horizontal
+   */
+  public static async exportContextoFormat(data: ComparativeAnalysisResponse): Promise<void> {
+    try {
+      const workbook = XLSX.utils.book_new()
+
+      // Estructura del archivo Contexto.xlsx
+      const contextoData: any[][] = []
+
+      // Fila 1: Vacía
+      contextoData.push(['', '', '', '', '', '', ''])
+
+      // Fila 2: Razón Social
+      contextoData.push(['', '', 'Razón Social', data.razon_social, '', '', ''])
+
+      // Fila 3: NIT
+      contextoData.push(['', '', 'Nit:', '', data.nit, '', ''])
+
+      // Fila 4: Año
+      contextoData.push(['', '', 'Año', data.current_year, '', '', ''])
+
+      // Fila 5: Vacía
+      contextoData.push(['', '', '', '', '', '', ''])
+
+      // Fila 6: Vacía
+      contextoData.push(['', '', '', '', '', '', ''])
+
+      // Fila 7: Encabezados de años
+      contextoData.push(['', '', '', '', `Año 2`, `Año 1`, ''])
+
+      // Fila 8: Encabezados de columnas
+      contextoData.push([
+        '',
+        '',
+        'Partida',
+        'Renglón',
+        `Cifra Renta \nFY ${data.current_year}`,
+        `Cifra Renta \nFY ${data.previous_year}`,
+        'Variación nominal',
+        'Variación relativa'
+      ])
+
+      // Agregar todas las variaciones
+      data.all_variations.forEach((variation: VariationAnalysis) => {
+        contextoData.push([
+          '',
+          '',
+          variation.field_name,
+          variation.line_number,
+          variation.current_value,
+          variation.previous_value,
+          variation.nominal_variation,
+          variation.relative_variation
+        ])
+      })
+
+      // Crear worksheet
+      const worksheet = XLSX.utils.aoa_to_sheet(contextoData)
+
+      // Configurar anchos de columna
+      worksheet['!cols'] = [
+        { wch: 2 },   // Columna A (vacía)
+        { wch: 2 },   // Columna B (vacía)
+        { wch: 30 },  // Columna C (Partida)
+        { wch: 10 },  // Columna D (Renglón)
+        { wch: 18 },  // Columna E (Año 2)
+        { wch: 18 },  // Columna F (Año 1)
+        { wch: 18 },  // Columna G (Variación nominal)
+        { wch: 18 }   // Columna H (Variación relativa)
+      ]
+
+      XLSX.utils.book_append_sheet(workbook, worksheet, 'Contexto')
+
+      // Generar nombre de archivo
+      const timestamp = new Date().toISOString().slice(0, 10)
+      const fileName = `Contexto_${data.razon_social.replace(/[^a-zA-Z0-9]/g, '_')}_${data.current_year}_${timestamp}.xlsx`
+
+      // Exportar archivo
+      XLSX.writeFile(workbook, fileName)
+
+    } catch (error) {
+      console.error('Error al exportar formato Contexto:', error)
+      throw new Error('Error al generar el archivo Excel en formato Contexto')
+    }
+  }
+
   // Función principal para exportar análisis comparativo
   public static async exportComparativeAnalysis(data: ComparativeAnalysisResponse): Promise<void> {
     try {

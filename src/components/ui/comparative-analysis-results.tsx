@@ -139,6 +139,19 @@ export function ComparativeAnalysisResults({ results, onClose }: ComparativeAnal
     }
   }
 
+  const handleExportContexto = async () => {
+    setIsExporting(true)
+    try {
+      await ExcelExportService.exportContextoFormat(results)
+      console.log('Archivo Excel formato Contexto exportado exitosamente')
+    } catch (error) {
+      console.error('Error al exportar formato Contexto:', error)
+      alert('Error al exportar formato Contexto. Por favor, inténtalo de nuevo.')
+    } finally {
+      setIsExporting(false)
+    }
+  }
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -353,12 +366,13 @@ export function ComparativeAnalysisResults({ results, onClose }: ComparativeAnal
               <div className="flex items-center justify-between">
                 <h3 className="font-semibold text-foreground">Análisis Detallado de Variaciones</h3>
                 <button
-                  onClick={handleExport}
+                  onClick={handleExportContexto}
                   disabled={isExporting}
-                  className="flex items-center gap-2 px-3 py-1 text-sm bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex items-center gap-2 px-3 py-1 text-sm bg-orange-600 hover:bg-orange-700 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  title="Exportar en formato Contexto.xlsx"
                 >
-                  <Download className="h-4 w-4" />
-                  {isExporting ? 'Exportando...' : 'Exportar'}
+                  <FileSpreadsheet className="h-4 w-4" />
+                  {isExporting ? 'Exportando...' : 'Exportar Excel'}
                 </button>
               </div>
             </div>
