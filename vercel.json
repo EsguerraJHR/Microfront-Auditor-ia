@@ -13,7 +13,7 @@
         },
         {
           "key": "Content-Security-Policy",
-          "value": "frame-ancestors 'self' https://auditoria-ejhr-assistant.vercel.app https://louisfrontendtest.vercel.app https://*.vercel.app http://localhost:* https://localhost:*"
+          "value": "frame-ancestors 'self' https://www.louis-legal.com https://louis-legal.com https://auditoria-ejhr-assistant.vercel.app https://louisfrontendtest.vercel.app https://*.vercel.app http://localhost:* https://localhost:*"
         }
       ]
     }

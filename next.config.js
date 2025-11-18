@@ -28,7 +28,7 @@ const nextConfig = {
             },
             {
               key: 'Content-Security-Policy',
-              value: "frame-ancestors 'self' http://localhost:* https://localhost:* https://auditoria-ejhr-assistant.vercel.app https://louisfrontendtest.vercel.app https://*.vercel.app"
+              value: "frame-ancestors 'self' https://www.louis-legal.com https://louis-legal.com http://localhost:* https://localhost:* https://auditoria-ejhr-assistant.vercel.app https://louisfrontendtest.vercel.app https://*.vercel.app"
             }
           ]
         }
