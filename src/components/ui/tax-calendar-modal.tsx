@@ -16,7 +16,10 @@ interface TaxCalendarModalProps {
 const formatDate = (dateString: string) => {
   if (!dateString) return 'No especificada'
   try {
-    const date = new Date(dateString)
+    // Separar la fecha en partes para evitar problemas de zona horaria
+    const [year, month, day] = dateString.split('-').map(Number)
+    // Crear fecha en zona horaria local (mes es 0-indexed)
+    const date = new Date(year, month - 1, day)
     return date.toLocaleDateString('es-CO', {
       year: 'numeric',
       month: 'long',

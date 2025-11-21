@@ -3,9 +3,11 @@
 import React, { useState } from "react"
 import { Upload, FileText, Loader2, X, Building, CheckCircle, AlertTriangle, Calendar, Clock, Users, DollarSign } from "lucide-react"
 import { FileUpload } from "@/components/ui/file-upload"
-import { declarationService, DetailedDeclarationResponse, UploadProgress, PagoDetalle } from "@/lib/api/declaration-service"
+import { declarationService, DetailedDeclarationResponse, UploadProgress, PagoDetalle, SSEProgressEvent } from "@/lib/api/declaration-service"
 import { taxCalendarService, GranContribuyenteResponse, PersonaJuridicaResponse } from "@/lib/api/tax-calendar-service"
 import { TaxCalendarModal } from "@/components/ui/tax-calendar-modal"
+import { ProgressBar } from "@/components/ui/progress-bar"
+import { FEATURES } from "@/config/features"
 
 export default function AnalisisEficaciaPage() {
   const [showUploadModal, setShowUploadModal] = useState(false)
@@ -13,6 +15,7 @@ export default function AnalisisEficaciaPage() {
   const [paymentFiles, setPaymentFiles] = useState<File[]>([])
   const [isUploading, setIsUploading] = useState(false)
   const [uploadProgress, setUploadProgress] = useState<UploadProgress | null>(null)
+  const [sseProgress, setSSEProgress] = useState<SSEProgressEvent | null>(null)
   const [extractionResult, setExtractionResult] = useState<DetailedDeclarationResponse | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [taxCalendar, setTaxCalendar] = useState<GranContribuyenteResponse | PersonaJuridicaResponse | null>(null)
@@ -42,13 +45,15 @@ export default function AnalisisEficaciaPage() {
 
     setIsUploading(true)
     setUploadProgress(null)
+    setSSEProgress(null)
     setError(null)
 
     try {
       const response = await declarationService.extractDetailedDeclaration(
         selectedFile,
         paymentFiles.length > 0 ? paymentFiles : undefined,
-        (progress) => setUploadProgress(progress)
+        (progress) => setUploadProgress(progress),
+        FEATURES.USE_SSE_PROGRESS ? (progress) => setSSEProgress(progress) : undefined
       )
 
       setExtractionResult(response)
@@ -64,6 +69,7 @@ export default function AnalisisEficaciaPage() {
     } finally {
       setIsUploading(false)
       setUploadProgress(null)
+      setSSEProgress(null)
     }
   }
 
@@ -207,7 +213,7 @@ export default function AnalisisEficaciaPage() {
               </div>
               <div>
                 <h3 className="text-xl font-bold text-orange-700 dark:text-orange-300">
-                  Calendario Tributario {declaracion?.ano_gravable}
+                  Calendario Tributario {declaracion?.ano_gravable ? declaracion.ano_gravable + 1 : ''}
                 </h3>
                 <p className="text-sm text-orange-600 dark:text-orange-400">
                   {extractionResult.es_gran_contribuyente ? 'Grandes Contribuyentes' : 'Personas Jurídicas'}
@@ -317,7 +323,7 @@ export default function AnalisisEficaciaPage() {
                 <span className="mx-2">•</span>
                 <span>Último dígito NIT: {taxCalendar.filtros_aplicados.ultimo_digito_nit}</span>
                 <span className="mx-2">•</span>
-                <span>Año gravable: {taxCalendar.filtros_aplicados.ano_gravable}</span>
+                <span>Año gravable: {taxCalendar.filtros_aplicados.ano_gravable || declaracion?.ano_gravable || 'N/A'}</span>
               </div>
             </div>
           </div>
@@ -545,6 +551,8 @@ export default function AnalisisEficaciaPage() {
                     maxFiles={1}
                     acceptedTypes={['application/pdf']}
                     maxFileSize={50}
+                    title="Cargar Declaración de Renta"
+                    description="Arrastra y suelta el archivo aquí o haz clic para seleccionar"
                   />
                 </div>
 
@@ -555,10 +563,23 @@ export default function AnalisisEficaciaPage() {
                     maxFiles={10}
                     acceptedTypes={['application/pdf']}
                     maxFileSize={50}
+                    title="Cargar Formularios Pago 490"
+                    description="Arrastra y suelta los archivos aquí o haz clic para seleccionar"
                   />
                 </div>
 
-                {uploadProgress && (
+                {/* Progress Bar - SSE Progress (si está habilitado) */}
+                {isUploading && FEATURES.USE_SSE_PROGRESS && sseProgress && (
+                  <div className="space-y-2">
+                    <ProgressBar
+                      percentage={sseProgress.percentage}
+                      message={sseProgress.message}
+                    />
+                  </div>
+                )}
+
+                {/* Progress Bar - Upload Progress (fallback o cuando SSE está deshabilitado) */}
+                {isUploading && !FEATURES.USE_SSE_PROGRESS && uploadProgress && (
                   <div className="space-y-2">
                     <div className="flex justify-between text-sm">
                       <span>Procesando archivos...</span>
@@ -570,6 +591,14 @@ export default function AnalisisEficaciaPage() {
                         style={{ width: `${uploadProgress.percentage}%` }}
                       ></div>
                     </div>
+                  </div>
+                )}
+
+                {/* Mensaje genérico si no hay progreso disponible aún */}
+                {isUploading && !sseProgress && !uploadProgress && (
+                  <div className="flex items-center gap-3 text-sm text-muted-foreground">
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    <span>Iniciando extracción...</span>
                   </div>
                 )}
 

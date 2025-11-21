@@ -15,6 +15,8 @@ interface FileUploadProps {
   acceptedTypes?: string[]
   maxFileSize?: number // in MB
   isUploading?: boolean
+  title?: string
+  description?: string
 }
 
 export function FileUpload({
@@ -22,7 +24,9 @@ export function FileUpload({
   maxFiles = 10,
   acceptedTypes = ['application/pdf', 'image/jpeg', 'image/png', 'image/jpg'],
   maxFileSize = 10,
-  isUploading = false
+  isUploading = false,
+  title = "Cargar Archivos RUT",
+  description = "Arrastra y suelta archivos aquí o haz clic para seleccionar"
 }: FileUploadProps) {
   const [files, setFiles] = useState<FileWithPreview[]>([])
   const [dragActive, setDragActive] = useState(false)
@@ -150,10 +154,10 @@ export function FileUpload({
 
           <div className="space-y-2">
             <h3 className="text-lg font-semibold text-foreground">
-              Cargar Archivos RUT
+              {title}
             </h3>
             <p className="text-sm text-muted-foreground">
-              Arrastra y suelta archivos aquí o haz clic para seleccionar
+              {description}
             </p>
             <p className="text-xs text-muted-foreground">
               PDF e imágenes (JPG, PNG) - Máximo {maxFileSize}MB por archivo

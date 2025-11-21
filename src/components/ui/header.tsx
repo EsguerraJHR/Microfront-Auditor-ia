@@ -13,7 +13,7 @@ export function Header({ onMenuToggle, isSidebarOpen }: HeaderProps) {
   const { theme, setTheme } = useTheme()
 
   return (
-    <header className="navbar-base h-16 flex items-center justify-between px-4 lg:px-6">
+    <header className="navbar-base h-16 flex items-center justify-between px-4 lg:px-6 hidden">
       <div className="flex items-center gap-4">
         {/* Menu Toggle Button */}
         <button
