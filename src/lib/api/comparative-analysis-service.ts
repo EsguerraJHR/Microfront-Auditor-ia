@@ -62,6 +62,69 @@ export interface StructureComparison {
   criterio_significancia: string
 }
 
+export interface TaxCoherenceEvaluation {
+  indice: string
+  valor_contribuyente: string
+  valor_sector: string | null
+  diferencia: string | null
+  nivel_riesgo: 'BAJO' | 'MEDIO' | 'ALTO' | 'CRITICO'
+  explicacion: string
+  icono: string
+}
+
+export interface TaxCoherenceData {
+  ano_gravable: number
+  datos_sectoriales: {
+    codigo_actividad: string
+    nombre_actividad: string
+    anio: number
+    total_ingresos_netos: number
+    renta_liquida_ordinaria: number
+    utilidad_fiscal: number
+  } | null
+  margen_utilidad_fiscal: {
+    valor: number
+    porcentaje: string
+  }
+  absorcion_ingresos: {
+    valor: number
+    porcentaje: string
+    alerta: boolean
+  }
+  tarifa_aplicada: {
+    valor: number
+    porcentaje: string
+    tarifa_esperada: string
+    correcto: boolean
+  }
+  tasa_efectiva: {
+    valor: number
+    porcentaje: string
+  }
+  proporcion_compensaciones: {
+    valor: number
+    porcentaje: string
+    alerta: boolean
+  }
+  proporcion_rentas_exentas: {
+    valor: number
+    porcentaje: string
+    alerta: boolean
+  }
+  nivel_endeudamiento: {
+    valor: number
+    porcentaje: string
+  }
+  retenciones_vs_impuesto: {
+    valor: number
+    porcentaje: string
+  }
+  evaluaciones: TaxCoherenceEvaluation[]
+  riesgo_global: 'BAJO' | 'MEDIO' | 'ALTO' | 'CRITICO'
+  resumen_ejecutivo: string
+  recomendaciones: string[]
+}
+
 export interface ComparativeAnalysisResponse {
   nit: string
   razon_social: string
@@ -79,6 +142,10 @@ export interface ComparativeAnalysisResponse {
   analisis_vertical_declaracion_current?: VerticalAnalysisYear
   analisis_vertical_declaracion_previous?: VerticalAnalysisYear
   estructura_comparacion?: StructureComparison
+
+  // Tax Coherence Fields
+  coherencia_tributaria_current?: TaxCoherenceData
+  coherencia_tributaria_previous?: TaxCoherenceData
 
   analysis_timestamp: string
   message: string

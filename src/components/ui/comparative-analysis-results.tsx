@@ -430,6 +430,9 @@ export function ComparativeAnalysisResults({ results, onClose }: ComparativeAnal
         <VerticalAnalysisView
           currentYear={results.analisis_vertical_declaracion_current}
           previousYear={results.analisis_vertical_declaracion_previous}
+          structureComparison={results.estructura_comparacion}
+          taxCoherenceCurrent={results.coherencia_tributaria_current}
+          taxCoherencePrevious={results.coherencia_tributaria_previous}
         />
       )}
 
