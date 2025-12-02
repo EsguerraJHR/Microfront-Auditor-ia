@@ -247,43 +247,45 @@ class ComparativeAnalysisService {
         // Mantener la última línea incompleta en el buffer
         buffer = lines.pop() || ''
 
-        for (let i = 0; i < lines.length; i++) {
-          const line = lines[i].trim()
+        let currentEvent: string | null = null
 
-          if (line.startsWith('event: progress')) {
-            // La siguiente línea contiene el data
-            const dataLine = lines[i + 1]
-            if (dataLine && dataLine.startsWith('data: ')) {
+        for (const line of lines) {
+          const trimmedLine = line.trim()
+
+          if (trimmedLine.startsWith('event:')) {
+            currentEvent = trimmedLine.substring(6).trim()
+          } else if (trimmedLine.startsWith('data:')) {
+            const dataContent = trimmedLine.substring(5).trim()
+
+            if (currentEvent === 'progress') {
               try {
-                const data = JSON.parse(dataLine.substring(6))
+                const data = JSON.parse(dataContent)
+                console.log('SSE Progress:', data)
                 onProgress({
                   percentage: data.percentage,
                   message: data.message
                 })
               } catch (e) {
-                console.error('Error parsing progress data:', e)
+                console.error('Error parsing progress data:', e, dataContent)
               }
-            }
-          } else if (line.startsWith('event: complete')) {
-            const dataLine = lines[i + 1]
-            if (dataLine && dataLine.startsWith('data: ')) {
+            } else if (currentEvent === 'complete') {
               try {
-                result = JSON.parse(dataLine.substring(6))
+                result = JSON.parse(dataContent)
+                console.log('SSE Complete received, result keys:', Object.keys(result || {}))
               } catch (e) {
-                console.error('Error parsing complete data:', e)
+                console.error('Error parsing complete data:', e, dataContent.substring(0, 100))
               }
-            }
-          } else if (line.startsWith('event: error')) {
-            const dataLine = lines[i + 1]
-            if (dataLine && dataLine.startsWith('data: ')) {
+            } else if (currentEvent === 'error') {
               try {
-                const error = JSON.parse(dataLine.substring(6))
+                const error = JSON.parse(dataContent)
                 throw new Error(error.error || 'Error en el análisis')
               } catch (e) {
                 if (e instanceof Error) throw e
                 throw new Error('Error desconocido en el análisis')
               }
             }
+
+            currentEvent = null
           }
         }
       }
