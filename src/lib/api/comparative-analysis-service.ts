@@ -237,55 +237,66 @@ class ComparativeAnalysisService {
     let buffer = ''
 
     try {
+      let currentEvent: string | null = null
+      let accumulatedData = ''
+
       while (true) {
         const { value, done } = await reader.read()
         if (done) break
 
         buffer += decoder.decode(value, { stream: true })
-        const lines = buffer.split('\n')
 
-        // Mantener la última línea incompleta en el buffer
-        buffer = lines.pop() || ''
+        // Procesar eventos completos separados por doble salto de línea
+        const events = buffer.split('\n\n')
 
-        let currentEvent: string | null = null
+        // El último elemento podría estar incompleto, mantenerlo en el buffer
+        buffer = events.pop() || ''
 
-        for (const line of lines) {
-          const trimmedLine = line.trim()
+        for (const eventText of events) {
+          const lines = eventText.split('\n')
+          currentEvent = null
+          accumulatedData = ''
 
-          if (trimmedLine.startsWith('event:')) {
-            currentEvent = trimmedLine.substring(6).trim()
-          } else if (trimmedLine.startsWith('data:')) {
-            const dataContent = trimmedLine.substring(5).trim()
+          for (const line of lines) {
+            const trimmedLine = line.trim()
 
+            if (trimmedLine.startsWith('event:')) {
+              currentEvent = trimmedLine.substring(6).trim()
+            } else if (trimmedLine.startsWith('data:')) {
+              // Acumular datos (pueden venir en múltiples líneas data:)
+              accumulatedData += trimmedLine.substring(5).trim()
+            }
+          }
+
+          // Procesar el evento acumulado
+          if (currentEvent && accumulatedData) {
             if (currentEvent === 'progress') {
               try {
-                const data = JSON.parse(dataContent)
+                const data = JSON.parse(accumulatedData)
                 console.log('SSE Progress:', data)
                 onProgress({
                   percentage: data.percentage,
                   message: data.message
                 })
               } catch (e) {
-                console.error('Error parsing progress data:', e, dataContent)
+                console.error('Error parsing progress data:', e)
               }
             } else if (currentEvent === 'complete') {
               try {
-                result = JSON.parse(dataContent)
+                result = JSON.parse(accumulatedData)
                 console.log('SSE Complete received, result keys:', Object.keys(result || {}))
               } catch (e) {
-                console.error('Error parsing complete data:', e, dataContent.substring(0, 100))
+                console.error('Error parsing complete data:', e, 'Data length:', accumulatedData.length)
               }
             } else if (currentEvent === 'error') {
               try {
-                const error = JSON.parse(dataContent)
+                const error = JSON.parse(accumulatedData)
                 throw new Error(error.error || 'Error en el análisis')
               } catch (e) {
                 if (e instanceof Error) throw e
                 throw new Error('Error desconocido en el análisis')
               }
             }
-
-            currentEvent = null
           }
         }
       }
