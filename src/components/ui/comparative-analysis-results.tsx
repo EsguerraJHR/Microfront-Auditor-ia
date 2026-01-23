@@ -2,8 +2,9 @@
 
 import { useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { TrendingUp, TrendingDown, Minus, Building, Calendar, X, Download, FileSpreadsheet, BarChart3, CheckCircle, Sparkles, ArrowUpRight, ArrowDownRight } from "lucide-react"
+import { TrendingUp, TrendingDown, Minus, Building, Calendar, X, Download, FileSpreadsheet, BarChart3, CheckCircle, Sparkles, ArrowUpRight, ArrowDownRight, FileText, Loader2 } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { getAuthHeaders } from "@/lib/utils/api-helpers"
 import { ComparativeAnalysisResponse, VariationAnalysis } from "@/lib/api/comparative-analysis-service"
 import { ExcelExportService } from "@/lib/services/excel-export"
 import { VerticalAnalysisView } from "./vertical-analysis-view"
@@ -192,6 +193,43 @@ function AnalysisCard({ title, analysis, icon, index = 0 }: AnalysisCardProps) {
 export function ComparativeAnalysisResults({ results, onClose }: ComparativeAnalysisResultsProps) {
   const [selectedTab, setSelectedTab] = useState<'summary' | 'details' | 'vertical' | 'structure'>('summary')
   const [isExporting, setIsExporting] = useState(false)
+  const [isGeneratingReport, setIsGeneratingReport] = useState(false)
+
+  const handleGenerateReport = async () => {
+    setIsGeneratingReport(true)
+    try {
+      const baseUrl = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8005'}/api/v1/compliance`
+      const response = await fetch(`${baseUrl}/analyze/declaration/comparative/report`, {
+        method: 'POST',
+        headers: getAuthHeaders(),
+        body: JSON.stringify(results)
+      })
+
+      if (!response.ok) {
+        let errorText = 'Error desconocido'
+        try {
+          const errorData = await response.json()
+          errorText = errorData.detail || errorData.message || `HTTP ${response.status}`
+        } catch {
+          errorText = `HTTP ${response.status} ${response.statusText}`
+        }
+        throw new Error(errorText)
+      }
+
+      const blob = await response.blob()
+      const url = window.URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `informe_tributario_${results.nit}_${results.current_year}.docx`
+      a.click()
+      window.URL.revokeObjectURL(url)
+    } catch (error) {
+      console.error('Error al generar reporte:', error)
+      alert(`Error al generar el reporte: ${error instanceof Error ? error.message : 'Error desconocido'}`)
+    } finally {
+      setIsGeneratingReport(false)
+    }
+  }
 
   const handleExport = async () => {
     setIsExporting(true)
@@ -272,16 +310,40 @@ export function ComparativeAnalysisResults({ results, onClose }: ComparativeAnal
                 </p>
               </div>
             </div>
-            {onClose && (
+            <div className="flex items-center gap-3">
               <motion.button
-                whileHover={{ scale: 1.1, rotate: 90 }}
-                whileTap={{ scale: 0.9 }}
-                onClick={onClose}
-                className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors"
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.3 }}
+                whileHover={{ scale: 1.05, boxShadow: "0 10px 30px rgba(249, 115, 22, 0.3)" }}
+                whileTap={{ scale: 0.95 }}
+                onClick={handleGenerateReport}
+                disabled={isGeneratingReport}
+                className="flex items-center gap-2 px-5 py-2.5 text-sm bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white rounded-xl transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <X className="h-5 w-5" />
+                {isGeneratingReport ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Generando...
+                  </>
+                ) : (
+                  <>
+                    <FileText className="h-4 w-4" />
+                    Generar Reporte
+                  </>
+                )}
               </motion.button>
-            )}
+              {onClose && (
+                <motion.button
+                  whileHover={{ scale: 1.1, rotate: 90 }}
+                  whileTap={{ scale: 0.9 }}
+                  onClick={onClose}
+                  className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors"
+                >
+                  <X className="h-5 w-5" />
+                </motion.button>
+              )}
+            </div>
           </div>
 
           <div className="grid grid-cols-3 gap-4">
