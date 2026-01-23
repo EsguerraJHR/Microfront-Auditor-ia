@@ -22,7 +22,7 @@ const containerVariants = {
       delayChildren: 0.1
     }
   }
-}
+} as const
 
 const itemVariants = {
   hidden: { opacity: 0, y: 20 },
@@ -30,7 +30,7 @@ const itemVariants = {
     opacity: 1,
     y: 0,
     transition: {
-      type: "spring",
+      type: "spring" as const,
       stiffness: 100,
       damping: 15
     }
@@ -43,7 +43,7 @@ const cardVariants = {
     opacity: 1,
     scale: 1,
     transition: {
-      type: "spring",
+      type: "spring" as const,
       stiffness: 100,
       damping: 15
     }
@@ -57,7 +57,7 @@ const tableRowVariants = {
     x: 0,
     transition: {
       delay: i * 0.05,
-      type: "spring",
+      type: "spring" as const,
       stiffness: 100,
       damping: 15
     }

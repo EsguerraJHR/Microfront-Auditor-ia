@@ -10,7 +10,7 @@ import { FEATURES } from "@/config/features"
 const overlayVariants = {
   hidden: { opacity: 0 },
   visible: { opacity: 1 }
-}
+} as const
 
 const modalVariants = {
   hidden: { opacity: 0, scale: 0.95, y: 20 },
@@ -19,7 +19,7 @@ const modalVariants = {
     scale: 1,
     y: 0,
     transition: {
-      type: "spring",
+      type: "spring" as const,
       stiffness: 300,
       damping: 30
     }
@@ -41,7 +41,7 @@ const contentVariants = {
       delayChildren: 0.2
     }
   }
-}
+} as const
 
 const itemVariants = {
   hidden: { opacity: 0, y: 10 },
@@ -49,7 +49,7 @@ const itemVariants = {
     opacity: 1,
     y: 0,
     transition: {
-      type: "spring",
+      type: "spring" as const,
       stiffness: 100
     }
   }
