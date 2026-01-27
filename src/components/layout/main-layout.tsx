@@ -12,6 +12,7 @@ interface MainLayoutProps {
 
 export function MainLayout({ children }: MainLayoutProps) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false)
 
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen)
@@ -21,15 +22,24 @@ export function MainLayout({ children }: MainLayoutProps) {
     setIsSidebarOpen(false)
   }
 
+  const toggleSidebarCollapse = () => {
+    setIsSidebarCollapsed(!isSidebarCollapsed)
+  }
+
   return (
     <div className="min-h-screen bg-gradient-main">
       {/* Sidebar */}
-      <Sidebar isOpen={isSidebarOpen} onClose={closeSidebar} />
+      <Sidebar
+        isOpen={isSidebarOpen}
+        onClose={closeSidebar}
+        isCollapsed={isSidebarCollapsed}
+        onToggleCollapse={toggleSidebarCollapse}
+      />
 
       {/* Main Content Area */}
       <div className={cn(
         "min-h-screen transition-all duration-300",
-        "lg:ml-80" // Always offset by sidebar width on desktop
+        isSidebarCollapsed ? "lg:ml-20" : "lg:ml-80"
       )}>
         {/* Header */}
         <Header onMenuToggle={toggleSidebar} isSidebarOpen={isSidebarOpen} />

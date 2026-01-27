@@ -8,6 +8,7 @@ import { accountingClientService, AccountingClient } from "@/lib/api/accounting-
 import { FileUpload } from "@/components/ui/file-upload"
 import { RutResults } from "@/components/ui/rut-results"
 import { ExcelExportService } from "@/lib/services/excel-export"
+import { RinganaExcelExportService, RINGANA_CODIGO_EMPRESA } from "@/lib/services/ringana-excel-export"
 
 type TerceroType = 'cliente' | 'proveedor'
 
@@ -29,6 +30,14 @@ export default function TercerosPage() {
   const [extractionProgress, setExtractionProgress] = useState<UploadProgress | null>(null)
   const [extractionResults, setExtractionResults] = useState<RutExtractionWithClientResponse | null>(null)
   const [extractionError, setExtractionError] = useState<string | null>(null)
+
+  // Ringana export result state
+  const [ringanaExportResult, setRinganaExportResult] = useState<{
+    naturales: number
+    juridicas: number
+    archivos: string[]
+  } | null>(null)
+  const [isExporting, setIsExporting] = useState(false)
 
   const loadAccountingClients = async () => {
     setIsLoadingAccountingClients(true)
@@ -55,6 +64,7 @@ export default function TercerosPage() {
     setSelectedFiles([])
     setExtractionResults(null)
     setExtractionError(null)
+    setRinganaExportResult(null)
   }
 
   const handleTypeChange = (type: TerceroType) => {
@@ -104,48 +114,69 @@ export default function TercerosPage() {
   }
 
   const handleGenerateExcel = async () => {
-    if (!extractionResults || !selectedAccountingClient) {
+    if (!extractionResults || !selectedAccountingClient || !selectedType) {
       return
     }
+
+    setIsExporting(true)
+    setRinganaExportResult(null)
 
     try {
       console.log('Selected Accounting Client:', selectedAccountingClient)
       console.log('Codigo Empresa:', selectedAccountingClient.codigo_empresa)
 
-      // Convertir los resultados al formato RutDetails
-      const rutDetails: RutDetails[] = extractionResults.results
-        .filter(result => result.success && result.data)
-        .map(result => {
-          const rutData = result.data!.rut_data
-          return {
-            id: 0, // No tenemos ID aún
-            nit: rutData.nit,
-            dv: rutData.dv,
-            numero_formulario: rutData.numero_formulario,
-            razon_social: rutData.razon_social,
-            nombre_comercial: rutData.nombre_comercial,
-            tipo_contribuyente: rutData.tipo_contribuyente,
-            pais: rutData.pais,
-            departamento: rutData.departamento,
-            ciudad_municipio: rutData.ciudad_municipio,
-            direccion_principal: rutData.direccion_principal,
-            telefono_1: rutData.telefono_1,
-            correo_electronico: rutData.correo_electronico,
-            actividad_principal_codigo: rutData.actividad_principal_codigo,
-            processing_state: 'LISTO',
-            representantes_legales: rutData.representantes_legales,
-            created_at: rutData.extraction_timestamp,
-            updated_at: null,
-            original_filename: result.filename
-          }
-        })
+      // Verificar si es Ringana (código 17)
+      const esRingana = selectedAccountingClient.codigo_empresa === RINGANA_CODIGO_EMPRESA
 
-      // Pasar el codigo_empresa del cliente de contabilidad seleccionado
-      console.log('Calling exportToExcel with codigo_empresa:', selectedAccountingClient.codigo_empresa)
-      await ExcelExportService.exportToExcel(rutDetails, selectedAccountingClient.codigo_empresa)
+      if (esRingana) {
+        // Usar servicio especializado de Ringana
+        console.log('Exportando para Ringana - separando por tipo de contribuyente')
+
+        const resultado = await RinganaExcelExportService.exportRingana(
+          extractionResults.results,
+          selectedType
+        )
+
+        setRinganaExportResult(resultado)
+
+        console.log('Exportación Ringana completada:', resultado)
+      } else {
+        // Usar servicio estándar para otros clientes
+        const rutDetails: RutDetails[] = extractionResults.results
+          .filter(result => result.success && result.data)
+          .map(result => {
+            const rutData = result.data!.rut_data
+            return {
+              id: 0,
+              nit: rutData.nit,
+              dv: rutData.dv,
+              numero_formulario: rutData.numero_formulario,
+              razon_social: rutData.razon_social,
+              nombre_comercial: rutData.nombre_comercial,
+              tipo_contribuyente: rutData.tipo_contribuyente,
+              pais: rutData.pais,
+              departamento: rutData.departamento,
+              ciudad_municipio: rutData.ciudad_municipio,
+              direccion_principal: rutData.direccion_principal,
+              telefono_1: rutData.telefono_1,
+              correo_electronico: rutData.correo_electronico,
+              actividad_principal_codigo: rutData.actividad_principal_codigo,
+              processing_state: 'LISTO',
+              representantes_legales: rutData.representantes_legales,
+              created_at: rutData.extraction_timestamp,
+              updated_at: null,
+              original_filename: result.filename
+            }
+          })
+
+        console.log('Calling exportToExcel with codigo_empresa:', selectedAccountingClient.codigo_empresa)
+        await ExcelExportService.exportToExcel(rutDetails, selectedAccountingClient.codigo_empresa)
+      }
     } catch (error) {
       console.error('Error generating Excel:', error)
       setExtractionError(error instanceof Error ? error.message : 'Error al generar el archivo Excel')
+    } finally {
+      setIsExporting(false)
     }
   }
 
@@ -414,11 +445,82 @@ export default function TercerosPage() {
                   {extractionResults.successful_extractions > 0 && (
                     <button
                       onClick={handleGenerateExcel}
-                      className="w-full btn-primary flex items-center justify-center gap-2"
+                      disabled={isExporting}
+                      className="w-full btn-primary flex items-center justify-center gap-2 disabled:opacity-50"
                     >
-                      <Download className="h-5 w-5" />
-                      Generar Formato {selectedType === 'cliente' ? 'Clientes' : 'Proveedores'}
+                      {isExporting ? (
+                        <>
+                          <Loader2 className="h-5 w-5 animate-spin" />
+                          Generando archivos...
+                        </>
+                      ) : (
+                        <>
+                          <Download className="h-5 w-5" />
+                          {selectedAccountingClient?.codigo_empresa === RINGANA_CODIGO_EMPRESA
+                            ? 'Generar Formatos Ringana (Separado por tipo)'
+                            : `Generar Formato ${selectedType === 'cliente' ? 'Clientes' : 'Proveedores'}`
+                          }
+                        </>
+                      )}
                     </button>
+                  )}
+
+                  {/* Ringana Export Result */}
+                  {ringanaExportResult && (
+                    <div className="p-4 bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded-lg">
+                      <div className="space-y-3">
+                        <div className="flex items-center gap-2">
+                          <CheckCircle className="h-5 w-5 text-purple-600" />
+                          <span className="font-medium text-purple-800 dark:text-purple-200">
+                            Exportación Ringana completada
+                          </span>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-4 text-sm">
+                          <div className="flex items-center gap-2">
+                            <span className="text-2xl">👤</span>
+                            <div>
+                              <p className="font-semibold text-emerald-700 dark:text-emerald-300">
+                                {ringanaExportResult.naturales} Personas Naturales
+                              </p>
+                              {ringanaExportResult.naturales > 0 && (
+                                <p className="text-xs text-muted-foreground">
+                                  2 archivos generados
+                                </p>
+                              )}
+                            </div>
+                          </div>
+
+                          <div className="flex items-center gap-2">
+                            <span className="text-2xl">🏢</span>
+                            <div>
+                              <p className="font-semibold text-blue-700 dark:text-blue-300">
+                                {ringanaExportResult.juridicas} Personas Jurídicas
+                              </p>
+                              {ringanaExportResult.juridicas > 0 && (
+                                <p className="text-xs text-muted-foreground">
+                                  1 archivo generado
+                                </p>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="pt-2 border-t border-purple-200 dark:border-purple-700">
+                          <p className="text-xs text-purple-700 dark:text-purple-300 font-medium mb-1">
+                            Archivos descargados:
+                          </p>
+                          <ul className="text-xs text-muted-foreground space-y-1">
+                            {ringanaExportResult.archivos.map((archivo, index) => (
+                              <li key={index} className="flex items-center gap-1">
+                                <FileText className="h-3 w-3" />
+                                {archivo}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      </div>
+                    </div>
                   )}
                 </div>
               )}

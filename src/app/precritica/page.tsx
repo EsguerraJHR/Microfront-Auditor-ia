@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState } from "react"
+import React, { useState, useEffect, useCallback } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import {
   BarChart3,
@@ -11,11 +11,16 @@ import {
   Sparkles,
   CheckCircle2,
   Clock,
-  Target
+  Target,
+  Trash2,
+  Eye,
+  Loader2,
+  History,
+  AlertCircle
 } from "lucide-react"
 import { ComparativeAnalysisModal } from "@/components/ui/comparative-analysis-modal"
 import { ComparativeAnalysisResults } from "@/components/ui/comparative-analysis-results"
-import { ComparativeAnalysisResponse } from "@/lib/api/comparative-analysis-service"
+import { ComparativeAnalysisResponse, RevisionResponse, comparativeAnalysisService } from "@/lib/api/comparative-analysis-service"
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -82,8 +87,69 @@ export default function PrecriticaPage() {
   const [showComparativeModal, setShowComparativeModal] = useState(false)
   const [comparativeAnalysisResult, setComparativeAnalysisResult] = useState<ComparativeAnalysisResponse | null>(null)
 
+  // Revision history
+  const [revisions, setRevisions] = useState<RevisionResponse[]>([])
+  const [isLoadingRevisions, setIsLoadingRevisions] = useState(false)
+  const [deletingRevisionId, setDeletingRevisionId] = useState<string | null>(null)
+  const [loadingRevisionId, setLoadingRevisionId] = useState<string | null>(null)
+  const [revisionError, setRevisionError] = useState<string | null>(null)
+
+  const loadRevisions = useCallback(async () => {
+    setIsLoadingRevisions(true)
+    setRevisionError(null)
+    try {
+      const data = await comparativeAnalysisService.listRevisions()
+      setRevisions(data)
+    } catch (error) {
+      console.error('Error loading revisions:', error)
+      setRevisionError('No se pudieron cargar las revisiones')
+    } finally {
+      setIsLoadingRevisions(false)
+    }
+  }, [])
+
+  useEffect(() => {
+    loadRevisions()
+  }, [loadRevisions])
+
+  const handleDeleteRevision = async (id: number | string) => {
+    if (!confirm('¿Estás seguro de que deseas eliminar esta revisión?')) return
+
+    const idStr = String(id)
+    setDeletingRevisionId(idStr)
+    try {
+      await comparativeAnalysisService.deleteRevision(idStr)
+      setRevisions(prev => prev.filter(r => String(r.id) !== idStr))
+    } catch (error) {
+      console.error('Error deleting revision:', error)
+      alert('Error al eliminar la revisión')
+    } finally {
+      setDeletingRevisionId(null)
+    }
+  }
+
+  const handleViewRevision = async (revision: RevisionResponse) => {
+    const idStr = String(revision.id)
+    setLoadingRevisionId(idStr)
+    try {
+      // Always fetch full revision to get analysis_data
+      const fullRevision = await comparativeAnalysisService.getRevision(idStr)
+      if (fullRevision.analysis_data) {
+        setComparativeAnalysisResult(fullRevision.analysis_data)
+      } else {
+        alert('Esta revisión aún no tiene resultados de análisis.')
+      }
+    } catch (error) {
+      console.error('Error fetching revision:', error)
+      alert('Error al cargar los resultados de la revisión')
+    } finally {
+      setLoadingRevisionId(null)
+    }
+  }
+
   const handleComparativeAnalysisComplete = (result: ComparativeAnalysisResponse) => {
     setComparativeAnalysisResult(result)
+    loadRevisions()
   }
 
   return (
@@ -121,9 +187,7 @@ export default function PrecriticaPage() {
                 </motion.div>
 
                 <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4">
-                  Pre-Crítica de
-                  <br />
-                  <span className="text-yellow-200">Declaraciones de Renta</span>
+                  <span className="text-yellow-200">Diagnostico Tributario</span>
                 </h1>
 
                 <p className="text-lg text-white/90 max-w-2xl mb-8">
@@ -194,6 +258,123 @@ export default function PrecriticaPage() {
                   <div className="text-sm text-muted-foreground">{stat.label}</div>
                 </motion.div>
               ))}
+            </motion.div>
+
+            {/* Revision History Section */}
+            <motion.div variants={itemVariants}>
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-3">
+                  <History className="h-6 w-6 text-orange-500" />
+                  <h2 className="text-2xl font-bold text-foreground">
+                    Historial de Revisiones
+                  </h2>
+                </div>
+                {!isLoadingRevisions && (
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={loadRevisions}
+                    className="text-sm text-orange-600 hover:text-orange-700 font-medium"
+                  >
+                    Actualizar
+                  </motion.button>
+                )}
+              </div>
+
+              {isLoadingRevisions ? (
+                <div className="flex items-center justify-center py-12 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl">
+                  <Loader2 className="h-6 w-6 text-orange-500 animate-spin mr-3" />
+                  <span className="text-muted-foreground">Cargando revisiones...</span>
+                </div>
+              ) : revisionError ? (
+                <div className="flex items-center justify-center gap-3 py-12 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl">
+                  <AlertCircle className="h-5 w-5 text-red-500" />
+                  <span className="text-muted-foreground">{revisionError}</span>
+                </div>
+              ) : revisions.length === 0 ? (
+                <div className="text-center py-12 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl">
+                  <History className="h-10 w-10 text-gray-300 dark:text-gray-700 mx-auto mb-3" />
+                  <p className="text-muted-foreground">No hay revisiones aún.</p>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Inicia un análisis comparativo para crear tu primera revisión.
+                  </p>
+                </div>
+              ) : (
+                <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl overflow-hidden">
+                  <div className="overflow-x-auto">
+                    <table className="w-full">
+                      <thead>
+                        <tr className="border-b border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-800/50">
+                          <th className="text-left text-xs font-medium text-muted-foreground uppercase tracking-wider px-6 py-3">Cliente</th>
+                          <th className="text-left text-xs font-medium text-muted-foreground uppercase tracking-wider px-6 py-3">NIT</th>
+                          <th className="text-left text-xs font-medium text-muted-foreground uppercase tracking-wider px-6 py-3">Mes</th>
+                          <th className="text-left text-xs font-medium text-muted-foreground uppercase tracking-wider px-6 py-3">Fecha</th>
+                          <th className="text-left text-xs font-medium text-muted-foreground uppercase tracking-wider px-6 py-3">Estado</th>
+                          <th className="text-right text-xs font-medium text-muted-foreground uppercase tracking-wider px-6 py-3">Acciones</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-gray-200 dark:divide-gray-800">
+                        {revisions.map((revision) => (
+                          <motion.tr
+                            key={revision.id}
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            className="hover:bg-gray-50 dark:hover:bg-gray-800/30 transition-colors"
+                          >
+                            <td className="px-6 py-4 text-sm font-medium text-foreground">{revision.nombre_cliente}</td>
+                            <td className="px-6 py-4 text-sm text-muted-foreground">{revision.nit}</td>
+                            <td className="px-6 py-4 text-sm text-muted-foreground">{revision.mes}</td>
+                            <td className="px-6 py-4 text-sm text-muted-foreground">{revision.fecha_revision}</td>
+                            <td className="px-6 py-4">
+                              <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                                revision.status === 'completed'
+                                  ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
+                                  : revision.status === 'pending'
+                                    ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400'
+                                    : 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400'
+                              }`}>
+                                {revision.status === 'completed' ? 'Completado' : revision.status === 'pending' ? 'Pendiente' : revision.status}
+                              </span>
+                            </td>
+                            <td className="px-6 py-4 text-right">
+                              <div className="flex items-center justify-end gap-2">
+                                <motion.button
+                                  whileHover={{ scale: 1.1 }}
+                                  whileTap={{ scale: 0.9 }}
+                                  onClick={() => handleViewRevision(revision)}
+                                  disabled={loadingRevisionId === String(revision.id)}
+                                  className="p-2 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors disabled:opacity-50"
+                                  title="Ver resultados"
+                                >
+                                  {loadingRevisionId === String(revision.id) ? (
+                                    <Loader2 className="h-4 w-4 animate-spin" />
+                                  ) : (
+                                    <Eye className="h-4 w-4" />
+                                  )}
+                                </motion.button>
+                                <motion.button
+                                  whileHover={{ scale: 1.1 }}
+                                  whileTap={{ scale: 0.9 }}
+                                  onClick={() => handleDeleteRevision(revision.id)}
+                                  disabled={deletingRevisionId === String(revision.id)}
+                                  className="p-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors disabled:opacity-50"
+                                  title="Eliminar revisión"
+                                >
+                                  {deletingRevisionId === String(revision.id) ? (
+                                    <Loader2 className="h-4 w-4 animate-spin" />
+                                  ) : (
+                                    <Trash2 className="h-4 w-4" />
+                                  )}
+                                </motion.button>
+                              </div>
+                            </td>
+                          </motion.tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
             </motion.div>
 
             {/* Features Section */}

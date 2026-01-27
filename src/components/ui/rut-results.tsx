@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { CheckCircle, AlertCircle, XCircle, Eye, EyeOff, Download, FileText, Building, User, Phone, Mail, Calendar } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { RutExtractionResponse, RutExtractionWithClientResponse, ExtractionResult, ExtractionResultWithClient, RutData } from "@/lib/api/rut-service"
+import { RutExtractionResponse, RutExtractionWithClientResponse, ExtractionResult, ExtractionResultWithClient, RutData, DeteccionTipo } from "@/lib/api/rut-service"
 
 const formatPhone = (phone: string) => {
   if (!phone) return 'No disponible'
@@ -30,6 +30,47 @@ const getRutDataFromResult = (result: ExtractionResult | ExtractionResultWithCli
 
 const isClientResponse = (results: RutExtractionResponse | RutExtractionWithClientResponse): results is RutExtractionWithClientResponse => {
   return 'cliente_proveedor' in results
+}
+
+// Helper para obtener detección de tipo de un resultado
+const getDeteccionTipo = (result: ExtractionResult | ExtractionResultWithClient): DeteccionTipo | null => {
+  if (!result.success || !result.data) return null
+
+  // Solo existe en el formato con cliente
+  if ('rut_data' in result.data && 'deteccion_tipo' in result.data) {
+    return (result.data as any).deteccion_tipo || null
+  }
+
+  return null
+}
+
+// Componente Badge para tipo de contribuyente
+const TipoContribuyenteBadge = ({ deteccion }: { deteccion: DeteccionTipo | null }) => {
+  if (!deteccion) {
+    return (
+      <span className="px-2 py-1 text-xs bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300 rounded-full">
+        RUT Existente
+      </span>
+    )
+  }
+
+  const isJuridica = deteccion.tipo_contribuyente_detectado === 'JURIDICA'
+
+  return (
+    <span
+      className={cn(
+        "px-2 py-1 text-xs rounded-full inline-flex items-center gap-1",
+        isJuridica
+          ? "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300"
+          : "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300"
+      )}
+      title={deteccion.fallback ? `Fallback desde: ${deteccion.agente_principal_fallido}` : `Agente: ${deteccion.agente_usado}`}
+    >
+      {isJuridica ? '🏢' : '👤'}
+      {isJuridica ? 'Persona Jurídica' : 'Persona Natural'}
+      {deteccion.fallback && <span className="text-amber-500">⚠</span>}
+    </span>
+  )
 }
 
 interface RutResultsProps {
@@ -208,6 +249,10 @@ export function RutResults({ results, onClose }: RutResultsProps) {
                 </div>
 
                 <div className="flex items-center gap-2">
+                  {/* Badge de tipo de contribuyente detectado */}
+                  {result.success && isClientResponse(results) && (
+                    <TipoContribuyenteBadge deteccion={getDeteccionTipo(result)} />
+                  )}
                   {result.excel_written && (
                     <span className="px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded-full">
                       Excel generado

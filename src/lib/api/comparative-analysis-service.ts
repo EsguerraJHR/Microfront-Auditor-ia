@@ -165,6 +165,33 @@ export interface UploadProgress {
   percentage: number
 }
 
+// Revision Types
+export interface RevisionCreateData {
+  nombre_cliente: string
+  nit: string
+  mes: string
+  fecha_revision: string
+}
+
+export interface RevisionResponse {
+  id: number | string
+  nombre_cliente: string
+  nit: string
+  mes: string
+  fecha_revision: string
+  user_id?: string
+  status: string
+  razon_social?: string
+  current_year?: number
+  previous_year?: number
+  riesgo_global_current?: string
+  riesgo_global_previous?: string
+  analysis_data?: ComparativeAnalysisResponse
+  error_message?: string | null
+  created_at: string
+  updated_at?: string
+}
+
 class ComparativeAnalysisService {
   private baseUrl = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8005'}/api/v1/compliance`
 
@@ -176,6 +203,7 @@ class ComparativeAnalysisService {
   async analyzeDeclarationComparative(
     currentYearFile: File,
     previousYearFile: File,
+    revisionId: string,
     onProgress?: (progress: UploadProgress) => void,
     onSSEProgress?: (progress: SSEProgressEvent) => void
   ): Promise<ComparativeAnalysisResponse> {
@@ -190,6 +218,7 @@ class ComparativeAnalysisService {
     const formData = new FormData()
     formData.append('current_year_file', currentYearFile)
     formData.append('previous_year_file', previousYearFile)
+    formData.append('revision_id', revisionId)
 
     // Elegir endpoint según feature flag
     if (FEATURES.USE_SSE_PROGRESS && onSSEProgress) {
@@ -351,6 +380,76 @@ class ComparativeAnalysisService {
         throw error
       }
       throw new Error('Error desconocido durante el análisis comparativo')
+    }
+  }
+
+  /**
+   * Crea una nueva revisión con los datos del cliente
+   */
+  async createRevision(data: RevisionCreateData): Promise<RevisionResponse> {
+    const response = await fetch(`${this.baseUrl}/analyze/declaration/comparative/revisions`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(data)
+    })
+
+    if (!response.ok) {
+      let errorText = 'Error desconocido'
+      try {
+        const errorData = await response.json()
+        errorText = errorData.detail || errorData.message || `HTTP ${response.status}`
+      } catch {
+        errorText = `HTTP ${response.status} ${response.statusText}`
+      }
+      throw new Error(`Error al crear revisión: ${errorText}`)
+    }
+
+    return await response.json()
+  }
+
+  /**
+   * Obtiene la lista de revisiones
+   */
+  async listRevisions(): Promise<RevisionResponse[]> {
+    const response = await fetch(`${this.baseUrl}/analyze/declaration/comparative/revisions`, {
+      method: 'GET',
+      headers: getAuthHeaders()
+    })
+
+    if (!response.ok) {
+      throw new Error(`Error al obtener revisiones: HTTP ${response.status}`)
+    }
+
+    return await response.json()
+  }
+
+  /**
+   * Obtiene una revisión por su ID
+   */
+  async getRevision(id: string): Promise<RevisionResponse> {
+    const response = await fetch(`${this.baseUrl}/analyze/declaration/comparative/revisions/${id}`, {
+      method: 'GET',
+      headers: getAuthHeaders()
+    })
+
+    if (!response.ok) {
+      throw new Error(`Error al obtener revisión: HTTP ${response.status}`)
+    }
+
+    return await response.json()
+  }
+
+  /**
+   * Elimina una revisión por su ID
+   */
+  async deleteRevision(id: string): Promise<void> {
+    const response = await fetch(`${this.baseUrl}/analyze/declaration/comparative/revisions/${id}`, {
+      method: 'DELETE',
+      headers: getAuthHeaders()
+    })
+
+    if (!response.ok) {
+      throw new Error(`Error al eliminar revisión: HTTP ${response.status}`)
     }
   }
 

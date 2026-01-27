@@ -84,6 +84,15 @@ export interface AsociacionInfo {
   observaciones: string
 }
 
+// Metadata de detección automática de tipo de contribuyente
+export interface DeteccionTipo {
+  tipo_contribuyente_detectado: 'JURIDICA' | 'NATURAL'
+  agente_usado: string
+  deteccion_automatica: boolean
+  fallback?: boolean
+  agente_principal_fallido?: string
+}
+
 export interface ExtractionResultWithClient {
   filename: string
   success: boolean
@@ -92,6 +101,7 @@ export interface ExtractionResultWithClient {
     cliente_proveedor: ClientProviderInfo
     asociacion: AsociacionInfo
     message: string
+    deteccion_tipo?: DeteccionTipo | null  // Metadata de detección automática (null si RUT existente)
   } | null
   error: string | null
   excel_written: boolean
