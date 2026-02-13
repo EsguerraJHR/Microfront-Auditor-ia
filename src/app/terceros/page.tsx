@@ -9,6 +9,7 @@ import { FileUpload } from "@/components/ui/file-upload"
 import { RutResults } from "@/components/ui/rut-results"
 import { ExcelExportService } from "@/lib/services/excel-export"
 import { RinganaExcelExportService, RINGANA_CODIGO_EMPRESA } from "@/lib/services/ringana-excel-export"
+import { getAuthHeaders } from "@/lib/utils/api-helpers"
 
 type TerceroType = 'cliente' | 'proveedor'
 
@@ -38,6 +39,10 @@ export default function TercerosPage() {
     archivos: string[]
   } | null>(null)
   const [isExporting, setIsExporting] = useState(false)
+
+  // Crossmatch provisions state
+  const [isCrossmatchLoading, setIsCrossmatchLoading] = useState(false)
+  const crossmatchInputRef = useRef<HTMLInputElement>(null)
 
   const loadAccountingClients = async () => {
     setIsLoadingAccountingClients(true)
@@ -177,6 +182,71 @@ export default function TercerosPage() {
       setExtractionError(error instanceof Error ? error.message : 'Error al generar el archivo Excel')
     } finally {
       setIsExporting(false)
+    }
+  }
+
+  const handleCrossmatchProvisiones = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (!file) return
+
+    setIsCrossmatchLoading(true)
+    setExtractionError(null)
+
+    try {
+      const formData = new FormData()
+      formData.append('file', file)
+
+      // Obtener headers de autenticación y remover Content-Type para que el browser lo configure
+      const authHeaders = getAuthHeaders() as Record<string, string>
+      const { 'Content-Type': _, ...headersWithoutContentType } = authHeaders
+
+      const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
+      const response = await fetch(
+        `${baseUrl}/api/v1/compliance/provisions/crossmatch-rut/download`,
+        {
+          method: 'POST',
+          body: formData,
+          headers: headersWithoutContentType,
+        }
+      )
+
+      if (!response.ok) {
+        const error = await response.json()
+        throw new Error(error.detail || 'Error al procesar archivo')
+      }
+
+      // Obtener el blob del Excel
+      const blob = await response.blob()
+
+      // Extraer nombre del archivo del header Content-Disposition
+      const contentDisposition = response.headers.get('Content-Disposition')
+      let filename = 'provisiones_con_status.xlsx'
+      if (contentDisposition) {
+        const match = contentDisposition.match(/filename="(.+)"/)
+        if (match) filename = match[1]
+      }
+
+      // Crear link de descarga y ejecutar
+      const url = window.URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.href = url
+      link.download = filename
+      document.body.appendChild(link)
+      link.click()
+
+      // Limpiar
+      document.body.removeChild(link)
+      window.URL.revokeObjectURL(url)
+
+    } catch (error) {
+      console.error('Error en crossmatch de provisiones:', error)
+      setExtractionError(error instanceof Error ? error.message : 'Error al procesar el archivo de provisiones')
+    } finally {
+      setIsCrossmatchLoading(false)
+      // Reset input para permitir seleccionar el mismo archivo de nuevo
+      if (crossmatchInputRef.current) {
+        crossmatchInputRef.current.value = ''
+      }
     }
   }
 
@@ -518,6 +588,46 @@ export default function TercerosPage() {
                               </li>
                             ))}
                           </ul>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Crossmatch Provisiones Button */}
+                  {extractionResults.successful_extractions > 0 && (
+                    <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
+                      <div className="space-y-2">
+                        <p className="text-sm font-medium text-foreground">
+                          Cruce con Provisiones
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          Sube un archivo Excel de provisiones para cruzar con los RUTs extraídos y obtener el status de cada tercero.
+                        </p>
+                        <div className="relative">
+                          <input
+                            ref={crossmatchInputRef}
+                            type="file"
+                            accept=".xlsx,.xls"
+                            onChange={handleCrossmatchProvisiones}
+                            disabled={isCrossmatchLoading}
+                            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer disabled:cursor-not-allowed"
+                          />
+                          <button
+                            disabled={isCrossmatchLoading}
+                            className="w-full btn-secondary flex items-center justify-center gap-2 disabled:opacity-50 border-2 border-dashed border-orange-300 dark:border-orange-700 hover:border-orange-400 dark:hover:border-orange-600 bg-orange-50 dark:bg-orange-900/20 text-orange-700 dark:text-orange-300"
+                          >
+                            {isCrossmatchLoading ? (
+                              <>
+                                <Loader2 className="h-5 w-5 animate-spin" />
+                                Procesando provisiones...
+                              </>
+                            ) : (
+                              <>
+                                <FileText className="h-5 w-5" />
+                                Subir Excel de Provisiones y Descargar Cruce
+                              </>
+                            )}
+                          </button>
                         </div>
                       </div>
                     </div>

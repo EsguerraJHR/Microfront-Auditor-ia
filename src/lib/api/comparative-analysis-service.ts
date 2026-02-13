@@ -1,6 +1,14 @@
 import { getAuthHeaders } from '@/lib/utils/api-helpers'
 import { FEATURES } from '@/config/features'
 
+// URL para SSE (puede ser directa al backend si el gateway no soporta streaming)
+const getSSEBaseUrl = () => {
+  if (FEATURES.SSE_DIRECT_URL) {
+    return `${FEATURES.SSE_DIRECT_URL}/api/v1/compliance`
+  }
+  return `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8005'}/api/v1/compliance`
+}
+
 // Types for SSE Progress Events
 export interface SSEProgressEvent {
   percentage: number
@@ -238,7 +246,11 @@ class ComparativeAnalysisService {
     const authHeaders = getAuthHeaders()
     const { 'Content-Type': _, ...headersWithoutContentType } = authHeaders as Record<string, string>
 
-    const response = await fetch(`${this.baseUrl}/analyze/declaration/comparative/stream`, {
+    // Usar URL directa para SSE si está configurada (bypass del gateway)
+    const sseUrl = getSSEBaseUrl()
+    console.log('Comparative Analysis SSE URL:', `${sseUrl}/analyze/declaration/comparative/stream`)
+
+    const response = await fetch(`${sseUrl}/analyze/declaration/comparative/stream`, {
       method: 'POST',
       body: formData,
       mode: 'cors',

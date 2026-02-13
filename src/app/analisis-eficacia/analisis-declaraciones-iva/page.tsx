@@ -1,0 +1,1138 @@
+"use client"
+
+import React, { useState, useEffect } from "react"
+import { motion, AnimatePresence } from "framer-motion"
+import {
+  Upload,
+  FileText,
+  Loader2,
+  ArrowLeft,
+  Receipt,
+  CheckCircle2,
+  AlertCircle,
+  Sparkles,
+  FileSpreadsheet,
+  Trash2,
+  Plus,
+  Building,
+  Calendar,
+  TrendingUp,
+  TrendingDown,
+  DollarSign,
+  ChevronDown,
+  ChevronUp,
+  Hash,
+  ClipboardCheck,
+  FileCheck,
+  Info
+} from "lucide-react"
+import Link from "next/link"
+import { cn } from "@/lib/utils"
+import {
+  ivaDeclarationService,
+  IvaExtractionResponse,
+  IvaExtractionResult,
+  IvaDeclarationData,
+  getPeriodName
+} from "@/lib/api/iva-declaration-service"
+import {
+  ivaValidationService,
+  IvaValidationResponse,
+  IvaValidationProgress,
+  IvaValidationRequest
+} from "@/lib/api/iva-validation-service"
+import {
+  declarationStorageService,
+  StoredRentaDeclaration
+} from "@/lib/services/declaration-storage-service"
+import { FEATURES } from "@/config/features"
+import { ProgressBar } from "@/components/ui/progress-bar"
+import { IvaValidationChecklist } from "@/components/ui/iva-validation-checklist"
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1,
+      delayChildren: 0.1
+    }
+  }
+} as const
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      type: "spring" as const,
+      stiffness: 100,
+      damping: 15
+    }
+  }
+}
+
+interface UploadedFile {
+  id: string
+  file: File
+  name: string
+  size: string
+}
+
+export default function AnalisisDeclaracionesIvaPage() {
+  // Extraction states
+  const [ivaFiles, setIvaFiles] = useState<UploadedFile[]>([])
+  const [relatedFiles, setRelatedFiles] = useState<UploadedFile[]>([])
+  const [isAnalyzing, setIsAnalyzing] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [dragOverIva, setDragOverIva] = useState(false)
+  const [dragOverRelated, setDragOverRelated] = useState(false)
+  const [extractionResult, setExtractionResult] = useState<IvaExtractionResponse | null>(null)
+  const [expandedCards, setExpandedCards] = useState<Set<string>>(new Set())
+
+  // Validation states
+  const [isValidating, setIsValidating] = useState(false)
+  const [validationResult, setValidationResult] = useState<IvaValidationResponse | null>(null)
+  const [validationProgress, setValidationProgress] = useState<IvaValidationProgress | null>(null)
+  const [rentaData, setRentaData] = useState<StoredRentaDeclaration | null>(null)
+  const [useStoredRenta, setUseStoredRenta] = useState(true)
+
+  // Load stored renta data on mount
+  useEffect(() => {
+    const storedRenta = declarationStorageService.getRentaDeclaration()
+    if (storedRenta) {
+      setRentaData(storedRenta)
+    }
+  }, [])
+
+  const formatFileSize = (bytes: number): string => {
+    if (bytes === 0) return '0 Bytes'
+    const k = 1024
+    const sizes = ['Bytes', 'KB', 'MB', 'GB']
+    const i = Math.floor(Math.log(bytes) / Math.log(k))
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
+  }
+
+  const formatCurrency = (value: number | null | undefined): string => {
+    if (value === null || value === undefined) return '$0'
+    return new Intl.NumberFormat('es-CO', {
+      style: 'currency',
+      currency: 'COP',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0
+    }).format(value)
+  }
+
+  const generateId = () => Math.random().toString(36).substring(2, 11)
+
+  const handleIvaFilesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files
+    if (files) {
+      const newFiles: UploadedFile[] = Array.from(files).map(file => ({
+        id: generateId(),
+        file,
+        name: file.name,
+        size: formatFileSize(file.size)
+      }))
+      setIvaFiles(prev => [...prev, ...newFiles])
+      setError(null)
+    }
+    e.target.value = ''
+  }
+
+  const handleRelatedFilesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files
+    if (files) {
+      const newFiles: UploadedFile[] = Array.from(files).map(file => ({
+        id: generateId(),
+        file,
+        name: file.name,
+        size: formatFileSize(file.size)
+      }))
+      setRelatedFiles(prev => [...prev, ...newFiles])
+      setError(null)
+    }
+    e.target.value = ''
+  }
+
+  const handleDrop = (e: React.DragEvent, type: 'iva' | 'related') => {
+    e.preventDefault()
+    if (type === 'iva') {
+      setDragOverIva(false)
+    } else {
+      setDragOverRelated(false)
+    }
+
+    const files = e.dataTransfer.files
+    if (files) {
+      const newFiles: UploadedFile[] = Array.from(files)
+        .filter(file => file.type === 'application/pdf')
+        .map(file => ({
+          id: generateId(),
+          file,
+          name: file.name,
+          size: formatFileSize(file.size)
+        }))
+
+      if (type === 'iva') {
+        setIvaFiles(prev => [...prev, ...newFiles])
+      } else {
+        setRelatedFiles(prev => [...prev, ...newFiles])
+      }
+      setError(null)
+    }
+  }
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault()
+  }
+
+  const removeIvaFile = (id: string) => {
+    setIvaFiles(prev => prev.filter(f => f.id !== id))
+  }
+
+  const removeRelatedFile = (id: string) => {
+    setRelatedFiles(prev => prev.filter(f => f.id !== id))
+  }
+
+  const toggleCardExpanded = (filename: string) => {
+    setExpandedCards(prev => {
+      const newSet = new Set(prev)
+      if (newSet.has(filename)) {
+        newSet.delete(filename)
+      } else {
+        newSet.add(filename)
+      }
+      return newSet
+    })
+  }
+
+  const handleAnalyze = async () => {
+    if (ivaFiles.length === 0) {
+      setError('Por favor sube al menos una declaración de IVA para analizar.')
+      return
+    }
+
+    setIsAnalyzing(true)
+    setError(null)
+    setExtractionResult(null)
+
+    try {
+      const files = ivaFiles.map(f => f.file)
+      const result = await ivaDeclarationService.extractDeclarations(files)
+      setExtractionResult(result)
+
+      // Expand all successful extractions by default
+      const successfulFilenames = result.results
+        .filter(r => r.success)
+        .map(r => r.filename)
+      setExpandedCards(new Set(successfulFilenames))
+    } catch (err) {
+      console.error('Error analyzing IVA declarations:', err)
+      setError(err instanceof Error ? err.message : 'Error durante el análisis')
+    } finally {
+      setIsAnalyzing(false)
+    }
+  }
+
+  const clearAll = () => {
+    setIvaFiles([])
+    setRelatedFiles([])
+    setError(null)
+    setExtractionResult(null)
+    setExpandedCards(new Set())
+    setValidationResult(null)
+    setValidationProgress(null)
+  }
+
+  const handleValidate = async () => {
+    if (!extractionResult) return
+
+    setIsValidating(true)
+    setError(null)
+    setValidationProgress(null)
+
+    try {
+      // Build request with extracted IVA data
+      const ivaDeclarations = extractionResult.results
+        .filter(r => r.success && r.data)
+        .map(r => r.data!)
+
+      if (ivaDeclarations.length === 0) {
+        throw new Error('No hay declaraciones de IVA válidas para validar')
+      }
+
+      const request: IvaValidationRequest = {
+        iva_declarations: ivaDeclarations
+      }
+
+      // Add renta data if available and selected
+      if (useStoredRenta && rentaData) {
+        request.renta_declaration = rentaData.declaracion
+      }
+
+      // Call validation service
+      const result = await ivaValidationService.validateChecklist(
+        request,
+        FEATURES.USE_SSE_PROGRESS ? (progress) => setValidationProgress(progress) : undefined
+      )
+
+      setValidationResult(result)
+    } catch (err) {
+      console.error('Error validating IVA declarations:', err)
+      setError(err instanceof Error ? err.message : 'Error durante la validación')
+    } finally {
+      setIsValidating(false)
+      setValidationProgress(null)
+    }
+  }
+
+  const clearValidation = () => {
+    setValidationResult(null)
+    setValidationProgress(null)
+  }
+
+  return (
+    <div className="min-h-[calc(100vh-4rem)] pb-12">
+      <motion.div
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+        className="space-y-8"
+      >
+        {/* Header with Back Button */}
+        <motion.div variants={itemVariants} className="space-y-4">
+          <Link
+            href="/analisis-eficacia"
+            className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Volver a Análisis de Eficacia
+          </Link>
+
+          <div className="space-y-2">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-lg shadow-blue-500/25">
+                <Receipt className="h-6 w-6 text-white" />
+              </div>
+              <div>
+                <h1 className="text-2xl md:text-3xl font-bold text-foreground">
+                  Análisis Declaración de IVA
+                </h1>
+                <p className="text-muted-foreground">
+                  Extracción y validación de declaraciones de IVA con documentos de soporte
+                </p>
+              </div>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Error Message */}
+        <AnimatePresence>
+          {error && (
+            <motion.div
+              initial={{ opacity: 0, y: -10, height: 0 }}
+              animate={{ opacity: 1, y: 0, height: 'auto' }}
+              exit={{ opacity: 0, y: -10, height: 0 }}
+              className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-4"
+            >
+              <div className="flex gap-3">
+                <AlertCircle className="h-5 w-5 text-red-600 flex-shrink-0" />
+                <p className="text-sm text-red-800 dark:text-red-200">{error}</p>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Upload Sections */}
+        {!extractionResult && (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* IVA Declarations Upload */}
+            <motion.div
+              variants={itemVariants}
+              className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl overflow-hidden shadow-sm"
+            >
+              <div className="bg-gradient-to-r from-blue-500 to-blue-600 px-6 py-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center">
+                    <Receipt className="h-5 w-5 text-white" />
+                  </div>
+                  <div>
+                    <h2 className="text-lg font-semibold text-white">Declaraciones de IVA</h2>
+                    <p className="text-blue-100 text-sm">Formularios 300 - Declaración bimestral</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="p-6 space-y-4">
+                {/* Drop Zone */}
+                <motion.div
+                  whileHover={{ scale: 1.01 }}
+                  whileTap={{ scale: 0.99 }}
+                  onDrop={(e) => handleDrop(e, 'iva')}
+                  onDragOver={handleDragOver}
+                  onDragEnter={() => setDragOverIva(true)}
+                  onDragLeave={() => setDragOverIva(false)}
+                  className={cn(
+                    "relative border-2 border-dashed rounded-xl p-8 text-center transition-all duration-200 cursor-pointer",
+                    dragOverIva
+                      ? "border-blue-500 bg-blue-50 dark:bg-blue-900/20"
+                      : "border-gray-300 dark:border-gray-700 hover:border-blue-400"
+                  )}
+                >
+                  <input
+                    type="file"
+                    accept=".pdf"
+                    multiple
+                    onChange={handleIvaFilesChange}
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                  />
+                  <div className="flex flex-col items-center gap-3">
+                    <div className={cn(
+                      "w-14 h-14 rounded-xl flex items-center justify-center transition-colors",
+                      dragOverIva ? "bg-blue-500" : "bg-blue-100 dark:bg-blue-900/30"
+                    )}>
+                      <Upload className={cn(
+                        "h-7 w-7",
+                        dragOverIva ? "text-white" : "text-blue-600"
+                      )} />
+                    </div>
+                    <div>
+                      <p className="font-medium text-foreground">
+                        Arrastra tus declaraciones aquí
+                      </p>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        o haz clic para seleccionar archivos PDF
+                      </p>
+                    </div>
+                  </div>
+                </motion.div>
+
+                {/* Uploaded Files List */}
+                <AnimatePresence>
+                  {ivaFiles.length > 0 && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: 'auto' }}
+                      exit={{ opacity: 0, height: 0 }}
+                      className="space-y-2"
+                    >
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm font-medium text-foreground">
+                          {ivaFiles.length} archivo{ivaFiles.length > 1 ? 's' : ''} seleccionado{ivaFiles.length > 1 ? 's' : ''}
+                        </span>
+                      </div>
+                      <div className="space-y-2 max-h-48 overflow-y-auto">
+                        {ivaFiles.map((file) => (
+                          <motion.div
+                            key={file.id}
+                            initial={{ opacity: 0, x: -20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            exit={{ opacity: 0, x: 20 }}
+                            className="flex items-center gap-3 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800"
+                          >
+                            <FileText className="h-5 w-5 text-blue-600 flex-shrink-0" />
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-medium text-foreground truncate">{file.name}</p>
+                              <p className="text-xs text-muted-foreground">{file.size}</p>
+                            </div>
+                            <button
+                              onClick={() => removeIvaFile(file.id)}
+                              className="p-1.5 rounded-lg hover:bg-red-100 dark:hover:bg-red-900/30 text-gray-400 hover:text-red-600 transition-colors"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </button>
+                          </motion.div>
+                        ))}
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            </motion.div>
+
+            {/* Related Documents Upload */}
+            <motion.div
+              variants={itemVariants}
+              className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl overflow-hidden shadow-sm"
+            >
+              <div className="bg-gradient-to-r from-purple-500 to-purple-600 px-6 py-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center">
+                    <FileSpreadsheet className="h-5 w-5 text-white" />
+                  </div>
+                  <div>
+                    <h2 className="text-lg font-semibold text-white">Documentos Relacionados</h2>
+                    <p className="text-purple-100 text-sm">Facturas, libros auxiliares, soportes</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="p-6 space-y-4">
+                {/* Drop Zone */}
+                <motion.div
+                  whileHover={{ scale: 1.01 }}
+                  whileTap={{ scale: 0.99 }}
+                  onDrop={(e) => handleDrop(e, 'related')}
+                  onDragOver={handleDragOver}
+                  onDragEnter={() => setDragOverRelated(true)}
+                  onDragLeave={() => setDragOverRelated(false)}
+                  className={cn(
+                    "relative border-2 border-dashed rounded-xl p-8 text-center transition-all duration-200 cursor-pointer",
+                    dragOverRelated
+                      ? "border-purple-500 bg-purple-50 dark:bg-purple-900/20"
+                      : "border-gray-300 dark:border-gray-700 hover:border-purple-400"
+                  )}
+                >
+                  <input
+                    type="file"
+                    accept=".pdf,.xlsx,.xls,.csv"
+                    multiple
+                    onChange={handleRelatedFilesChange}
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                  />
+                  <div className="flex flex-col items-center gap-3">
+                    <div className={cn(
+                      "w-14 h-14 rounded-xl flex items-center justify-center transition-colors",
+                      dragOverRelated ? "bg-purple-500" : "bg-purple-100 dark:bg-purple-900/30"
+                    )}>
+                      <Plus className={cn(
+                        "h-7 w-7",
+                        dragOverRelated ? "text-white" : "text-purple-600"
+                      )} />
+                    </div>
+                    <div>
+                      <p className="font-medium text-foreground">
+                        Documentos de soporte (opcional)
+                      </p>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        PDF, Excel o CSV con información adicional
+                      </p>
+                    </div>
+                  </div>
+                </motion.div>
+
+                {/* Uploaded Files List */}
+                <AnimatePresence>
+                  {relatedFiles.length > 0 && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: 'auto' }}
+                      exit={{ opacity: 0, height: 0 }}
+                      className="space-y-2"
+                    >
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm font-medium text-foreground">
+                          {relatedFiles.length} archivo{relatedFiles.length > 1 ? 's' : ''} de soporte
+                        </span>
+                      </div>
+                      <div className="space-y-2 max-h-48 overflow-y-auto">
+                        {relatedFiles.map((file) => (
+                          <motion.div
+                            key={file.id}
+                            initial={{ opacity: 0, x: -20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            exit={{ opacity: 0, x: 20 }}
+                            className="flex items-center gap-3 p-3 bg-purple-50 dark:bg-purple-900/20 rounded-lg border border-purple-200 dark:border-purple-800"
+                          >
+                            <FileSpreadsheet className="h-5 w-5 text-purple-600 flex-shrink-0" />
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-medium text-foreground truncate">{file.name}</p>
+                              <p className="text-xs text-muted-foreground">{file.size}</p>
+                            </div>
+                            <button
+                              onClick={() => removeRelatedFile(file.id)}
+                              className="p-1.5 rounded-lg hover:bg-red-100 dark:hover:bg-red-900/30 text-gray-400 hover:text-red-600 transition-colors"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </button>
+                          </motion.div>
+                        ))}
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            </motion.div>
+          </div>
+        )}
+
+        {/* Action Buttons */}
+        <motion.div variants={itemVariants} className="flex flex-wrap gap-4">
+          {!extractionResult ? (
+            <>
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={handleAnalyze}
+                disabled={isAnalyzing || ivaFiles.length === 0}
+                className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-xl font-medium shadow-lg shadow-blue-500/25 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+              >
+                {isAnalyzing ? (
+                  <>
+                    <Loader2 className="h-5 w-5 animate-spin" />
+                    Extrayendo datos...
+                  </>
+                ) : (
+                  <>
+                    <Sparkles className="h-5 w-5" />
+                    Extraer Declaraciones
+                  </>
+                )}
+              </motion.button>
+
+              {(ivaFiles.length > 0 || relatedFiles.length > 0) && (
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={clearAll}
+                  disabled={isAnalyzing}
+                  className="inline-flex items-center gap-2 px-6 py-3 border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 rounded-xl font-medium hover:bg-gray-50 dark:hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                >
+                  <Trash2 className="h-5 w-5" />
+                  Limpiar Todo
+                </motion.button>
+              )}
+            </>
+          ) : (
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={clearAll}
+              className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-xl font-medium shadow-lg shadow-blue-500/25 transition-all"
+            >
+              <Plus className="h-5 w-5" />
+              Nueva Extracción
+            </motion.button>
+          )}
+        </motion.div>
+
+        {/* Extraction Results */}
+        <AnimatePresence>
+          {extractionResult && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              className="space-y-6"
+            >
+              {/* Summary Header */}
+              <motion.div
+                variants={itemVariants}
+                className="bg-gradient-to-r from-slate-700 via-slate-800 to-slate-900 rounded-2xl p-6 shadow-xl"
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    <div className="w-14 h-14 rounded-xl bg-green-500/20 backdrop-blur-sm flex items-center justify-center border border-green-500/30">
+                      <CheckCircle2 className="h-7 w-7 text-green-400" />
+                    </div>
+                    <div>
+                      <h2 className="text-2xl font-bold text-white">
+                        Extracción Completada
+                      </h2>
+                      <p className="text-slate-300">
+                        {extractionResult.message}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex gap-4">
+                    <div className="text-center px-4 py-2 bg-green-500/20 rounded-xl border border-green-500/30">
+                      <p className="text-2xl font-bold text-green-400">{extractionResult.successful}</p>
+                      <p className="text-xs text-green-300">Exitosos</p>
+                    </div>
+                    {extractionResult.failed > 0 && (
+                      <div className="text-center px-4 py-2 bg-red-500/20 rounded-xl border border-red-500/30">
+                        <p className="text-2xl font-bold text-red-400">{extractionResult.failed}</p>
+                        <p className="text-xs text-red-300">Fallidos</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </motion.div>
+
+              {/* Results Cards */}
+              <div className="space-y-4">
+                {extractionResult.results.map((result, index) => (
+                  <IvaResultCard
+                    key={result.filename}
+                    result={result}
+                    index={index}
+                    isExpanded={expandedCards.has(result.filename)}
+                    onToggle={() => toggleCardExpanded(result.filename)}
+                    formatCurrency={formatCurrency}
+                  />
+                ))}
+              </div>
+
+              {/* Validation Section - Show after extraction, before validation results */}
+              {!validationResult && FEATURES.IVA_VALIDATION_ENABLED && (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.3 }}
+                  className="bg-white dark:bg-gray-900 border-2 border-emerald-200 dark:border-emerald-800 rounded-2xl p-6 shadow-lg"
+                >
+                  <div className="flex items-start gap-4">
+                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center shadow-lg shadow-emerald-500/25">
+                      <ClipboardCheck className="h-6 w-6 text-white" />
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="text-lg font-semibold text-foreground mb-1">
+                        Checklist de Validación IVA
+                      </h3>
+                      <p className="text-muted-foreground text-sm mb-4">
+                        Ejecuta 11 validaciones automáticas sobre las declaraciones extraídas para verificar consistencia y cumplimiento.
+                      </p>
+
+                      {/* Renta data indicator */}
+                      <div className="mb-4 p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
+                        <label className="flex items-start gap-3 cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={useStoredRenta}
+                            onChange={(e) => setUseStoredRenta(e.target.checked)}
+                            disabled={!rentaData}
+                            className="mt-1 h-4 w-4 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500"
+                          />
+                          <div className="flex-1">
+                            <span className="font-medium text-foreground">
+                              Incluir datos de Declaración de Renta
+                            </span>
+                            {rentaData ? (
+                              <div className="flex items-center gap-2 mt-1">
+                                <CheckCircle2 className="h-4 w-4 text-green-500" />
+                                <span className="text-sm text-green-600 dark:text-green-400">
+                                  {rentaData.declaracion.razon_social} - Año {rentaData.declaracion.ano_gravable}
+                                </span>
+                              </div>
+                            ) : (
+                              <div className="flex items-center gap-2 mt-1">
+                                <Info className="h-4 w-4 text-amber-500" />
+                                <span className="text-sm text-amber-600 dark:text-amber-400">
+                                  No hay datos de renta disponibles. Algunas validaciones se omitirán.
+                                </span>
+                              </div>
+                            )}
+                          </div>
+                        </label>
+                      </div>
+
+                      {/* Validation progress */}
+                      {isValidating && validationProgress && (
+                        <div className="mb-4">
+                          <ProgressBar
+                            percentage={validationProgress.percentage}
+                            message={validationProgress.message}
+                          />
+                          <p className="text-sm text-muted-foreground mt-2">
+                            Validación {validationProgress.current_validation} de {validationProgress.total_validations}
+                          </p>
+                        </div>
+                      )}
+
+                      {/* Validate button */}
+                      <motion.button
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                        onClick={handleValidate}
+                        disabled={isValidating}
+                        className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white rounded-xl font-medium shadow-lg shadow-emerald-500/25 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                      >
+                        {isValidating ? (
+                          <>
+                            <Loader2 className="h-5 w-5 animate-spin" />
+                            Validando...
+                          </>
+                        ) : (
+                          <>
+                            <FileCheck className="h-5 w-5" />
+                            Ejecutar Checklist de Validación
+                          </>
+                        )}
+                      </motion.button>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+
+              {/* Validation Results */}
+              {validationResult && (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="space-y-4"
+                >
+                  {/* Back to extraction button */}
+                  <div className="flex justify-between items-center">
+                    <button
+                      onClick={clearValidation}
+                      className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                      <ArrowLeft className="h-4 w-4" />
+                      Volver a resultados de extracción
+                    </button>
+                  </div>
+
+                  {/* Checklist component */}
+                  <IvaValidationChecklist result={validationResult} />
+                </motion.div>
+              )}
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Info Section - Only show when no results */}
+        {!extractionResult && (
+          <motion.section variants={itemVariants}>
+            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-6">
+              <div className="flex gap-4">
+                <div className="w-12 h-12 rounded-xl bg-blue-500/10 flex items-center justify-center flex-shrink-0">
+                  <Sparkles className="h-6 w-6 text-blue-600" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-blue-900 dark:text-blue-100 mb-2">
+                    ¿Qué documentos puedo subir?
+                  </h3>
+                  <ul className="text-blue-700 dark:text-blue-300 text-sm leading-relaxed space-y-1">
+                    <li className="flex items-center gap-2">
+                      <CheckCircle2 className="h-4 w-4 text-blue-500" />
+                      <span><strong>Declaraciones de IVA:</strong> Formularios 300 en formato PDF</span>
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <CheckCircle2 className="h-4 w-4 text-blue-500" />
+                      <span><strong>Libros auxiliares:</strong> Registros de ventas y compras</span>
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <CheckCircle2 className="h-4 w-4 text-blue-500" />
+                      <span><strong>Facturas electrónicas:</strong> Para cruce de información</span>
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <CheckCircle2 className="h-4 w-4 text-blue-500" />
+                      <span><strong>Información exógena:</strong> Archivos de terceros relacionados</span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </motion.section>
+        )}
+      </motion.div>
+    </div>
+  )
+}
+
+// Component for individual IVA result card
+interface IvaResultCardProps {
+  result: IvaExtractionResult
+  index: number
+  isExpanded: boolean
+  onToggle: () => void
+  formatCurrency: (value: number | null | undefined) => string
+}
+
+function IvaResultCard({ result, index, isExpanded, onToggle, formatCurrency }: IvaResultCardProps) {
+  if (!result.success || !result.data) {
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: index * 0.1 }}
+        className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-4"
+      >
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-lg bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
+            <AlertCircle className="h-5 w-5 text-red-600" />
+          </div>
+          <div>
+            <p className="font-medium text-red-800 dark:text-red-200">{result.filename}</p>
+            <p className="text-sm text-red-600 dark:text-red-400">
+              {result.errors?.join(', ') || 'Error en la extracción'}
+            </p>
+          </div>
+        </div>
+      </motion.div>
+    )
+  }
+
+  const data = result.data
+  const declarante = data.datos_declarante
+  const periodName = getPeriodName(declarante.periodo, declarante.periodicidad)
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: index * 0.1 }}
+      className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl overflow-hidden shadow-sm"
+    >
+      {/* Card Header - Always visible */}
+      <button
+        onClick={onToggle}
+        className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
+      >
+        <div className="flex items-center gap-4">
+          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-lg shadow-blue-500/25">
+            <Receipt className="h-6 w-6 text-white" />
+          </div>
+          <div className="text-left">
+            <h3 className="font-semibold text-foreground">
+              {declarante.razon_social || 'Sin razón social'}
+            </h3>
+            <div className="flex items-center gap-3 text-sm text-muted-foreground">
+              <span className="flex items-center gap-1">
+                <Hash className="h-3 w-3" />
+                NIT: {declarante.nit}-{declarante.dv}
+              </span>
+              <span className="flex items-center gap-1">
+                <Calendar className="h-3 w-3" />
+                Periodo {declarante.periodo}: {periodName} {declarante.ano}
+              </span>
+              <span className="px-2 py-0.5 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-full text-xs">
+                {declarante.periodicidad}
+              </span>
+            </div>
+          </div>
+        </div>
+        <div className="flex items-center gap-4">
+          {/* Quick Stats */}
+          <div className="hidden md:flex items-center gap-4">
+            <div className="text-right">
+              <p className="text-xs text-muted-foreground">Total IVA Generado</p>
+              <p className="font-semibold text-green-600">{formatCurrency(data.impuesto_generado.total_impuesto_generado)}</p>
+            </div>
+            <div className="text-right">
+              <p className="text-xs text-muted-foreground">Saldo</p>
+              <p className={cn(
+                "font-semibold",
+                data.liquidacion_privada.total_saldo_pagar > 0 ? "text-red-600" : "text-blue-600"
+              )}>
+                {data.liquidacion_privada.total_saldo_pagar > 0
+                  ? `A pagar: ${formatCurrency(data.liquidacion_privada.total_saldo_pagar)}`
+                  : `A favor: ${formatCurrency(data.liquidacion_privada.total_saldo_favor)}`
+                }
+              </p>
+            </div>
+          </div>
+          {isExpanded ? (
+            <ChevronUp className="h-5 w-5 text-muted-foreground" />
+          ) : (
+            <ChevronDown className="h-5 w-5 text-muted-foreground" />
+          )}
+        </div>
+      </button>
+
+      {/* Expandable Content */}
+      <AnimatePresence>
+        {isExpanded && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            className="overflow-hidden"
+          >
+            <div className="px-6 pb-6 space-y-6 border-t border-gray-200 dark:border-gray-800 pt-4">
+              {/* Summary Cards */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <SummaryCard
+                  icon={<TrendingUp className="h-5 w-5 text-green-600" />}
+                  label="Total Ingresos"
+                  value={formatCurrency(data.ingresos.total_ingresos_netos_periodo)}
+                  bgColor="bg-green-50 dark:bg-green-900/20"
+                  borderColor="border-green-200 dark:border-green-800"
+                />
+                <SummaryCard
+                  icon={<TrendingDown className="h-5 w-5 text-red-600" />}
+                  label="Total Compras"
+                  value={formatCurrency(data.compras_nacionales.total_compras_netas_periodo)}
+                  bgColor="bg-red-50 dark:bg-red-900/20"
+                  borderColor="border-red-200 dark:border-red-800"
+                />
+                <SummaryCard
+                  icon={<DollarSign className="h-5 w-5 text-blue-600" />}
+                  label="IVA Generado"
+                  value={formatCurrency(data.impuesto_generado.total_impuesto_generado)}
+                  bgColor="bg-blue-50 dark:bg-blue-900/20"
+                  borderColor="border-blue-200 dark:border-blue-800"
+                />
+                <SummaryCard
+                  icon={<DollarSign className="h-5 w-5 text-purple-600" />}
+                  label="IVA Descontable"
+                  value={formatCurrency(data.impuesto_descontable.total_impuestos_descontables)}
+                  bgColor="bg-purple-50 dark:bg-purple-900/20"
+                  borderColor="border-purple-200 dark:border-purple-800"
+                />
+              </div>
+
+              {/* Detailed Sections */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* Ingresos */}
+                <DetailSection title="Ingresos" icon={<TrendingUp className="h-4 w-4" />}>
+                  <DetailRow label="Gravados tarifa general (19%)" value={formatCurrency(data.ingresos.ingresos_gravados_tarifa_general)} />
+                  <DetailRow label="Gravados tarifa 5%" value={formatCurrency(data.ingresos.ingresos_gravados_5_porciento)} />
+                  <DetailRow label="Operaciones no gravadas" value={formatCurrency(data.ingresos.operaciones_no_gravadas)} />
+                  <DetailRow label="Operaciones excluidas" value={formatCurrency(data.ingresos.operaciones_excluidas)} />
+                  <DetailRow label="Exportaciones" value={formatCurrency(data.ingresos.exportaciones_bienes + data.ingresos.exportaciones_servicios)} />
+                  <DetailRow label="Total ingresos brutos" value={formatCurrency(data.ingresos.total_ingresos_brutos)} highlight />
+                </DetailSection>
+
+                {/* Compras */}
+                <DetailSection title="Compras Nacionales" icon={<TrendingDown className="h-4 w-4" />}>
+                  <DetailRow label="Servicios tarifa general (19%)" value={formatCurrency(data.compras_nacionales.compras_servicios_tarifa_general)} />
+                  <DetailRow label="Servicios tarifa 5%" value={formatCurrency(data.compras_nacionales.compras_servicios_5_porciento)} />
+                  <DetailRow label="Bienes tarifa general (19%)" value={formatCurrency(data.compras_nacionales.compras_bienes_tarifa_general)} />
+                  <DetailRow label="Bienes excluidos/exentos" value={formatCurrency(data.compras_nacionales.compras_bienes_excluidos_exentos)} />
+                  <DetailRow label="Total compras netas" value={formatCurrency(data.compras_nacionales.total_compras_netas_periodo)} highlight />
+                </DetailSection>
+
+                {/* IVA Generado */}
+                <DetailSection title="Impuesto Generado" icon={<DollarSign className="h-4 w-4" />}>
+                  <DetailRow label="IVA tarifa general (19%)" value={formatCurrency(data.impuesto_generado.impuesto_generado_tarifa_general)} />
+                  <DetailRow label="IVA tarifa 5%" value={formatCurrency(data.impuesto_generado.impuesto_generado_5_porciento)} />
+                  <DetailRow label="IVA AIU operaciones" value={formatCurrency(data.impuesto_generado.impuesto_aiu_operaciones)} />
+                  <DetailRow label="Total IVA generado" value={formatCurrency(data.impuesto_generado.total_impuesto_generado)} highlight />
+                </DetailSection>
+
+                {/* IVA Descontable */}
+                <DetailSection title="Impuesto Descontable" icon={<DollarSign className="h-4 w-4" />}>
+                  <DetailRow label="IVA servicios tarifa general" value={formatCurrency(data.impuesto_descontable.iva_servicios_tarifa_general)} />
+                  <DetailRow label="IVA servicios tarifa 5%" value={formatCurrency(data.impuesto_descontable.iva_servicios_5_porciento)} />
+                  <DetailRow label="IVA compras bienes tarifa general" value={formatCurrency(data.impuesto_descontable.iva_compras_bienes_tarifa_general)} />
+                  <DetailRow label="Total IVA descontable" value={formatCurrency(data.impuesto_descontable.total_impuestos_descontables)} highlight />
+                </DetailSection>
+              </div>
+
+              {/* Liquidación */}
+              <div className="bg-gradient-to-r from-slate-50 to-slate-100 dark:from-slate-800/50 dark:to-slate-900/50 rounded-xl p-5 border border-slate-200 dark:border-slate-700">
+                <h4 className="font-semibold text-foreground mb-4 flex items-center gap-2">
+                  <Building className="h-5 w-5 text-slate-600" />
+                  Liquidación Privada
+                </h4>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <div>
+                    <p className="text-xs text-muted-foreground">Saldo a pagar periodo</p>
+                    <p className="font-semibold text-foreground">{formatCurrency(data.liquidacion_privada.saldo_pagar_periodo_fiscal)}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-muted-foreground">Saldo a favor anterior</p>
+                    <p className="font-semibold text-foreground">{formatCurrency(data.liquidacion_privada.saldo_favor_periodo_anterior)}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-muted-foreground">Retenciones IVA</p>
+                    <p className="font-semibold text-foreground">{formatCurrency(data.liquidacion_privada.retenciones_iva_practicaron)}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-muted-foreground">Sanciones</p>
+                    <p className="font-semibold text-foreground">{formatCurrency(data.liquidacion_privada.sanciones)}</p>
+                  </div>
+                </div>
+                <div className="mt-4 pt-4 border-t border-slate-200 dark:border-slate-700 grid grid-cols-2 gap-4">
+                  <div className={cn(
+                    "p-4 rounded-xl",
+                    data.liquidacion_privada.total_saldo_pagar > 0
+                      ? "bg-red-100 dark:bg-red-900/30 border border-red-200 dark:border-red-800"
+                      : "bg-gray-100 dark:bg-gray-800"
+                  )}>
+                    <p className="text-sm text-muted-foreground">Total Saldo a Pagar</p>
+                    <p className={cn(
+                      "text-2xl font-bold",
+                      data.liquidacion_privada.total_saldo_pagar > 0 ? "text-red-600" : "text-gray-400"
+                    )}>
+                      {formatCurrency(data.liquidacion_privada.total_saldo_pagar)}
+                    </p>
+                  </div>
+                  <div className={cn(
+                    "p-4 rounded-xl",
+                    data.liquidacion_privada.total_saldo_favor > 0
+                      ? "bg-blue-100 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800"
+                      : "bg-gray-100 dark:bg-gray-800"
+                  )}>
+                    <p className="text-sm text-muted-foreground">Total Saldo a Favor</p>
+                    <p className={cn(
+                      "text-2xl font-bold",
+                      data.liquidacion_privada.total_saldo_favor > 0 ? "text-blue-600" : "text-gray-400"
+                    )}>
+                      {formatCurrency(data.liquidacion_privada.total_saldo_favor)}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Metadata */}
+              <div className="text-xs text-muted-foreground flex items-center gap-4 pt-2">
+                <span>Formulario: {declarante.numero_formulario}</span>
+                <span>•</span>
+                <span>Campos extraídos: {data.metadatos.campos_extraidos}</span>
+                <span>•</span>
+                <span>Fecha extracción: {new Date(data.metadatos.fecha_extraccion).toLocaleString('es-CO')}</span>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.div>
+  )
+}
+
+// Helper Components
+function SummaryCard({ icon, label, value, bgColor, borderColor }: {
+  icon: React.ReactNode
+  label: string
+  value: string
+  bgColor: string
+  borderColor: string
+}) {
+  return (
+    <div className={cn("p-4 rounded-xl border", bgColor, borderColor)}>
+      <div className="flex items-center gap-2 mb-2">
+        {icon}
+        <span className="text-xs font-medium text-muted-foreground">{label}</span>
+      </div>
+      <p className="text-lg font-bold text-foreground">{value}</p>
+    </div>
+  )
+}
+
+function DetailSection({ title, icon, children }: {
+  title: string
+  icon: React.ReactNode
+  children: React.ReactNode
+}) {
+  return (
+    <div className="bg-gray-50 dark:bg-gray-800/50 rounded-xl p-4">
+      <h4 className="font-semibold text-foreground mb-3 flex items-center gap-2 text-sm">
+        {icon}
+        {title}
+      </h4>
+      <div className="space-y-2">
+        {children}
+      </div>
+    </div>
+  )
+}
+
+function DetailRow({ label, value, highlight = false }: {
+  label: string
+  value: string
+  highlight?: boolean
+}) {
+  return (
+    <div className={cn(
+      "flex justify-between items-center text-sm",
+      highlight && "pt-2 mt-2 border-t border-gray-200 dark:border-gray-700"
+    )}>
+      <span className={cn(
+        highlight ? "font-semibold text-foreground" : "text-muted-foreground"
+      )}>
+        {label}
+      </span>
+      <span className={cn(
+        "font-mono",
+        highlight ? "font-bold text-foreground" : "text-foreground"
+      )}>
+        {value}
+      </span>
+    </div>
+  )
+}
