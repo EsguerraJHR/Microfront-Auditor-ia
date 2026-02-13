@@ -313,7 +313,7 @@ export default function AnalisisDeclaracionesIvaPage() {
 
           <div className="space-y-2">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-lg shadow-blue-500/25">
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-brand-navy to-brand-indigo flex items-center justify-center shadow-lg shadow-brand-navy/25">
                 <Receipt className="h-6 w-6 text-white" />
               </div>
               <div>
@@ -353,14 +353,14 @@ export default function AnalisisDeclaracionesIvaPage() {
               variants={itemVariants}
               className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl overflow-hidden shadow-sm"
             >
-              <div className="bg-gradient-to-r from-blue-500 to-blue-600 px-6 py-4">
+              <div className="bg-gradient-to-r from-brand-navy to-brand-indigo px-6 py-4">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center">
                     <Receipt className="h-5 w-5 text-white" />
                   </div>
                   <div>
                     <h2 className="text-lg font-semibold text-white">Declaraciones de IVA</h2>
-                    <p className="text-blue-100 text-sm">Formularios 300 - Declaración bimestral</p>
+                    <p className="text-indigo-100 text-sm">Formularios 300 - Declaración bimestral</p>
                   </div>
                 </div>
               </div>
@@ -377,8 +377,8 @@ export default function AnalisisDeclaracionesIvaPage() {
                   className={cn(
                     "relative border-2 border-dashed rounded-xl p-8 text-center transition-all duration-200 cursor-pointer",
                     dragOverIva
-                      ? "border-blue-500 bg-blue-50 dark:bg-blue-900/20"
-                      : "border-gray-300 dark:border-gray-700 hover:border-blue-400"
+                      ? "border-brand-indigo bg-indigo-50 dark:bg-indigo-900/20"
+                      : "border-gray-300 dark:border-gray-700 hover:border-brand-indigo"
                   )}
                 >
                   <input
@@ -391,11 +391,11 @@ export default function AnalisisDeclaracionesIvaPage() {
                   <div className="flex flex-col items-center gap-3">
                     <div className={cn(
                       "w-14 h-14 rounded-xl flex items-center justify-center transition-colors",
-                      dragOverIva ? "bg-blue-500" : "bg-blue-100 dark:bg-blue-900/30"
+                      dragOverIva ? "bg-brand-indigo" : "bg-indigo-100 dark:bg-indigo-900/30"
                     )}>
                       <Upload className={cn(
                         "h-7 w-7",
-                        dragOverIva ? "text-white" : "text-blue-600"
+                        dragOverIva ? "text-white" : "text-brand-indigo"
                       )} />
                     </div>
                     <div>
@@ -430,9 +430,9 @@ export default function AnalisisDeclaracionesIvaPage() {
                             initial={{ opacity: 0, x: -20 }}
                             animate={{ opacity: 1, x: 0 }}
                             exit={{ opacity: 0, x: 20 }}
-                            className="flex items-center gap-3 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800"
+                            className="flex items-center gap-3 p-3 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg border border-indigo-200 dark:border-indigo-800"
                           >
-                            <FileText className="h-5 w-5 text-blue-600 flex-shrink-0" />
+                            <FileText className="h-5 w-5 text-brand-indigo flex-shrink-0" />
                             <div className="flex-1 min-w-0">
                               <p className="text-sm font-medium text-foreground truncate">{file.name}</p>
                               <p className="text-xs text-muted-foreground">{file.size}</p>
@@ -567,7 +567,7 @@ export default function AnalisisDeclaracionesIvaPage() {
                 whileTap={{ scale: 0.98 }}
                 onClick={handleAnalyze}
                 disabled={isAnalyzing || ivaFiles.length === 0}
-                className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-xl font-medium shadow-lg shadow-blue-500/25 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-brand-navy to-brand-indigo hover:from-brand-navy/90 hover:to-brand-indigo-hover text-white rounded-xl font-medium shadow-lg shadow-brand-navy/25 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
               >
                 {isAnalyzing ? (
                   <>
@@ -600,7 +600,7 @@ export default function AnalisisDeclaracionesIvaPage() {
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               onClick={clearAll}
-              className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-xl font-medium shadow-lg shadow-blue-500/25 transition-all"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-brand-navy to-brand-indigo hover:from-brand-navy/90 hover:to-brand-indigo-hover text-white rounded-xl font-medium shadow-lg shadow-brand-navy/25 transition-all"
             >
               <Plus className="h-5 w-5" />
               Nueva Extracción
@@ -785,30 +785,30 @@ export default function AnalisisDeclaracionesIvaPage() {
         {/* Info Section - Only show when no results */}
         {!extractionResult && (
           <motion.section variants={itemVariants}>
-            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-6">
+            <div className="bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 border border-indigo-200 dark:border-indigo-800 rounded-xl p-6">
               <div className="flex gap-4">
-                <div className="w-12 h-12 rounded-xl bg-blue-500/10 flex items-center justify-center flex-shrink-0">
-                  <Sparkles className="h-6 w-6 text-blue-600" />
+                <div className="w-12 h-12 rounded-xl bg-brand-indigo/10 flex items-center justify-center flex-shrink-0">
+                  <Sparkles className="h-6 w-6 text-brand-indigo" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-blue-900 dark:text-blue-100 mb-2">
+                  <h3 className="font-semibold text-brand-navy dark:text-indigo-100 mb-2">
                     ¿Qué documentos puedo subir?
                   </h3>
-                  <ul className="text-blue-700 dark:text-blue-300 text-sm leading-relaxed space-y-1">
+                  <ul className="text-brand-text dark:text-indigo-300 text-sm leading-relaxed space-y-1">
                     <li className="flex items-center gap-2">
-                      <CheckCircle2 className="h-4 w-4 text-blue-500" />
+                      <CheckCircle2 className="h-4 w-4 text-brand-indigo" />
                       <span><strong>Declaraciones de IVA:</strong> Formularios 300 en formato PDF</span>
                     </li>
                     <li className="flex items-center gap-2">
-                      <CheckCircle2 className="h-4 w-4 text-blue-500" />
+                      <CheckCircle2 className="h-4 w-4 text-brand-indigo" />
                       <span><strong>Libros auxiliares:</strong> Registros de ventas y compras</span>
                     </li>
                     <li className="flex items-center gap-2">
-                      <CheckCircle2 className="h-4 w-4 text-blue-500" />
+                      <CheckCircle2 className="h-4 w-4 text-brand-indigo" />
                       <span><strong>Facturas electrónicas:</strong> Para cruce de información</span>
                     </li>
                     <li className="flex items-center gap-2">
-                      <CheckCircle2 className="h-4 w-4 text-blue-500" />
+                      <CheckCircle2 className="h-4 w-4 text-brand-indigo" />
                       <span><strong>Información exógena:</strong> Archivos de terceros relacionados</span>
                     </li>
                   </ul>
@@ -872,7 +872,7 @@ function IvaResultCard({ result, index, isExpanded, onToggle, formatCurrency }: 
         className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
       >
         <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-lg shadow-blue-500/25">
+          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-brand-navy to-brand-indigo flex items-center justify-center shadow-lg shadow-brand-navy/25">
             <Receipt className="h-6 w-6 text-white" />
           </div>
           <div className="text-left">
@@ -888,7 +888,7 @@ function IvaResultCard({ result, index, isExpanded, onToggle, formatCurrency }: 
                 <Calendar className="h-3 w-3" />
                 Periodo {declarante.periodo}: {periodName} {declarante.ano}
               </span>
-              <span className="px-2 py-0.5 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-full text-xs">
+              <span className="px-2 py-0.5 bg-indigo-100 dark:bg-indigo-900/30 text-brand-indigo dark:text-indigo-300 rounded-full text-xs">
                 {declarante.periodicidad}
               </span>
             </div>
@@ -905,7 +905,7 @@ function IvaResultCard({ result, index, isExpanded, onToggle, formatCurrency }: 
               <p className="text-xs text-muted-foreground">Saldo</p>
               <p className={cn(
                 "font-semibold",
-                data.liquidacion_privada.total_saldo_pagar > 0 ? "text-red-600" : "text-blue-600"
+                data.liquidacion_privada.total_saldo_pagar > 0 ? "text-red-600" : "text-brand-indigo"
               )}>
                 {data.liquidacion_privada.total_saldo_pagar > 0
                   ? `A pagar: ${formatCurrency(data.liquidacion_privada.total_saldo_pagar)}`
@@ -950,11 +950,11 @@ function IvaResultCard({ result, index, isExpanded, onToggle, formatCurrency }: 
                   borderColor="border-red-200 dark:border-red-800"
                 />
                 <SummaryCard
-                  icon={<DollarSign className="h-5 w-5 text-blue-600" />}
+                  icon={<DollarSign className="h-5 w-5 text-brand-indigo" />}
                   label="IVA Generado"
                   value={formatCurrency(data.impuesto_generado.total_impuesto_generado)}
-                  bgColor="bg-blue-50 dark:bg-blue-900/20"
-                  borderColor="border-blue-200 dark:border-blue-800"
+                  bgColor="bg-indigo-50 dark:bg-indigo-900/20"
+                  borderColor="border-indigo-200 dark:border-indigo-800"
                 />
                 <SummaryCard
                   icon={<DollarSign className="h-5 w-5 text-purple-600" />}
@@ -1045,13 +1045,13 @@ function IvaResultCard({ result, index, isExpanded, onToggle, formatCurrency }: 
                   <div className={cn(
                     "p-4 rounded-xl",
                     data.liquidacion_privada.total_saldo_favor > 0
-                      ? "bg-blue-100 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800"
+                      ? "bg-indigo-100 dark:bg-indigo-900/30 border border-indigo-200 dark:border-indigo-800"
                       : "bg-gray-100 dark:bg-gray-800"
                   )}>
                     <p className="text-sm text-muted-foreground">Total Saldo a Favor</p>
                     <p className={cn(
                       "text-2xl font-bold",
-                      data.liquidacion_privada.total_saldo_favor > 0 ? "text-blue-600" : "text-gray-400"
+                      data.liquidacion_privada.total_saldo_favor > 0 ? "text-brand-indigo" : "text-gray-400"
                     )}>
                       {formatCurrency(data.liquidacion_privada.total_saldo_favor)}
                     </p>

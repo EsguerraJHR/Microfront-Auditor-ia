@@ -264,8 +264,8 @@ export default function TercerosPage() {
       {/* Header */}
       <div className="space-y-2">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-lg bg-purple-100 dark:bg-purple-900/20 flex items-center justify-center">
-            <Users className="h-5 w-5 text-purple-600" />
+          <div className="w-10 h-10 rounded-lg bg-indigo-100 dark:bg-indigo-900/20 flex items-center justify-center">
+            <Users className="h-5 w-5 text-brand-indigo" />
           </div>
           <div>
             <h1 className="text-2xl font-bold text-foreground">Gestión de Terceros v2</h1>
@@ -300,7 +300,7 @@ export default function TercerosPage() {
               className={cn(
                 "w-full px-4 py-3 pr-10 text-sm border border-gray-300 dark:border-gray-600 rounded-lg",
                 "bg-white dark:bg-gray-800 text-foreground",
-                "focus:ring-2 focus:ring-purple-500 focus:border-purple-500",
+                "focus:ring-2 focus:ring-brand-indigo focus:border-brand-indigo",
                 "disabled:opacity-50 disabled:cursor-not-allowed",
                 "appearance-none"
               )}
@@ -330,10 +330,10 @@ export default function TercerosPage() {
           </div>
 
           {selectedAccountingClient && (
-            <div className="p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg border border-purple-200 dark:border-purple-800">
+            <div className="p-4 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg border border-indigo-200 dark:border-indigo-800">
               <div className="flex items-center gap-3 mb-2">
-                <div className="w-8 h-8 rounded-lg bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
-                  <Building className="h-4 w-4 text-purple-600" />
+                <div className="w-8 h-8 rounded-lg bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center">
+                  <Building className="h-4 w-4 text-brand-indigo" />
                 </div>
                 <div>
                   <p className="font-medium text-foreground">{selectedAccountingClient.razon_social}</p>
@@ -366,7 +366,7 @@ export default function TercerosPage() {
               className={cn(
                 "flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-md transition-all duration-200",
                 selectedType === 'cliente'
-                  ? "bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 shadow-sm"
+                  ? "bg-white dark:bg-gray-700 text-brand-indigo dark:text-indigo-400 shadow-sm"
                   : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200"
               )}
             >
@@ -393,11 +393,11 @@ export default function TercerosPage() {
             <div className={cn(
               "w-8 h-8 rounded-lg flex items-center justify-center",
               selectedType === 'cliente'
-                ? "bg-blue-100 dark:bg-blue-900/20"
+                ? "bg-indigo-100 dark:bg-indigo-900/20"
                 : "bg-green-100 dark:bg-green-900/20"
             )}>
               {selectedType === 'cliente' ? (
-                <UserCheck className="h-4 w-4 text-blue-600" />
+                <UserCheck className="h-4 w-4 text-brand-indigo" />
               ) : (
                 <Truck className="h-4 w-4 text-green-600" />
               )}
@@ -487,7 +487,7 @@ export default function TercerosPage() {
                   </div>
                   <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
                     <div
-                      className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                      className="bg-brand-indigo h-2 rounded-full transition-all duration-300"
                       style={{ width: `${extractionProgress.percentage}%` }}
                     />
                   </div>
@@ -537,11 +537,11 @@ export default function TercerosPage() {
 
                   {/* Ringana Export Result */}
                   {ringanaExportResult && (
-                    <div className="p-4 bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded-lg">
+                    <div className="p-4 bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-800 rounded-lg">
                       <div className="space-y-3">
                         <div className="flex items-center gap-2">
-                          <CheckCircle className="h-5 w-5 text-purple-600" />
-                          <span className="font-medium text-purple-800 dark:text-purple-200">
+                          <CheckCircle className="h-5 w-5 text-brand-indigo" />
+                          <span className="font-medium text-brand-navy dark:text-indigo-200">
                             Exportación Ringana completada
                           </span>
                         </div>
@@ -576,8 +576,8 @@ export default function TercerosPage() {
                           </div>
                         </div>
 
-                        <div className="pt-2 border-t border-purple-200 dark:border-purple-700">
-                          <p className="text-xs text-purple-700 dark:text-purple-300 font-medium mb-1">
+                        <div className="pt-2 border-t border-indigo-200 dark:border-indigo-700">
+                          <p className="text-xs text-brand-indigo dark:text-indigo-300 font-medium mb-1">
                             Archivos descargados:
                           </p>
                           <ul className="text-xs text-muted-foreground space-y-1">
@@ -614,7 +614,7 @@ export default function TercerosPage() {
                           />
                           <button
                             disabled={isCrossmatchLoading}
-                            className="w-full btn-secondary flex items-center justify-center gap-2 disabled:opacity-50 border-2 border-dashed border-orange-300 dark:border-orange-700 hover:border-orange-400 dark:hover:border-orange-600 bg-orange-50 dark:bg-orange-900/20 text-orange-700 dark:text-orange-300"
+                            className="w-full btn-secondary flex items-center justify-center gap-2 disabled:opacity-50 border-2 border-dashed border-indigo-300 dark:border-indigo-700 hover:border-brand-indigo dark:hover:border-indigo-600 bg-indigo-50 dark:bg-indigo-900/20 text-brand-indigo dark:text-indigo-300"
                           >
                             {isCrossmatchLoading ? (
                               <>

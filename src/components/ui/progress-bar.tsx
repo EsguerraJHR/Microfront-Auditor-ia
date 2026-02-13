@@ -17,10 +17,10 @@ export function ProgressBar({ percentage, message, className = '' }: ProgressBar
   return (
     <div className={`w-full ${className}`}>
       {/* Progress Bar Container */}
-      <div className="relative w-full h-3 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden shadow-inner">
+      <div className="relative w-full h-3 bg-brand-bg-alt dark:bg-gray-700 rounded-full overflow-hidden shadow-inner">
         {/* Animated Progress Fill */}
         <motion.div
-          className="h-full bg-gradient-to-r from-orange-500 via-orange-600 to-orange-700 rounded-full"
+          className="h-full bg-gradient-to-r from-brand-navy to-brand-indigo rounded-full"
           initial={{ width: '0%' }}
           animate={{ width: `${percentage}%` }}
           transition={{
@@ -36,14 +36,14 @@ export function ProgressBar({ percentage, message, className = '' }: ProgressBar
       {/* Progress Info */}
       <div className="mt-2 flex justify-between items-center">
         <motion.p
-          className="text-sm text-gray-700 dark:text-gray-300 flex-1"
+          className="text-sm text-brand-text dark:text-gray-300 flex-1"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           key={message} // Re-animate cuando cambie el mensaje
         >
           {message}
         </motion.p>
-        <span className="text-sm font-semibold text-orange-600 dark:text-orange-400 ml-3">
+        <span className="text-sm font-semibold text-brand-indigo dark:text-brand-indigo ml-3">
           {percentage}%
         </span>
       </div>
@@ -60,7 +60,7 @@ export function ProgressBarCompact({ percentage, message }: ProgressBarProps) {
       {/* Mini Progress Bar */}
       <div className="relative w-32 h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
         <motion.div
-          className="h-full bg-orange-600 rounded-full"
+          className="h-full bg-brand-indigo rounded-full"
           initial={{ width: '0%' }}
           animate={{ width: `${percentage}%` }}
           transition={{ duration: 0.3 }}
@@ -106,7 +106,7 @@ export function ProgressCircular({ percentage, message }: ProgressBarProps) {
             cx="48"
             cy="48"
             r={radius}
-            className="stroke-orange-600"
+            className="stroke-brand-indigo"
             strokeWidth="6"
             fill="none"
             strokeLinecap="round"
@@ -121,7 +121,7 @@ export function ProgressCircular({ percentage, message }: ProgressBarProps) {
 
         {/* Percentage in Center */}
         <div className="absolute inset-0 flex items-center justify-center">
-          <span className="text-xl font-bold text-orange-600">
+          <span className="text-xl font-bold text-brand-indigo">
             {percentage}%
           </span>
         </div>

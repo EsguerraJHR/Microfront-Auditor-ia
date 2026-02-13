@@ -58,8 +58,8 @@ const features = [
     icon: FileSearch,
     title: "Comparación Detallada",
     description: "Compara campo por campo las declaraciones de dos años consecutivos",
-    color: "text-blue-600",
-    bgColor: "bg-blue-100 dark:bg-blue-900/30"
+    color: "text-brand-indigo",
+    bgColor: "bg-indigo-100 dark:bg-indigo-900/30"
   },
   {
     icon: Shield,
@@ -72,8 +72,8 @@ const features = [
     icon: Target,
     title: "Análisis Vertical",
     description: "Evalúa la estructura porcentual y coherencia tributaria",
-    color: "text-orange-600",
-    bgColor: "bg-orange-100 dark:bg-orange-900/30"
+    color: "text-brand-navy",
+    bgColor: "bg-indigo-100 dark:bg-indigo-900/30"
   }
 ]
 
@@ -167,12 +167,12 @@ export default function PrecriticaPage() {
             {/* Hero Section */}
             <motion.div
               variants={itemVariants}
-              className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-orange-500 via-orange-600 to-yellow-500 p-8 md:p-12"
+              className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-brand-navy via-brand-indigo to-indigo-500 p-8 md:p-12"
             >
               {/* Background decorations */}
               <div className="absolute inset-0 overflow-hidden">
                 <div className="absolute -top-1/2 -right-1/4 w-96 h-96 bg-white/10 rounded-full blur-3xl" />
-                <div className="absolute -bottom-1/2 -left-1/4 w-96 h-96 bg-yellow-300/20 rounded-full blur-3xl" />
+                <div className="absolute -bottom-1/2 -left-1/4 w-96 h-96 bg-indigo-300/20 rounded-full blur-3xl" />
               </div>
 
               <div className="relative z-10">
@@ -187,7 +187,7 @@ export default function PrecriticaPage() {
                 </motion.div>
 
                 <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4">
-                  <span className="text-yellow-200">Diagnostico Tributario</span>
+                  <span className="text-indigo-200">Diagnostico Tributario</span>
                 </h1>
 
                 <p className="text-lg text-white/90 max-w-2xl mb-8">
@@ -200,7 +200,7 @@ export default function PrecriticaPage() {
                   onClick={() => setShowComparativeModal(true)}
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
-                  className="group inline-flex items-center gap-3 bg-white text-orange-600 px-8 py-4 rounded-xl font-semibold text-lg shadow-lg shadow-orange-700/25 hover:shadow-xl hover:shadow-orange-700/30 transition-shadow"
+                  className="group inline-flex items-center gap-3 bg-white text-brand-indigo px-8 py-4 rounded-xl font-semibold text-lg shadow-lg shadow-brand-navy/25 hover:shadow-xl hover:shadow-brand-navy/30 transition-shadow"
                 >
                   <BarChart3 className="h-5 w-5" />
                   Iniciar Análisis Comparativo
@@ -253,7 +253,7 @@ export default function PrecriticaPage() {
                   whileHover={{ scale: 1.02, y: -2 }}
                   className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl p-6 text-center shadow-sm hover:shadow-md transition-shadow"
                 >
-                  <stat.icon className="h-6 w-6 text-orange-500 mx-auto mb-3" />
+                  <stat.icon className="h-6 w-6 text-brand-indigo mx-auto mb-3" />
                   <div className="text-3xl font-bold text-foreground mb-1">{stat.value}</div>
                   <div className="text-sm text-muted-foreground">{stat.label}</div>
                 </motion.div>
@@ -264,7 +264,7 @@ export default function PrecriticaPage() {
             <motion.div variants={itemVariants}>
               <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-3">
-                  <History className="h-6 w-6 text-orange-500" />
+                  <History className="h-6 w-6 text-brand-indigo" />
                   <h2 className="text-2xl font-bold text-foreground">
                     Historial de Revisiones
                   </h2>
@@ -274,7 +274,7 @@ export default function PrecriticaPage() {
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                     onClick={loadRevisions}
-                    className="text-sm text-orange-600 hover:text-orange-700 font-medium"
+                    className="text-sm text-brand-indigo hover:text-brand-indigo-hover font-medium"
                   >
                     Actualizar
                   </motion.button>
@@ -283,7 +283,7 @@ export default function PrecriticaPage() {
 
               {isLoadingRevisions ? (
                 <div className="flex items-center justify-center py-12 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl">
-                  <Loader2 className="h-6 w-6 text-orange-500 animate-spin mr-3" />
+                  <Loader2 className="h-6 w-6 text-brand-indigo animate-spin mr-3" />
                   <span className="text-muted-foreground">Cargando revisiones...</span>
                 </div>
               ) : revisionError ? (
@@ -343,7 +343,7 @@ export default function PrecriticaPage() {
                                   whileTap={{ scale: 0.9 }}
                                   onClick={() => handleViewRevision(revision)}
                                   disabled={loadingRevisionId === String(revision.id)}
-                                  className="p-2 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors disabled:opacity-50"
+                                  className="p-2 text-brand-indigo hover:bg-indigo-50 dark:hover:bg-indigo-900/20 rounded-lg transition-colors disabled:opacity-50"
                                   title="Ver resultados"
                                 >
                                   {loadingRevisionId === String(revision.id) ? (
@@ -422,7 +422,7 @@ export default function PrecriticaPage() {
                 onClick={() => setShowComparativeModal(true)}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className="inline-flex items-center gap-2 bg-orange-600 hover:bg-orange-700 text-white px-6 py-3 rounded-lg font-medium transition-colors shadow-md hover:shadow-lg"
+                className="inline-flex items-center gap-2 bg-brand-indigo hover:bg-brand-indigo-hover text-white px-6 py-3 rounded-lg font-medium transition-colors shadow-md hover:shadow-lg"
               >
                 <BarChart3 className="h-5 w-5" />
                 Comenzar Análisis

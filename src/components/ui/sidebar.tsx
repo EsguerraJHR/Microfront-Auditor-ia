@@ -137,7 +137,7 @@ export function Sidebar({ isOpen, onClose, isCollapsed, onToggleCollapse }: Side
                   "flex items-center rounded-lg transition-all duration-200 group",
                   isCollapsed ? "lg:justify-center lg:p-3 gap-3 p-3" : "gap-3 p-3",
                   isActive
-                    ? "bg-blue-100 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400 border border-blue-200 dark:border-blue-800"
+                    ? "bg-indigo-100 dark:bg-indigo-900/20 text-brand-indigo dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800"
                     : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
                 )}
               >
@@ -145,7 +145,7 @@ export function Sidebar({ isOpen, onClose, isCollapsed, onToggleCollapse }: Side
                   className={cn(
                     "p-2 rounded-lg transition-colors flex-shrink-0",
                     isActive
-                      ? "bg-blue-200 dark:bg-blue-800"
+                      ? "bg-indigo-200 dark:bg-indigo-800"
                       : "bg-sidebar-accent group-hover:bg-sidebar-accent"
                   )}
                 >
@@ -153,7 +153,7 @@ export function Sidebar({ isOpen, onClose, isCollapsed, onToggleCollapse }: Side
                     className={cn(
                       "h-4 w-4",
                       isActive
-                        ? "text-blue-700 dark:text-blue-400"
+                        ? "text-brand-indigo dark:text-indigo-400"
                         : "text-sidebar-foreground"
                     )}
                   />
@@ -169,7 +169,7 @@ export function Sidebar({ isOpen, onClose, isCollapsed, onToggleCollapse }: Side
                 </div>
                 {isActive && (
                   <div className={cn(
-                    "w-2 h-2 bg-blue-500 rounded-full flex-shrink-0",
+                    "w-2 h-2 bg-brand-indigo rounded-full flex-shrink-0",
                     isCollapsed && "lg:hidden"
                   )}></div>
                 )}
@@ -190,7 +190,7 @@ export function Sidebar({ isOpen, onClose, isCollapsed, onToggleCollapse }: Side
           )}>
             <div className="p-3 rounded-lg bg-sidebar-accent">
               <div className="flex items-center gap-2 mb-2">
-                <div className="h-2 w-2 bg-blue-500 rounded-full animate-pulse"></div>
+                <div className="h-2 w-2 bg-brand-indigo rounded-full animate-pulse"></div>
                 <span className="text-sm font-medium text-sidebar-foreground">
                   Estado del Sistema
                 </span>

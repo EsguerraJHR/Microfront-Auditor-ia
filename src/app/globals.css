@@ -157,7 +157,7 @@
 
   /* Botones principales */
   .btn-primary {
-    @apply bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors duration-200;
+    @apply bg-brand-indigo hover:bg-brand-indigo-hover text-white px-4 py-2 rounded-lg transition-colors duration-200;
   }
 
   /* Cards */
@@ -182,12 +182,12 @@
 
   /* Gradientes de fondo */
   .bg-gradient-main {
-    @apply bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/50;
+    @apply bg-gradient-to-br from-slate-50 via-indigo-50/30 to-purple-50/50;
   }
 
-  /* Gradiente específico para Auditor-IA */
+  /* Gradiente específico para Auditor-IA - Louis Legal brand colors */
   .gradient-accounting {
-    background: linear-gradient(to right, #2563eb, #4f46e5);
+    background: linear-gradient(to right, #172D5F, #413D93);
   }
 
   /* Elementos decorativos */
@@ -197,11 +197,11 @@
 
   /* Ícono de calculadora con estilo consistente */
   .calculator-icon-container {
-    @apply bg-blue-100 p-2 rounded-lg mt-1;
+    @apply bg-indigo-100 p-2 rounded-lg mt-1;
   }
 
   .calculator-icon {
-    @apply h-4 w-4 text-blue-600;
+    @apply h-4 w-4 text-brand-indigo;
   }
 
   /* Estados de validación para datos contables */
@@ -218,7 +218,7 @@
   }
 
   .status-pending {
-    @apply bg-blue-50 text-blue-800 border-blue-200;
+    @apply bg-indigo-50 text-brand-indigo border-indigo-200;
   }
 
   /* Indicadores monetarios */
@@ -279,7 +279,7 @@
 .accountingTitle {
   font-size: clamp(24px, 1.75rem, 28px);
   font-weight: 700;
-  color: #2563eb;
+  color: #172D5F;
   margin: 2.5rem 0 1.5rem 0;
   letter-spacing: -0.025em;
   line-height: 1.2;

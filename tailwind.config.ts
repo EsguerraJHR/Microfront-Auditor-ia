@@ -23,6 +23,18 @@ export default {
     },
     extend: {
       colors: {
+        // Brand colors - Louis Legal
+        brand: {
+          navy: '#172D5F',
+          indigo: '#413D93',
+          'indigo-hover': '#362F7A',
+          bg: '#F5F5F7',
+          'bg-alt': '#EEEEF2',
+          text: '#1D1D1F',
+          'text-secondary': '#6E6E73',
+          border: '#E0E0E5',
+          shadow: 'rgba(23, 45, 95, 0.08)',
+        },
         border: 'hsl(var(--border))',
         input: 'hsl(var(--input))',
         ring: 'hsl(var(--ring))',

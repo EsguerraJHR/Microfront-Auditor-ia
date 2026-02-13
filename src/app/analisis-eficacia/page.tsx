@@ -46,9 +46,9 @@ const analysisOptions: AnalysisOption[] = [
     description: "Extracción y análisis de declaraciones de renta. Incluye validación de pagos, calendario tributario y comparación año a año.",
     href: "/analisis-eficacia/analisis-declaraciones-renta",
     icon: FileText,
-    color: "text-orange-600",
-    bgColor: "bg-orange-100 dark:bg-orange-900/30",
-    borderColor: "border-orange-200 dark:border-orange-800 hover:border-orange-400 dark:hover:border-orange-600",
+    color: "text-brand-navy",
+    bgColor: "bg-indigo-100 dark:bg-indigo-900/30",
+    borderColor: "border-indigo-200 dark:border-indigo-800 hover:border-brand-indigo dark:hover:border-indigo-600",
     available: true
   },
   {
@@ -56,9 +56,9 @@ const analysisOptions: AnalysisOption[] = [
     description: "Análisis y validación de declaraciones de IVA. Verificación de bases gravables, tarifas aplicadas y cruce con información exógena.",
     href: "/analisis-eficacia/analisis-declaraciones-iva",
     icon: Receipt,
-    color: "text-blue-600",
-    bgColor: "bg-blue-100 dark:bg-blue-900/30",
-    borderColor: "border-blue-200 dark:border-blue-800 hover:border-blue-400 dark:hover:border-blue-600",
+    color: "text-brand-indigo",
+    bgColor: "bg-indigo-100 dark:bg-indigo-900/30",
+    borderColor: "border-indigo-200 dark:border-indigo-800 hover:border-brand-indigo dark:hover:border-indigo-600",
     available: true
   },
   {
@@ -95,12 +95,12 @@ export default function AnalisisEficaciaPage() {
         {/* Hero Section */}
         <motion.section
           variants={itemVariants}
-          className="relative overflow-hidden bg-gradient-to-br from-orange-500 via-orange-600 to-yellow-500 rounded-2xl p-8 md:p-12 shadow-xl"
+          className="relative overflow-hidden bg-gradient-to-br from-brand-navy via-brand-indigo to-indigo-500 rounded-2xl p-8 md:p-12 shadow-xl"
         >
           {/* Background decorations */}
           <div className="absolute inset-0 overflow-hidden">
             <div className="absolute -top-1/2 -right-1/4 w-96 h-96 bg-white/10 rounded-full blur-3xl" />
-            <div className="absolute -bottom-1/2 -left-1/4 w-96 h-96 bg-yellow-300/20 rounded-full blur-3xl" />
+            <div className="absolute -bottom-1/2 -left-1/4 w-96 h-96 bg-indigo-300/20 rounded-full blur-3xl" />
           </div>
 
           {/* Floating elements */}
@@ -130,7 +130,7 @@ export default function AnalisisEficaciaPage() {
               ease: "easeInOut",
               delay: 0.5
             }}
-            className="absolute bottom-8 right-24 md:right-32 w-12 h-12 bg-yellow-400/30 backdrop-blur-sm rounded-lg flex items-center justify-center"
+            className="absolute bottom-8 right-24 md:right-32 w-12 h-12 bg-indigo-400/30 backdrop-blur-sm rounded-lg flex items-center justify-center"
           >
             <Sparkles className="h-6 w-6 text-white" />
           </motion.div>
@@ -160,7 +160,7 @@ export default function AnalisisEficaciaPage() {
         {/* Analysis Options Grid */}
         <motion.section variants={itemVariants} className="space-y-6">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500 to-yellow-500 flex items-center justify-center shadow-lg shadow-orange-500/25">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-navy to-brand-indigo flex items-center justify-center shadow-lg shadow-brand-navy/25">
               <FileText className="h-5 w-5 text-white" />
             </div>
             <div>
@@ -196,10 +196,10 @@ export default function AnalisisEficaciaPage() {
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 mb-2">
-                            <h3 className="text-lg font-semibold text-foreground group-hover:text-orange-600 dark:group-hover:text-orange-400 transition-colors">
+                            <h3 className="text-lg font-semibold text-foreground group-hover:text-brand-indigo dark:group-hover:text-indigo-400 transition-colors">
                               {option.title}
                             </h3>
-                            <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:text-orange-500 group-hover:translate-x-1 transition-all" />
+                            <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:text-brand-indigo group-hover:translate-x-1 transition-all" />
                           </div>
                           <p className="text-muted-foreground text-sm leading-relaxed">
                             {option.description}
@@ -254,16 +254,16 @@ export default function AnalisisEficaciaPage() {
 
         {/* Info Section */}
         <motion.section variants={itemVariants}>
-          <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-6">
+          <div className="bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 border border-indigo-200 dark:border-indigo-800 rounded-xl p-6">
             <div className="flex gap-4">
-              <div className="w-12 h-12 rounded-xl bg-blue-500/10 flex items-center justify-center flex-shrink-0">
-                <Sparkles className="h-6 w-6 text-blue-600" />
+              <div className="w-12 h-12 rounded-xl bg-brand-indigo/10 flex items-center justify-center flex-shrink-0">
+                <Sparkles className="h-6 w-6 text-brand-indigo" />
               </div>
               <div>
-                <h3 className="font-semibold text-blue-900 dark:text-blue-100 mb-2">
+                <h3 className="font-semibold text-brand-navy dark:text-indigo-100 mb-2">
                   Análisis impulsado por IA
                 </h3>
-                <p className="text-blue-700 dark:text-blue-300 text-sm leading-relaxed">
+                <p className="text-brand-text dark:text-indigo-300 text-sm leading-relaxed">
                   Nuestros módulos de análisis utilizan inteligencia artificial para extraer, validar y analizar
                   información de documentos tributarios. Cada módulo está optimizado para su tipo específico de
                   declaración, garantizando precisión y eficiencia en el proceso de auditoría.

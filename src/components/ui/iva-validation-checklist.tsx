@@ -125,8 +125,8 @@ export function IvaValidationChecklist({ result, onClose }: IvaValidationCheckli
       >
         <div className="flex items-center justify-between flex-wrap gap-4">
           <div className="flex items-center gap-4">
-            <div className="w-14 h-14 rounded-xl bg-blue-500/20 backdrop-blur-sm flex items-center justify-center border border-blue-500/30">
-              <ClipboardCheck className="h-7 w-7 text-blue-400" />
+            <div className="w-14 h-14 rounded-xl bg-brand-indigo/20 backdrop-blur-sm flex items-center justify-center border border-brand-indigo/30">
+              <ClipboardCheck className="h-7 w-7 text-indigo-400" />
             </div>
             <div>
               <h2 className="text-2xl font-bold text-white">
@@ -198,14 +198,14 @@ export function IvaValidationChecklist({ result, onClose }: IvaValidationCheckli
         <div className="flex gap-2">
           <button
             onClick={expandAll}
-            className="text-sm text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
+            className="text-sm text-brand-indigo hover:text-brand-indigo-hover dark:text-indigo-400 dark:hover:text-indigo-300"
           >
             Expandir todo
           </button>
           <span className="text-muted-foreground">|</span>
           <button
             onClick={collapseAll}
-            className="text-sm text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
+            className="text-sm text-brand-indigo hover:text-brand-indigo-hover dark:text-indigo-400 dark:hover:text-indigo-300"
           >
             Colapsar todo
           </button>
@@ -392,7 +392,7 @@ function ValidationItemCard({
               {validation.difference !== undefined && validation.difference !== 0 && (
                 <p className={cn(
                   "text-sm font-medium",
-                  validation.difference > 0 ? "text-red-600" : "text-blue-600"
+                  validation.difference > 0 ? "text-red-600" : "text-brand-indigo"
                 )}>
                   Diferencia: {validation.difference > 0 ? '+' : ''}{validation.difference.toLocaleString('es-CO')}
                 </p>
@@ -400,9 +400,9 @@ function ValidationItemCard({
 
               {/* Detalles adicionales */}
               {validation.details && (
-                <div className="flex items-start gap-2 bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg">
-                  <FileText className="h-4 w-4 text-blue-600 mt-0.5 flex-shrink-0" />
-                  <p className="text-sm text-blue-800 dark:text-blue-200">
+                <div className="flex items-start gap-2 bg-indigo-50 dark:bg-indigo-900/20 p-3 rounded-lg">
+                  <FileText className="h-4 w-4 text-brand-indigo mt-0.5 flex-shrink-0" />
+                  <p className="text-sm text-brand-navy dark:text-indigo-200">
                     {validation.details}
                   </p>
                 </div>
