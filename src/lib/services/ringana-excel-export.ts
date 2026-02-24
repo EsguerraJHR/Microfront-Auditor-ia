@@ -9,7 +9,79 @@ export interface RutDetailsWithDetection extends RutDetails {
 // Constante para el código de Ringana
 export const RINGANA_CODIGO_EMPRESA = '17'
 
+// Mapeo de códigos de responsabilidad DIAN a descripciones
+export const RESPONSABILIDADES_DIAN: Record<string, string> = {
+  // Códigos 01-10
+  "01": "Aporte especial para la administración de justicia",
+  "02": "Gravamen a los movimientos financieros",
+  "03": "Impuesto al Patrimonio",
+  "04": "Impuesto sobre la renta - régimen tributario especial",
+  "05": "Impuesto sobre la renta - régimen ordinario",
+  "06": "Ingresos y patrimonio",
+  "07": "Retención en la fuente a título de renta",
+  "08": "Retención timbre nacional",
+  "09": "Retención en la fuente en el impuesto sobre las ventas",
+  "10": "Obligado aduanero",
+  // Códigos 11-23 (IVA y Facturación)
+  "11": "Ventas régimen común",
+  "12": "Ventas régimen simplificado",
+  "13": "Gran contribuyente",
+  "14": "Informante de exógena",
+  "15": "Autorretenedor",
+  "16": "Obligación de facturar por ingresos excluidos",
+  "17": "Profesionales de compra y venta de divisas",
+  "18": "Precios de Transferencia",
+  "19": "Productor y/o exportador de bienes exentos",
+  "20": "Obtención NIT",
+  "21": "Declarar ingreso/salida de divisas",
+  "22": "Obligado a cumplir deberes formales a nombre de terceros",
+  "23": "Agente de retención en el impuesto sobre las ventas",
+  // Códigos 26-42
+  "26": "Declaración Informativa Individual Precios de transferencia",
+  "32": "Impuesto Nacional a la Gasolina y al ACPM",
+  "33": "Impuesto Nacional al consumo",
+  "36": "Establecimiento Permanente",
+  "39": "Proveedor de Servicios Tecnológicos PST",
+  "41": "Declaración anual de activos en el exterior",
+  "42": "Obligado a Llevar Contabilidad",
+  // Códigos 45-53 (IVA y Facturación Electrónica)
+  "45": "Autorretenedor de rendimientos financieros",
+  "46": "IVA Prestadores de Servicios desde el Exterior",
+  "47": "Régimen Simple de Tributación – SIMPLE",
+  "48": "Impuesto sobre las ventas - IVA",
+  "49": "No responsable de IVA",
+  "50": "No responsable de Consumo restaurantes y bares",
+  "51": "Agente retención impoconsumo de bienes inmuebles",
+  "52": "Facturador electrónico",
+  "53": "Persona Jurídica No Responsable de IVA",
+  // Códigos 54-66 (Información y nuevos impuestos Ley 2277/2022)
+  "54": "Intercambio Automático de Información CRS",
+  "55": "Informante de Beneficiarios Finales",
+  "56": "Impuesto al Carbono",
+  "58": "Intercambio Automático de Información FATCA",
+  "59": "Autorretención especial renta",
+  "60": "Autorretención rendimientos financieros (Superfinanciera)",
+  "61": "Autorretención comisiones (Superfinanciera)",
+  "62": "Impuesto nacional sobre productos plásticos",
+  "63": "Impuesto a las bebidas ultraprocesadas azucaradas",
+  "64": "Impuesto a los productos comestibles ultraprocesados",
+  "65": "Renta Presencia económica significativa (PES)",
+  "66": "Intercambio Automático de Información DPI",
+}
+
 export class RinganaExcelExportService {
+
+  /**
+   * Formatea un código de responsabilidad con su descripción
+   * @param codigo Código de responsabilidad (ej: "49")
+   * @returns Formato "49 - No responsable de IVA" o solo el código si no existe descripción
+   */
+  private static formatResponsabilidad(codigo: string | null | undefined): string | null {
+    if (!codigo) return null
+    const codigoLimpio = codigo.toString().trim().padStart(2, '0')
+    const descripcion = RESPONSABILIDADES_DIAN[codigoLimpio]
+    return descripcion ? `${codigoLimpio} - ${descripcion}` : codigoLimpio
+  }
 
   // Mapeo de departamentos a códigos
   private static DEPARTAMENTO_MAP: Record<string, string> = {
@@ -320,14 +392,14 @@ export class RinganaExcelExportService {
       const { apellido1, apellido2, nombres } = this.parseNombreCompleto(rut.razon_social)
       const depCodigo = this.getDepartamentoCodigo(rut.departamento)
 
-      // Parsear responsabilidades
+      // Parsear responsabilidades con formato "código - descripción"
       const responsabilidades = rut.responsabilidades || []
-      const resp1 = responsabilidades[0] || null
-      const resp2 = responsabilidades[1] || null
-      const resp3 = responsabilidades[2] || null
-      const resp4 = responsabilidades[3] || null
-      const resp5 = responsabilidades[4] || null
-      const resp6 = responsabilidades[5] || null
+      const resp1 = this.formatResponsabilidad(responsabilidades[0])
+      const resp2 = this.formatResponsabilidad(responsabilidades[1])
+      const resp3 = this.formatResponsabilidad(responsabilidades[2])
+      const resp4 = this.formatResponsabilidad(responsabilidades[3])
+      const resp5 = this.formatResponsabilidad(responsabilidades[4])
+      const resp6 = this.formatResponsabilidad(responsabilidades[5])
 
       // Fecha del RUT (convertir a número Excel si es posible)
       let fechaRut: number | string = ''
