@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { TrendingUp, TrendingDown, Minus, Building, Calendar, X, Download, FileSpreadsheet, BarChart3, CheckCircle, Sparkles, ArrowUpRight, ArrowDownRight, FileText, Loader2 } from "lucide-react"
+import { TrendingUp, TrendingDown, Minus, Building, Calendar, X, Download, FileSpreadsheet, BarChart3, CheckCircle, Sparkles, ArrowUpRight, ArrowDownRight, FileText, Loader2, ChevronDown, AlertTriangle, Shield, Calculator, Percent } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { getAuthHeaders } from "@/lib/utils/api-helpers"
 import { ComparativeAnalysisResponse, VariationAnalysis } from "@/lib/api/comparative-analysis-service"
@@ -130,6 +130,8 @@ export function ComparativeAnalysisResults({ results, onClose }: ComparativeAnal
   const [selectedTab, setSelectedTab] = useState<'summary' | 'details' | 'vertical' | 'structure'>('summary')
   const [isExporting, setIsExporting] = useState(false)
   const [isGeneratingReport, setIsGeneratingReport] = useState(false)
+  const [isInfoCollapsed, setIsInfoCollapsed] = useState(false)
+  const [isVerticalInfoCollapsed, setIsVerticalInfoCollapsed] = useState(false)
 
   const handleGenerateReport = async () => {
     setIsGeneratingReport(true)
@@ -193,7 +195,7 @@ export function ComparativeAnalysisResults({ results, onClose }: ComparativeAnal
 
   const tabs = [
     { key: 'summary', label: 'Resumen Ejecutivo', show: true },
-    { key: 'details', label: 'Análisis Detallado', show: true },
+    { key: 'details', label: 'Análisis Horizontal', show: true },
     { key: 'vertical', label: 'Análisis Vertical', show: !!results.analisis_vertical_declaracion_current },
     { key: 'structure', label: 'Cambios Estructurales', show: !!results.estructura_comparacion }
   ].filter(tab => tab.show)
@@ -450,7 +452,130 @@ export function ComparativeAnalysisResults({ results, onClose }: ComparativeAnal
 
       {selectedTab === 'details' && (
         <div className="space-y-4 animate-in fade-in duration-200">
-          {/* All Variations Table — sin motion en filas */}
+          {/* Sección informativa del Análisis Horizontal */}
+          <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl overflow-hidden shadow-lg">
+            <button
+              onClick={() => setIsInfoCollapsed(!isInfoCollapsed)}
+              className="w-full px-6 py-5 bg-gradient-to-r from-blue-600 via-indigo-600 to-brand-indigo border-b border-gray-200 dark:border-gray-700 text-left cursor-pointer hover:brightness-110 transition-all"
+            >
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center">
+                    <BarChart3 className="h-5 w-5 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-white text-lg">Análisis Horizontal (Comparativo entre años)</h3>
+                    <p className="text-blue-200 text-sm">Compara campo a campo los valores de dos declaraciones de renta (año actual vs año anterior) del mismo contribuyente.</p>
+                  </div>
+                </div>
+                <ChevronDown className={cn(
+                  "h-5 w-5 text-white/70 flex-shrink-0 ml-4 transition-transform duration-200",
+                  isInfoCollapsed && "-rotate-90"
+                )} />
+              </div>
+            </button>
+
+            {!isInfoCollapsed && (
+            <div className="p-6 space-y-6 animate-in fade-in slide-in-from-top-2 duration-200">
+              {/* Datos requeridos */}
+              <div className="flex items-start gap-3">
+                <div className="w-8 h-8 rounded-lg bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <FileSpreadsheet className="h-4 w-4 text-brand-indigo" />
+                </div>
+                <div>
+                  <p className="font-semibold text-sm text-foreground">Datos requeridos</p>
+                  <p className="text-sm text-muted-foreground">2 PDFs de declaraciones de renta (Formulario 210) de años consecutivos.</p>
+                </div>
+              </div>
+
+              {/* Campos analizados */}
+              <div>
+                <p className="font-semibold text-sm text-foreground mb-3">Campos analizados (17 en total)</p>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="bg-gray-50 dark:bg-gray-800/50">
+                        <th className="px-4 py-2.5 text-left font-semibold text-gray-700 dark:text-gray-200 text-xs uppercase tracking-wider">Bloque</th>
+                        <th className="px-4 py-2.5 text-left font-semibold text-gray-700 dark:text-gray-200 text-xs uppercase tracking-wider">Campos</th>
+                        <th className="px-4 py-2.5 text-left font-semibold text-gray-700 dark:text-gray-200 text-xs uppercase tracking-wider">Renglones</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
+                      <tr className="hover:bg-gray-50/50 dark:hover:bg-gray-800/30">
+                        <td className="px-4 py-2.5">
+                          <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 text-xs font-medium">Patrimonio</span>
+                        </td>
+                        <td className="px-4 py-2.5 text-muted-foreground">Patrimonio Bruto, Deudas, Patrimonio Líquido</td>
+                        <td className="px-4 py-2.5 font-mono text-xs text-muted-foreground">44, 45, 46</td>
+                      </tr>
+                      <tr className="hover:bg-gray-50/50 dark:hover:bg-gray-800/30">
+                        <td className="px-4 py-2.5">
+                          <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 text-xs font-medium">Ingresos</span>
+                        </td>
+                        <td className="px-4 py-2.5 text-muted-foreground">Ingresos Brutos Ordinarios, Ingresos Financieros, Total Ingresos Netos</td>
+                        <td className="px-4 py-2.5 font-mono text-xs text-muted-foreground">47, 48, 61</td>
+                      </tr>
+                      <tr className="hover:bg-gray-50/50 dark:hover:bg-gray-800/30">
+                        <td className="px-4 py-2.5">
+                          <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 text-xs font-medium">Gastos</span>
+                        </td>
+                        <td className="px-4 py-2.5 text-muted-foreground">Gastos de Administración, Gastos Financieros, Total Costos y Gastos</td>
+                        <td className="px-4 py-2.5 font-mono text-xs text-muted-foreground">63, 65, 67</td>
+                      </tr>
+                      <tr className="hover:bg-gray-50/50 dark:hover:bg-gray-800/30">
+                        <td className="px-4 py-2.5">
+                          <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 text-xs font-medium">Renta/Impuestos</span>
+                        </td>
+                        <td className="px-4 py-2.5 text-muted-foreground">Renta Líquida Ordinaria, Renta Líquida, Renta Líquida Gravable, Impuesto sobre Renta</td>
+                        <td className="px-4 py-2.5 font-mono text-xs text-muted-foreground">72, 75, 79, 91</td>
+                      </tr>
+                      <tr className="hover:bg-gray-50/50 dark:hover:bg-gray-800/30">
+                        <td className="px-4 py-2.5">
+                          <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300 text-xs font-medium">Retenciones/Pagos</span>
+                        </td>
+                        <td className="px-4 py-2.5 text-muted-foreground">Autorretenciones, Total Retenciones, Valor a Pagar, Saldo a Favor</td>
+                        <td className="px-4 py-2.5 font-mono text-xs text-muted-foreground">105, 107, 113, 114</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              {/* Fórmulas */}
+              <div>
+                <p className="font-semibold text-sm text-foreground mb-3">Fórmulas</p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <div className="p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg border border-gray-200 dark:border-gray-700">
+                    <p className="text-xs text-muted-foreground mb-1">Variación Nominal</p>
+                    <code className="text-sm font-mono text-foreground">Valor_Actual - Valor_Anterior</code>
+                  </div>
+                  <div className="p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg border border-gray-200 dark:border-gray-700">
+                    <p className="text-xs text-muted-foreground mb-1">Variación Relativa (%)</p>
+                    <code className="text-sm font-mono text-foreground">(Actual - Anterior) / Anterior × 100</code>
+                  </div>
+                </div>
+                <p className="text-xs text-muted-foreground mt-2">
+                  Si el valor anterior es <strong>0</strong> y el actual {'>'} 0, se marca como <span className="inline-flex px-1.5 py-0.5 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-300 rounded text-xs font-medium">∞ (valor nuevo)</span>
+                </p>
+              </div>
+
+              {/* Resumen ejecutivo */}
+              <div className="p-4 bg-amber-50 dark:bg-amber-900/10 rounded-lg border border-amber-200 dark:border-amber-800/50">
+                <div className="flex items-start gap-2">
+                  <TrendingUp className="h-4 w-4 text-amber-600 mt-0.5 flex-shrink-0" />
+                  <div>
+                    <p className="font-semibold text-sm text-amber-800 dark:text-amber-200">Resumen ejecutivo</p>
+                    <p className="text-sm text-amber-700 dark:text-amber-300 mt-1">
+                      Cuenta campos con incrementos, decrementos e iguales. Se marca como <strong>cambio significativo</strong> cualquier variación relativa {'>'} 20%.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            )}
+          </div>
+
+          {/* All Variations Table */}
           <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl overflow-hidden shadow-lg">
             <div className="px-6 py-5 bg-gradient-to-r from-slate-700 via-slate-800 to-slate-900 border-b border-gray-200 dark:border-gray-700">
               <div className="flex items-center justify-between">
@@ -578,7 +703,253 @@ export function ComparativeAnalysisResults({ results, onClose }: ComparativeAnal
 
       {/* Vertical Analysis Tab */}
       {selectedTab === 'vertical' && results.analisis_vertical_declaracion_current && (
-        <div className="animate-in fade-in duration-200">
+        <div className="space-y-4 animate-in fade-in duration-200">
+
+          {/* Sección informativa del Análisis Vertical */}
+          <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl overflow-hidden shadow-lg">
+            <button
+              onClick={() => setIsVerticalInfoCollapsed(!isVerticalInfoCollapsed)}
+              className="w-full px-6 py-5 bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-700 border-b border-gray-200 dark:border-gray-700 text-left cursor-pointer hover:brightness-110 transition-all"
+            >
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center">
+                    <Percent className="h-5 w-5 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-white text-lg">Análisis Vertical (Estructura porcentual por año)</h3>
+                    <p className="text-emerald-200 text-sm">Expresa cada partida como porcentaje de una base dentro del mismo año, para entender la composición de la declaración.</p>
+                  </div>
+                </div>
+                <ChevronDown className={cn(
+                  "h-5 w-5 text-white/70 flex-shrink-0 ml-4 transition-transform duration-200",
+                  isVerticalInfoCollapsed && "-rotate-90"
+                )} />
+              </div>
+            </button>
+
+            {!isVerticalInfoCollapsed && (
+            <div className="p-6 space-y-6 animate-in fade-in slide-in-from-top-2 duration-200">
+
+              {/* Bases utilizadas */}
+              <div>
+                <p className="font-semibold text-sm text-foreground mb-3">Bases utilizadas</p>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="bg-gray-50 dark:bg-gray-800/50">
+                        <th className="px-4 py-2.5 text-left font-semibold text-gray-700 dark:text-gray-200 text-xs uppercase tracking-wider">Bloque</th>
+                        <th className="px-4 py-2.5 text-left font-semibold text-gray-700 dark:text-gray-200 text-xs uppercase tracking-wider">Base (100%)</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
+                      <tr className="hover:bg-gray-50/50 dark:hover:bg-gray-800/30">
+                        <td className="px-4 py-2.5"><span className="inline-flex px-2 py-0.5 rounded-md bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 text-xs font-medium">Patrimonio</span></td>
+                        <td className="px-4 py-2.5 text-muted-foreground">Patrimonio Bruto (R44)</td>
+                      </tr>
+                      <tr className="hover:bg-gray-50/50 dark:hover:bg-gray-800/30">
+                        <td className="px-4 py-2.5"><span className="inline-flex px-2 py-0.5 rounded-md bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 text-xs font-medium">Resultados</span></td>
+                        <td className="px-4 py-2.5 text-muted-foreground">Ingresos Netos (R61)</td>
+                      </tr>
+                      <tr className="hover:bg-gray-50/50 dark:hover:bg-gray-800/30">
+                        <td className="px-4 py-2.5"><span className="inline-flex px-2 py-0.5 rounded-md bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 text-xs font-medium">Impuestos</span></td>
+                        <td className="px-4 py-2.5 text-muted-foreground">Ingresos Netos (R61)</td>
+                      </tr>
+                      <tr className="hover:bg-gray-50/50 dark:hover:bg-gray-800/30">
+                        <td className="px-4 py-2.5"><span className="inline-flex px-2 py-0.5 rounded-md bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300 text-xs font-medium">Pagos y Saldos</span></td>
+                        <td className="px-4 py-2.5 text-muted-foreground">Ingresos Netos (R61)</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                <div className="mt-2 p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg border border-gray-200 dark:border-gray-700">
+                  <p className="text-xs text-muted-foreground"><strong>Fórmula:</strong> <code className="font-mono bg-gray-100 dark:bg-gray-700 px-1.5 py-0.5 rounded">(Valor del campo / Base) × 100</code></p>
+                </div>
+              </div>
+
+              {/* Campos por bloque */}
+              <div>
+                <p className="font-semibold text-sm text-foreground mb-3">Campos por bloque</p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <div className="p-3 bg-blue-50 dark:bg-blue-900/10 rounded-lg border border-blue-200 dark:border-blue-800/50">
+                    <p className="font-semibold text-xs text-blue-700 dark:text-blue-300 mb-1.5">Patrimonio</p>
+                    <p className="text-xs text-muted-foreground">Patrimonio Bruto, Deudas, Patrimonio Líquido</p>
+                  </div>
+                  <div className="p-3 bg-green-50 dark:bg-green-900/10 rounded-lg border border-green-200 dark:border-green-800/50">
+                    <p className="font-semibold text-xs text-green-700 dark:text-green-300 mb-1.5">Resultados</p>
+                    <p className="text-xs text-muted-foreground">Ingresos Netos, Total Costos y Gastos, Renta Líquida Ordinaria, Recuperación Deducciones, Pérdida Líquida, Compensaciones, Renta Exenta, Renta Líquida Gravable</p>
+                  </div>
+                  <div className="p-3 bg-purple-50 dark:bg-purple-900/10 rounded-lg border border-purple-200 dark:border-purple-800/50">
+                    <p className="font-semibold text-xs text-purple-700 dark:text-purple-300 mb-1.5">Impuestos</p>
+                    <p className="text-xs text-muted-foreground">Impuesto sobre Renta Líquida, Descuentos Tributarios, Impuesto Neto de Renta, Ganancia Ocasional Gravable, Impuesto Ganancia Ocasional, Total Impuesto a Cargo</p>
+                  </div>
+                  <div className="p-3 bg-orange-50 dark:bg-orange-900/10 rounded-lg border border-orange-200 dark:border-orange-800/50">
+                    <p className="font-semibold text-xs text-orange-700 dark:text-orange-300 mb-1.5">Pagos y Saldos</p>
+                    <p className="text-xs text-muted-foreground">Anticipo Año Anterior, Saldo a Favor Año Anterior, Retenciones, Anticipo Año Siguiente, Anticipo Puntos Adicionales, Valor a Pagar, Saldo a Favor</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Comparación estructural */}
+              <div className="p-4 bg-teal-50 dark:bg-teal-900/10 rounded-lg border border-teal-200 dark:border-teal-800/50">
+                <div className="flex items-start gap-2">
+                  <BarChart3 className="h-4 w-4 text-teal-600 mt-0.5 flex-shrink-0" />
+                  <div>
+                    <p className="font-semibold text-sm text-teal-800 dark:text-teal-200">Comparación estructural</p>
+                    <p className="text-sm text-teal-700 dark:text-teal-300 mt-1">
+                      Se compara la estructura vertical del año actual con la del anterior. Se marcan como <strong>cambios significativos</strong> las diferencias mayores a <strong>5 puntos porcentuales</strong>, con interpretación automática (ej: &quot;Reducción significativa en costos/gastos - mejora en eficiencia operativa&quot;).
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Coherencia Tributaria */}
+              <div className="border-t border-gray-200 dark:border-gray-700 pt-6">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-8 h-8 rounded-lg bg-rose-100 dark:bg-rose-900/30 flex items-center justify-center">
+                    <Shield className="h-4 w-4 text-rose-600" />
+                  </div>
+                  <div>
+                    <p className="font-semibold text-sm text-foreground">Insights / Coherencia Tributaria</p>
+                    <p className="text-xs text-muted-foreground">8 índices + 2 cruces de verificación + 1 validación legal, cada uno con nivel de riesgo</p>
+                  </div>
+                </div>
+
+                {/* Niveles de riesgo */}
+                <div className="flex flex-wrap gap-2 mb-4">
+                  <span className="inline-flex items-center px-2 py-1 rounded-md bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 text-xs font-medium">BAJO</span>
+                  <span className="inline-flex items-center px-2 py-1 rounded-md bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300 text-xs font-medium">MEDIO</span>
+                  <span className="inline-flex items-center px-2 py-1 rounded-md bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300 text-xs font-medium">ALTO</span>
+                  <span className="inline-flex items-center px-2 py-1 rounded-md bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 text-xs font-medium">CRITICO</span>
+                </div>
+
+                {/* Índices calculados */}
+                <div className="mb-4">
+                  <p className="font-semibold text-xs text-foreground mb-2">Índices calculados</p>
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-xs">
+                      <thead>
+                        <tr className="bg-gray-50 dark:bg-gray-800/50">
+                          <th className="px-3 py-2 text-left font-semibold text-gray-700 dark:text-gray-200 uppercase tracking-wider">#</th>
+                          <th className="px-3 py-2 text-left font-semibold text-gray-700 dark:text-gray-200 uppercase tracking-wider">Índice</th>
+                          <th className="px-3 py-2 text-left font-semibold text-gray-700 dark:text-gray-200 uppercase tracking-wider">Fórmula</th>
+                          <th className="px-3 py-2 text-left font-semibold text-gray-700 dark:text-gray-200 uppercase tracking-wider">Criterio de alerta</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
+                        <tr className="hover:bg-gray-50/50 dark:hover:bg-gray-800/30">
+                          <td className="px-3 py-2 font-mono">1</td>
+                          <td className="px-3 py-2 font-medium text-foreground">Margen de Utilidad Fiscal</td>
+                          <td className="px-3 py-2 text-muted-foreground font-mono">R72 / R61</td>
+                          <td className="px-3 py-2 text-muted-foreground">Comparación vs promedio sectorial DIAN. Riesgo si {'>'} 60% por debajo</td>
+                        </tr>
+                        <tr className="hover:bg-gray-50/50 dark:hover:bg-gray-800/30">
+                          <td className="px-3 py-2 font-mono">2</td>
+                          <td className="px-3 py-2 font-medium text-foreground">Absorción de Ingresos</td>
+                          <td className="px-3 py-2 text-muted-foreground font-mono">R67 / R61</td>
+                          <td className="px-3 py-2 text-muted-foreground">BAJO {'<'}80%, MEDIO 80-95%, ALTO 95-100%, CRITICO {'≥'}100%</td>
+                        </tr>
+                        <tr className="hover:bg-gray-50/50 dark:hover:bg-gray-800/30">
+                          <td className="px-3 py-2 font-mono">3</td>
+                          <td className="px-3 py-2 font-medium text-foreground">Verificación de Tarifa</td>
+                          <td className="px-3 py-2 text-muted-foreground font-mono">R91 / R79</td>
+                          <td className="px-3 py-2 text-muted-foreground">Debe estar entre 34.5% y 40%</td>
+                        </tr>
+                        <tr className="hover:bg-gray-50/50 dark:hover:bg-gray-800/30">
+                          <td className="px-3 py-2 font-mono">4</td>
+                          <td className="px-3 py-2 font-medium text-foreground">Tasa Efectiva</td>
+                          <td className="px-3 py-2 text-muted-foreground font-mono">R99 / R79</td>
+                          <td className="px-3 py-2 text-muted-foreground">Informativo</td>
+                        </tr>
+                        <tr className="hover:bg-gray-50/50 dark:hover:bg-gray-800/30">
+                          <td className="px-3 py-2 font-mono">5</td>
+                          <td className="px-3 py-2 font-medium text-foreground">Proporción Compensaciones</td>
+                          <td className="px-3 py-2 text-muted-foreground font-mono">R74 / R72</td>
+                          <td className="px-3 py-2 text-muted-foreground">Alerta si {'>'} 20%. CRITICO si {'>'} 40%</td>
+                        </tr>
+                        <tr className="hover:bg-gray-50/50 dark:hover:bg-gray-800/30">
+                          <td className="px-3 py-2 font-mono">6</td>
+                          <td className="px-3 py-2 font-medium text-foreground">Proporción Rentas Exentas</td>
+                          <td className="px-3 py-2 text-muted-foreground font-mono">R77 / R72</td>
+                          <td className="px-3 py-2 text-muted-foreground">Alerta si {'>'} 30%. CRITICO si {'>'} 50%</td>
+                        </tr>
+                        <tr className="hover:bg-gray-50/50 dark:hover:bg-gray-800/30">
+                          <td className="px-3 py-2 font-mono">7</td>
+                          <td className="px-3 py-2 font-medium text-foreground">Nivel de Endeudamiento</td>
+                          <td className="px-3 py-2 text-muted-foreground font-mono">R45 / R44</td>
+                          <td className="px-3 py-2 text-muted-foreground">Informativo</td>
+                        </tr>
+                        <tr className="hover:bg-gray-50/50 dark:hover:bg-gray-800/30">
+                          <td className="px-3 py-2 font-mono">8</td>
+                          <td className="px-3 py-2 font-medium text-foreground">Retenciones vs Impuesto</td>
+                          <td className="px-3 py-2 text-muted-foreground font-mono">R107 / R99</td>
+                          <td className="px-3 py-2 text-muted-foreground">Informativo</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                {/* Cruces de verificación */}
+                <div className="mb-4">
+                  <p className="font-semibold text-xs text-foreground mb-2">Cruces de verificación</p>
+                  <div className="space-y-2">
+                    <div className="p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg border border-gray-200 dark:border-gray-700">
+                      <p className="font-medium text-xs text-foreground mb-1">9. Saldo a Favor vs Activos</p>
+                      <p className="text-xs text-muted-foreground">Si Otros Activos (R43) {'<'} Saldo a Favor (R114) → el saldo no fue incluido en activos.</p>
+                    </div>
+                    <div className="p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg border border-gray-200 dark:border-gray-700">
+                      <p className="font-medium text-xs text-foreground mb-1">10. Autorretenciones vs Tarifa CIIU</p>
+                      <p className="text-xs text-muted-foreground">(R61 + R70 + R80) × tarifa_CIIU vs R105. Verificación directa + inversa con tolerancia del 5%. Requiere tarifa de autorretención por código CIIU.</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Validación legal */}
+                <div className="mb-4">
+                  <p className="font-semibold text-xs text-foreground mb-2">Validación legal</p>
+                  <div className="p-3 bg-red-50 dark:bg-red-900/10 rounded-lg border border-red-200 dark:border-red-800/50">
+                    <p className="font-medium text-xs text-red-700 dark:text-red-300 mb-1">11. Gastos No Explicados (Art. 663 E.T.)</p>
+                    <p className="text-xs text-muted-foreground">Fuentes = Ingresos Netos (R61) + (Pasivos actuales R45 − Pasivos anteriores R45). Si Fuentes {'<'} Total Costos y Gastos (R67) → existen gastos sin fuente de ingreso que los explique.</p>
+                  </div>
+                </div>
+
+                {/* Datos externos */}
+                <div className="mb-4">
+                  <p className="font-semibold text-xs text-foreground mb-2">Datos externos requeridos</p>
+                  <div className="flex flex-wrap gap-2">
+                    <span className="inline-flex items-center gap-1 text-xs px-2.5 py-1 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-700 dark:text-indigo-300 rounded-md border border-indigo-200 dark:border-indigo-800/50">
+                      <FileSpreadsheet className="h-3 w-3" />
+                      Datos sectoriales DIAN (promedio utilidad por CIIU)
+                    </span>
+                    <span className="inline-flex items-center gap-1 text-xs px-2.5 py-1 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-700 dark:text-indigo-300 rounded-md border border-indigo-200 dark:border-indigo-800/50">
+                      <Calculator className="h-3 w-3" />
+                      Tarifas de autorretención por CIIU
+                    </span>
+                  </div>
+                </div>
+
+                {/* Riesgo Global */}
+                <div className="p-4 bg-amber-50 dark:bg-amber-900/10 rounded-lg border border-amber-200 dark:border-amber-800/50">
+                  <div className="flex items-start gap-2">
+                    <AlertTriangle className="h-4 w-4 text-amber-600 mt-0.5 flex-shrink-0" />
+                    <div>
+                      <p className="font-semibold text-sm text-amber-800 dark:text-amber-200">Riesgo Global</p>
+                      <ul className="text-xs text-amber-700 dark:text-amber-300 mt-1 space-y-1 list-disc list-inside">
+                        <li>Si hay algún índice <strong>CRITICO</strong> → Global CRITICO</li>
+                        <li>Si hay ≥2 ALTO → Global ALTO</li>
+                        <li>Si hay ≥1 ALTO o ≥3 MEDIO → Global MEDIO</li>
+                        <li>De lo contrario → Global BAJO</li>
+                      </ul>
+                      <p className="text-xs text-amber-700 dark:text-amber-300 mt-2">Se generan recomendaciones automáticas solo para índices con riesgo ALTO o CRITICO.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            )}
+          </div>
+
           <VerticalAnalysisView
             currentYear={results.analisis_vertical_declaracion_current}
             previousYear={results.analisis_vertical_declaracion_previous}

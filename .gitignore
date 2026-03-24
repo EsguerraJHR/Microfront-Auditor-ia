@@ -160,3 +160,9 @@ config.local.*
 
 # CSV files (uncomment if you don't want to track CSV files)
 # *.csv
+
+# Claude Code skills and agents
+.agents/
+.claude/skills/
+.claude/settings.local.json
+skills-lock.json
