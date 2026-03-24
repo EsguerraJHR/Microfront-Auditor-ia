@@ -9,6 +9,7 @@ import { declarationStorageService } from "@/lib/services/declaration-storage-se
 import { TaxCalendarModal } from "@/components/ui/tax-calendar-modal"
 import { ProgressBar } from "@/components/ui/progress-bar"
 import { FEATURES } from "@/config/features"
+import { formatCurrency, formatDate } from "@/lib/utils/format"
 import Link from "next/link"
 
 export default function AnalisisDeclaracionesRentaPage() {
@@ -112,26 +113,7 @@ export default function AnalisisDeclaracionesRentaPage() {
     }
   }
 
-  const formatCurrency = (value?: number) => {
-    if (value === undefined || value === null) return 'N/A'
-    return new Intl.NumberFormat('es-CO', {
-      style: 'currency',
-      currency: 'COP',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0
-    }).format(value)
-  }
-
-  const formatDate = (dateString: string) => {
-    if (!dateString) return 'N/A'
-    const [year, month, day] = dateString.split('-').map(Number)
-    const date = new Date(year, month - 1, day)
-    return date.toLocaleDateString('es-CO', {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit'
-    })
-  }
+  // formatCurrency and formatDate imported from @/lib/utils/format
 
   const handleViewCompleteGrandesContribuyentes = async () => {
     setCalendarModalType('grandes-contribuyentes')
