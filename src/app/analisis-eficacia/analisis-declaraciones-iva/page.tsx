@@ -2,6 +2,26 @@
 
 import React, { useState, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.08,
+      delayChildren: 0.05
+    }
+  }
+} as const
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 10 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.2 }
+  }
+}
 import {
   Upload,
   FileText,
@@ -48,30 +68,7 @@ import {
 import { FEATURES } from "@/config/features"
 import { ProgressBar } from "@/components/ui/progress-bar"
 import { IvaValidationChecklist } from "@/components/ui/iva-validation-checklist"
-
-const containerVariants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.1,
-      delayChildren: 0.1
-    }
-  }
-} as const
-
-const itemVariants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: {
-      type: "spring" as const,
-      stiffness: 100,
-      damping: 15
-    }
-  }
-}
+import { formatCurrency } from "@/lib/utils/format"
 
 interface UploadedFile {
   id: string
@@ -114,15 +111,7 @@ export default function AnalisisDeclaracionesIvaPage() {
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
   }
 
-  const formatCurrency = (value: number | null | undefined): string => {
-    if (value === null || value === undefined) return '$0'
-    return new Intl.NumberFormat('es-CO', {
-      style: 'currency',
-      currency: 'COP',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0
-    }).format(value)
-  }
+  // formatCurrency imported from @/lib/utils/format
 
   const generateId = () => Math.random().toString(36).substring(2, 11)
 

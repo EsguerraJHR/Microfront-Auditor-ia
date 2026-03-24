@@ -98,8 +98,10 @@
 }
 
 @layer base {
-  * {
-    @apply border-border;
+  *,
+  ::before,
+  ::after {
+    border-color: hsl(var(--border));
   }
 
   body {
@@ -160,14 +162,15 @@
     @apply bg-brand-indigo hover:bg-brand-indigo-hover text-white px-4 py-2 rounded-lg transition-colors duration-200;
   }
 
-  /* Cards */
+  /* Cards — sin backdrop-blur, transition solo en shadow y border */
   .card-base {
-    @apply bg-white/90 backdrop-blur-sm rounded-3xl shadow-lg border border-gray-100 hover:shadow-2xl hover:border-gray-200 transition-all duration-500;
+    @apply bg-white dark:bg-gray-900 rounded-3xl shadow-lg border border-gray-100 dark:border-gray-800 hover:shadow-xl hover:border-gray-200 dark:hover:border-gray-700;
+    transition: box-shadow 0.3s ease, border-color 0.3s ease;
   }
 
-  /* Navbar */
+  /* Navbar — sin backdrop-blur */
   .navbar-base {
-    @apply bg-white/90 backdrop-blur-md border-b border-gray-200 sticky top-0 z-50;
+    @apply bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 sticky top-0 z-50;
   }
 
   /* Dropdowns */
@@ -190,9 +193,9 @@
     background: linear-gradient(to right, #172D5F, #413D93);
   }
 
-  /* Elementos decorativos */
+  /* Elementos decorativos — sin animate-pulse, blur reducido */
   .blob-decoration {
-    @apply absolute rounded-full blur-3xl animate-pulse;
+    @apply absolute rounded-full blur-2xl opacity-40;
   }
 
   /* Ícono de calculadora con estilo consistente */
@@ -234,13 +237,15 @@
     @apply text-gray-600 font-semibold;
   }
 
-  /* Hover effects */
+  /* Hover effects — GPU-accelerated con will-change y transiciones específicas */
   .hover-scale {
-    @apply transition-transform duration-300 hover:scale-105;
+    @apply hover:scale-105;
+    transition: transform 0.3s ease;
   }
 
   .hover-lift {
-    @apply transition-all duration-300 hover:-translate-y-2 hover:shadow-xl;
+    @apply hover:-translate-y-1 hover:shadow-lg;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
   }
 }
 

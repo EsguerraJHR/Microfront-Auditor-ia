@@ -190,7 +190,7 @@ export function Sidebar({ isOpen, onClose, isCollapsed, onToggleCollapse }: Side
           )}>
             <div className="p-3 rounded-lg bg-sidebar-accent">
               <div className="flex items-center gap-2 mb-2">
-                <div className="h-2 w-2 bg-brand-indigo rounded-full animate-pulse"></div>
+                <div className="h-2 w-2 bg-brand-indigo rounded-full"></div>
                 <span className="text-sm font-medium text-sidebar-foreground">
                   Estado del Sistema
                 </span>

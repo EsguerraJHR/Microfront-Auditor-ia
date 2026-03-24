@@ -1,7 +1,6 @@
 "use client"
 
 import React, { useState } from "react"
-import { motion, AnimatePresence } from "framer-motion"
 import {
   CheckCircle2,
   XCircle,
@@ -20,30 +19,6 @@ import {
   ValidationStatus,
   VALIDATION_DESCRIPTIONS
 } from "@/lib/api/iva-validation-service"
-
-const containerVariants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.05,
-      delayChildren: 0.1
-    }
-  }
-} as const
-
-const itemVariants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: {
-      type: "spring" as const,
-      stiffness: 100,
-      damping: 15
-    }
-  }
-}
 
 interface IvaValidationChecklistProps {
   result: IvaValidationResponse
@@ -112,20 +87,12 @@ export function IvaValidationChecklist({ result, onClose }: IvaValidationCheckli
   }
 
   return (
-    <motion.div
-      variants={containerVariants}
-      initial="hidden"
-      animate="visible"
-      className="space-y-6"
-    >
+    <div className="space-y-6 animate-in fade-in duration-300">
       {/* Header con resumen */}
-      <motion.div
-        variants={itemVariants}
-        className="bg-gradient-to-r from-slate-700 via-slate-800 to-slate-900 rounded-2xl p-6 shadow-xl"
-      >
+      <div className="bg-gradient-to-r from-slate-700 via-slate-800 to-slate-900 rounded-2xl p-6 shadow-xl">
         <div className="flex items-center justify-between flex-wrap gap-4">
           <div className="flex items-center gap-4">
-            <div className="w-14 h-14 rounded-xl bg-brand-indigo/20 backdrop-blur-sm flex items-center justify-center border border-brand-indigo/30">
+            <div className="w-14 h-14 rounded-xl bg-brand-indigo/20 flex items-center justify-center border border-brand-indigo/30">
               <ClipboardCheck className="h-7 w-7 text-indigo-400" />
             </div>
             <div>
@@ -188,10 +155,10 @@ export function IvaValidationChecklist({ result, onClose }: IvaValidationCheckli
             ))}
           </div>
         </div>
-      </motion.div>
+      </div>
 
       {/* Controles */}
-      <motion.div variants={itemVariants} className="flex justify-between items-center">
+      <div className="flex justify-between items-center">
         <h3 className="text-lg font-semibold text-foreground">
           Detalle de Validaciones ({result.validations.length})
         </h3>
@@ -210,7 +177,7 @@ export function IvaValidationChecklist({ result, onClose }: IvaValidationCheckli
             Colapsar todo
           </button>
         </div>
-      </motion.div>
+      </div>
 
       {/* Lista de validaciones */}
       <div className="space-y-3">
@@ -226,13 +193,10 @@ export function IvaValidationChecklist({ result, onClose }: IvaValidationCheckli
       </div>
 
       {/* Footer con timestamp */}
-      <motion.div
-        variants={itemVariants}
-        className="text-center text-xs text-muted-foreground pt-4 border-t border-gray-200 dark:border-gray-800"
-      >
+      <div className="text-center text-xs text-muted-foreground pt-4 border-t border-gray-200 dark:border-gray-800">
         Validación ejecutada el {new Date(result.timestamp).toLocaleString('es-CO')}
-      </motion.div>
-    </motion.div>
+      </div>
+    </div>
   )
 }
 
@@ -283,12 +247,9 @@ function ValidationItemCard({
   const description = VALIDATION_DESCRIPTIONS[validation.id]
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: index * 0.03 }}
+    <div
       className={cn(
-        "rounded-xl border overflow-hidden transition-all",
+        "rounded-xl border overflow-hidden",
         config.bg,
         config.border
       )}
@@ -323,16 +284,9 @@ function ValidationItemCard({
       </button>
 
       {/* Contenido expandible */}
-      <AnimatePresence>
-        {isExpanded && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: 'auto', opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            className="overflow-hidden"
-          >
-            <div className="px-4 pb-4 space-y-3 border-t border-gray-200/50 dark:border-gray-700/50 pt-3">
+      {isExpanded && (
+        <div className="animate-in fade-in slide-in-from-top-2 duration-200">
+          <div className="px-4 pb-4 space-y-3 border-t border-gray-200/50 dark:border-gray-700/50 pt-3">
               {/* Descripción */}
               <div className="flex items-start gap-2">
                 <Info className="h-4 w-4 text-muted-foreground mt-0.5 flex-shrink-0" />
@@ -431,11 +385,10 @@ function ValidationItemCard({
                   )}
                 </div>
               )}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </motion.div>
+          </div>
+        </div>
+      )}
+    </div>
   )
 }
 

@@ -7,8 +7,10 @@ import { rutService, RutExtractionWithClientResponse, UploadProgress, RutDetails
 import { accountingClientService, AccountingClient } from "@/lib/api/accounting-client-service"
 import { FileUpload } from "@/components/ui/file-upload"
 import { RutResults } from "@/components/ui/rut-results"
-import { ExcelExportService } from "@/lib/services/excel-export"
-import { RinganaExcelExportService, RINGANA_CODIGO_EMPRESA } from "@/lib/services/ringana-excel-export"
+// Lazy import para servicios de Excel — se cargan solo cuando el usuario exporta
+const getExcelExportService = () => import("@/lib/services/excel-export").then(m => m.ExcelExportService)
+const getRinganaExcelExport = () => import("@/lib/services/ringana-excel-export")
+import { RINGANA_CODIGO_EMPRESA } from "@/lib/services/ringana-excel-export"
 import { getAuthHeaders } from "@/lib/utils/api-helpers"
 
 type TerceroType = 'cliente' | 'proveedor'
@@ -137,6 +139,7 @@ export default function TercerosPage() {
         // Usar servicio especializado de Ringana
         console.log('Exportando para Ringana - separando por tipo de contribuyente')
 
+        const { RinganaExcelExportService } = await getRinganaExcelExport()
         const resultado = await RinganaExcelExportService.exportRingana(
           extractionResults.results,
           selectedType
@@ -175,6 +178,7 @@ export default function TercerosPage() {
           })
 
         console.log('Calling exportToExcel with codigo_empresa:', selectedAccountingClient.codigo_empresa)
+        const ExcelExportService = await getExcelExportService()
         await ExcelExportService.exportToExcel(rutDetails, selectedAccountingClient.codigo_empresa)
       }
     } catch (error) {
