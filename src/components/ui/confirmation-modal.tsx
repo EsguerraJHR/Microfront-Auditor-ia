@@ -34,34 +34,34 @@ export function ConfirmationModal({
       case 'success':
         return {
           icon: CheckCircle,
-          iconColor: 'text-green-600',
-          iconBg: 'bg-green-100',
-          confirmBg: 'bg-green-600 hover:bg-green-700',
-          borderColor: 'border-green-200'
+          iconColor: 'text-success',
+          iconBg: 'bg-success-bg',
+          confirmBg: 'bg-success hover:bg-success/90',
+          borderColor: 'border-success-bg'
         }
       case 'error':
         return {
           icon: XCircle,
-          iconColor: 'text-red-600',
-          iconBg: 'bg-red-100',
-          confirmBg: 'bg-red-600 hover:bg-red-700',
-          borderColor: 'border-red-200'
+          iconColor: 'text-error',
+          iconBg: 'bg-error-bg',
+          confirmBg: 'bg-error hover:bg-error/90',
+          borderColor: 'border-error-bg'
         }
       case 'info':
         return {
           icon: CheckCircle,
-          iconColor: 'text-blue-600',
-          iconBg: 'bg-blue-100',
-          confirmBg: 'bg-blue-600 hover:bg-blue-700',
-          borderColor: 'border-blue-200'
+          iconColor: 'text-brand-indigo',
+          iconBg: 'bg-brand-indigo/10',
+          confirmBg: 'bg-brand-indigo hover:bg-brand-indigo-hover',
+          borderColor: 'border-brand-indigo/20'
         }
       default: // warning
         return {
           icon: AlertTriangle,
-          iconColor: 'text-yellow-600',
-          iconBg: 'bg-yellow-100',
-          confirmBg: 'bg-yellow-600 hover:bg-yellow-700',
-          borderColor: 'border-yellow-200'
+          iconColor: 'text-warning',
+          iconBg: 'bg-warning-bg',
+          confirmBg: 'bg-warning hover:bg-warning/90',
+          borderColor: 'border-warning-bg'
         }
     }
   }
@@ -78,7 +78,7 @@ export function ConfirmationModal({
       />
 
       {/* Modal */}
-      <div className="relative z-10 bg-white dark:bg-gray-900 rounded-xl shadow-2xl border border-gray-200 dark:border-gray-700 p-6 max-w-md w-full mx-4 transform transition-all">
+      <div className="relative z-10 bg-white rounded-xl shadow-2xl border border-brand-border p-6 max-w-md w-full mx-4 transform transition-all">
         <div className="space-y-6">
           {/* Header */}
           <div className="flex items-start justify-between">
@@ -86,14 +86,14 @@ export function ConfirmationModal({
               <div className={`p-2 rounded-full ${config.iconBg}`}>
                 <Icon className={`h-6 w-6 ${config.iconColor}`} />
               </div>
-              <h3 className="text-lg font-semibold text-foreground">
+              <h3 className="text-lg font-semibold text-brand-text">
                 {title}
               </h3>
             </div>
             {!isLoading && (
               <button
                 onClick={onClose}
-                className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                className="text-brand-text-secondary hover:text-brand-text"
               >
                 <X className="h-5 w-5" />
               </button>
@@ -102,7 +102,7 @@ export function ConfirmationModal({
 
           {/* Message */}
           <div className={`p-4 rounded-lg border ${config.borderColor} ${config.iconBg}/30`}>
-            <p className="text-sm text-foreground whitespace-pre-line">
+            <p className="text-sm text-brand-text whitespace-pre-line">
               {message}
             </p>
           </div>
@@ -115,7 +115,7 @@ export function ConfirmationModal({
             <button
               onClick={onClose}
               disabled={isLoading}
-              className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-4 py-2 text-sm font-medium text-brand-text-secondary border border-brand-border rounded-lg hover:bg-brand-bg-alt transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {cancelText}
             </button>

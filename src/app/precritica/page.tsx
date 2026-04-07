@@ -26,29 +26,29 @@ const features = [
     icon: TrendingUp,
     title: "Análisis de Variaciones",
     description: "Detecta cambios significativos en patrimonio, ingresos, gastos y renta líquida",
-    color: "text-green-600",
-    bgColor: "bg-green-100 dark:bg-green-900/30"
+    color: "text-success",
+    bgColor: "bg-brand-indigo/10"
   },
   {
     icon: FileSearch,
     title: "Comparación Detallada",
     description: "Compara campo por campo las declaraciones de dos años consecutivos",
     color: "text-brand-indigo",
-    bgColor: "bg-indigo-100 dark:bg-indigo-900/30"
+    bgColor: "bg-brand-indigo/10"
   },
   {
     icon: Shield,
     title: "Detección de Anomalías",
     description: "Identifica inconsistencias y variaciones atípicas para revisión",
-    color: "text-purple-600",
-    bgColor: "bg-purple-100 dark:bg-purple-900/30"
+    color: "text-brand-indigo",
+    bgColor: "bg-brand-indigo/10"
   },
   {
     icon: Target,
     title: "Análisis Vertical",
     description: "Evalúa la estructura porcentual y coherencia tributaria",
     color: "text-brand-navy",
-    bgColor: "bg-indigo-100 dark:bg-indigo-900/30"
+    bgColor: "bg-brand-indigo/10"
   }
 ]
 
@@ -135,7 +135,7 @@ export default function PrecriticaPage() {
             {/* Background decorations — estáticas, sin blur pesado */}
             <div className="absolute inset-0 overflow-hidden">
               <div className="absolute -top-1/2 -right-1/4 w-96 h-96 bg-white/10 rounded-full blur-2xl" />
-              <div className="absolute -bottom-1/2 -left-1/4 w-96 h-96 bg-indigo-300/15 rounded-full blur-2xl" />
+              <div className="absolute -bottom-1/2 -left-1/4 w-96 h-96 bg-brand-indigo/15 rounded-full blur-2xl" />
             </div>
 
             <div className="relative z-10">
@@ -145,7 +145,7 @@ export default function PrecriticaPage() {
               </div>
 
               <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4">
-                <span className="text-indigo-200">Diagnostico Tributario</span>
+                <span className="text-white/80">Diagnostico Tributario</span>
               </h1>
 
               <p className="text-lg text-white/90 max-w-2xl mb-8">
@@ -172,7 +172,7 @@ export default function PrecriticaPage() {
             </div>
 
             <div className="absolute bottom-8 right-32 hidden lg:block">
-              <div className="w-16 h-16 bg-yellow-300/30 rounded-xl flex items-center justify-center">
+              <div className="w-16 h-16 bg-warning/30 rounded-xl flex items-center justify-center">
                 <TrendingUp className="h-8 w-8 text-white" />
               </div>
             </div>
@@ -183,11 +183,11 @@ export default function PrecriticaPage() {
             {stats.map((stat, index) => (
               <div
                 key={index}
-                className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl p-6 text-center shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200"
+                className="card-base rounded-xl p-6 text-center shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200"
               >
                 <stat.icon className="h-6 w-6 text-brand-indigo mx-auto mb-3" />
-                <div className="text-3xl font-bold text-foreground mb-1">{stat.value}</div>
-                <div className="text-sm text-muted-foreground">{stat.label}</div>
+                <div className="text-3xl font-bold text-brand-text mb-1">{stat.value}</div>
+                <div className="text-sm text-brand-text-secondary">{stat.label}</div>
               </div>
             ))}
           </div>
@@ -197,7 +197,7 @@ export default function PrecriticaPage() {
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-3">
                 <History className="h-6 w-6 text-brand-indigo" />
-                <h2 className="text-2xl font-bold text-foreground">
+                <h2 className="text-2xl font-bold text-brand-text">
                   Historial de Revisiones
                 </h2>
               </div>
@@ -212,54 +212,54 @@ export default function PrecriticaPage() {
             </div>
 
             {isLoadingRevisions ? (
-              <div className="flex items-center justify-center py-12 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl">
+              <div className="flex items-center justify-center py-12 card-base rounded-xl">
                 <Loader2 className="h-6 w-6 text-brand-indigo animate-spin mr-3" />
-                <span className="text-muted-foreground">Cargando revisiones...</span>
+                <span className="text-brand-text-secondary">Cargando revisiones...</span>
               </div>
             ) : revisionError ? (
-              <div className="flex items-center justify-center gap-3 py-12 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl">
-                <AlertCircle className="h-5 w-5 text-red-500" />
-                <span className="text-muted-foreground">{revisionError}</span>
+              <div className="flex items-center justify-center gap-3 py-12 card-base rounded-xl">
+                <AlertCircle className="h-5 w-5 text-error" />
+                <span className="text-brand-text-secondary">{revisionError}</span>
               </div>
             ) : revisions.length === 0 ? (
-              <div className="text-center py-12 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl">
-                <History className="h-10 w-10 text-gray-300 dark:text-gray-700 mx-auto mb-3" />
-                <p className="text-muted-foreground">No hay revisiones aún.</p>
-                <p className="text-sm text-muted-foreground mt-1">
+              <div className="text-center py-12 card-base rounded-xl">
+                <History className="h-10 w-10 text-brand-text-secondary mx-auto mb-3" />
+                <p className="text-brand-text-secondary">No hay revisiones aún.</p>
+                <p className="text-sm text-brand-text-secondary mt-1">
                   Inicia un análisis comparativo para crear tu primera revisión.
                 </p>
               </div>
             ) : (
-              <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl overflow-hidden">
+              <div className="card-base rounded-xl overflow-hidden">
                 <div className="overflow-x-auto">
                   <table className="w-full">
                     <thead>
-                      <tr className="border-b border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-800/50">
-                        <th className="text-left text-xs font-medium text-muted-foreground uppercase tracking-wider px-6 py-3">Cliente</th>
-                        <th className="text-left text-xs font-medium text-muted-foreground uppercase tracking-wider px-6 py-3">NIT</th>
-                        <th className="text-left text-xs font-medium text-muted-foreground uppercase tracking-wider px-6 py-3">Mes</th>
-                        <th className="text-left text-xs font-medium text-muted-foreground uppercase tracking-wider px-6 py-3">Fecha</th>
-                        <th className="text-left text-xs font-medium text-muted-foreground uppercase tracking-wider px-6 py-3">Estado</th>
-                        <th className="text-right text-xs font-medium text-muted-foreground uppercase tracking-wider px-6 py-3">Acciones</th>
+                      <tr className="border-b border-brand-border bg-brand-bg">
+                        <th className="text-left text-xs font-medium text-brand-text-secondary uppercase tracking-wider px-6 py-3">Cliente</th>
+                        <th className="text-left text-xs font-medium text-brand-text-secondary uppercase tracking-wider px-6 py-3">NIT</th>
+                        <th className="text-left text-xs font-medium text-brand-text-secondary uppercase tracking-wider px-6 py-3">Mes</th>
+                        <th className="text-left text-xs font-medium text-brand-text-secondary uppercase tracking-wider px-6 py-3">Fecha</th>
+                        <th className="text-left text-xs font-medium text-brand-text-secondary uppercase tracking-wider px-6 py-3">Estado</th>
+                        <th className="text-right text-xs font-medium text-brand-text-secondary uppercase tracking-wider px-6 py-3">Acciones</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-gray-200 dark:divide-gray-800">
+                    <tbody className="divide-y divide-brand-border">
                       {revisions.map((revision) => (
                         <tr
                           key={revision.id}
-                          className="hover:bg-gray-50 dark:hover:bg-gray-800/30 transition-colors"
+                          className="hover:bg-brand-bg-alt transition-colors"
                         >
-                          <td className="px-6 py-4 text-sm font-medium text-foreground">{revision.nombre_cliente}</td>
-                          <td className="px-6 py-4 text-sm text-muted-foreground">{revision.nit}</td>
-                          <td className="px-6 py-4 text-sm text-muted-foreground">{revision.mes}</td>
-                          <td className="px-6 py-4 text-sm text-muted-foreground">{revision.fecha_revision}</td>
+                          <td className="px-6 py-4 text-sm font-medium text-brand-text">{revision.nombre_cliente}</td>
+                          <td className="px-6 py-4 text-sm text-brand-text-secondary">{revision.nit}</td>
+                          <td className="px-6 py-4 text-sm text-brand-text-secondary">{revision.mes}</td>
+                          <td className="px-6 py-4 text-sm text-brand-text-secondary">{revision.fecha_revision}</td>
                           <td className="px-6 py-4">
-                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-medium ${
                               revision.status === 'completed'
-                                ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
+                                ? 'bg-success-bg text-success-foreground'
                                 : revision.status === 'pending'
-                                  ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400'
-                                  : 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400'
+                                  ? 'bg-warning-bg text-warning-foreground'
+                                  : 'bg-brand-bg-alt text-brand-text-secondary'
                             }`}>
                               {revision.status === 'completed' ? 'Completado' : revision.status === 'pending' ? 'Pendiente' : revision.status}
                             </span>
@@ -269,7 +269,7 @@ export default function PrecriticaPage() {
                               <button
                                 onClick={() => handleViewRevision(revision)}
                                 disabled={loadingRevisionId === String(revision.id)}
-                                className="p-2 text-brand-indigo hover:bg-indigo-50 dark:hover:bg-indigo-900/20 rounded-lg transition-colors disabled:opacity-50 hover:scale-110 active:scale-95"
+                                className="p-2 text-brand-indigo hover:bg-brand-indigo/5 rounded-lg transition-colors disabled:opacity-50 hover:scale-110 active:scale-95"
                                 title="Ver resultados"
                               >
                                 {loadingRevisionId === String(revision.id) ? (
@@ -281,7 +281,7 @@ export default function PrecriticaPage() {
                               <button
                                 onClick={() => handleDeleteRevision(revision.id)}
                                 disabled={deletingRevisionId === String(revision.id)}
-                                className="p-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors disabled:opacity-50 hover:scale-110 active:scale-95"
+                                className="p-2 text-error hover:bg-error-bg rounded-lg transition-colors disabled:opacity-50 hover:scale-110 active:scale-95"
                                 title="Eliminar revisión"
                               >
                                 {deletingRevisionId === String(revision.id) ? (
@@ -303,22 +303,22 @@ export default function PrecriticaPage() {
 
           {/* Features Section */}
           <div>
-            <h2 className="text-2xl font-bold text-foreground mb-6 text-center">
+            <h2 className="text-2xl font-bold text-brand-text mb-6 text-center">
               ¿Qué incluye el análisis?
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {features.map((feature, index) => (
                 <div
                   key={index}
-                  className="group bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl p-6 hover:shadow-lg hover:-translate-y-1 transition-all duration-200"
+                  className="group card-base rounded-xl p-6 hover:shadow-lg hover:-translate-y-1 transition-all duration-200"
                 >
                   <div className={`w-12 h-12 ${feature.bgColor} rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-200`}>
                     <feature.icon className={`h-6 w-6 ${feature.color}`} />
                   </div>
-                  <h3 className="text-lg font-semibold text-foreground mb-2">
+                  <h3 className="text-lg font-semibold text-brand-text mb-2">
                     {feature.title}
                   </h3>
-                  <p className="text-muted-foreground text-sm leading-relaxed">
+                  <p className="text-brand-text-secondary text-sm leading-relaxed">
                     {feature.description}
                   </p>
                 </div>
@@ -327,11 +327,11 @@ export default function PrecriticaPage() {
           </div>
 
           {/* CTA Section */}
-          <div className="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 rounded-2xl p-8 text-center border border-gray-200 dark:border-gray-700">
-            <h3 className="text-xl font-bold text-foreground mb-3">
+          <div className="bg-brand-bg-alt rounded-2xl p-8 text-center border border-brand-border">
+            <h3 className="text-xl font-bold text-brand-text mb-3">
               ¿Listo para comenzar?
             </h3>
-            <p className="text-muted-foreground mb-6 max-w-lg mx-auto">
+            <p className="text-brand-text-secondary mb-6 max-w-lg mx-auto">
               Sube las declaraciones de renta de dos años consecutivos y obtén un análisis
               detallado en segundos.
             </p>
@@ -349,7 +349,7 @@ export default function PrecriticaPage() {
           {/* Back button */}
           <button
             onClick={() => setComparativeAnalysisResult(null)}
-            className="mb-6 inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
+            className="mb-6 inline-flex items-center gap-2 text-brand-text-secondary hover:text-brand-text transition-colors"
           >
             <ArrowRight className="h-4 w-4 rotate-180" />
             Volver al inicio

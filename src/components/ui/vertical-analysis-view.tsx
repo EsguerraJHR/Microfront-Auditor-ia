@@ -83,17 +83,17 @@ const formatCurrency = (value: number | null): string => {
 }
 
 const getPercentageColor = (percentage: number | null): string => {
-  if (percentage === null) return 'text-gray-600'
-  if (percentage < 10) return 'text-green-600'
-  if (percentage < 30) return 'text-yellow-600'
-  return 'text-red-600'
+  if (percentage === null) return 'text-brand-text-secondary'
+  if (percentage < 10) return 'text-success'
+  if (percentage < 30) return 'text-warning'
+  return 'text-error'
 }
 
 const getPercentageBgColor = (percentage: number | null): string => {
-  if (percentage === null) return 'bg-gray-50 dark:bg-gray-800'
-  if (percentage < 10) return 'bg-green-50 dark:bg-green-900/20'
-  if (percentage < 30) return 'bg-yellow-50 dark:bg-yellow-900/20'
-  return 'bg-red-50 dark:bg-red-900/20'
+  if (percentage === null) return 'bg-brand-bg'
+  if (percentage < 10) return 'bg-success-bg'
+  if (percentage < 30) return 'bg-warning-bg'
+  return 'bg-error-bg'
 }
 
 interface AnalysisBlockCardProps {
@@ -117,11 +117,11 @@ const AnalysisBlockCard: React.FC<AnalysisBlockCardProps> = ({ block, icon, colo
         damping: 15
       }}
       whileHover={{ scale: 1.01 }}
-      className="bg-white dark:bg-gray-900 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden"
+      className="bg-white rounded-xl shadow-lg border border-brand-border overflow-hidden"
     >
       {/* Header */}
       <motion.div
-        className={cn("px-6 py-4 border-b border-gray-200 dark:border-gray-700 cursor-pointer", colorClass)}
+        className={cn("px-6 py-4 border-b border-brand-border cursor-pointer", colorClass)}
         onClick={() => setIsExpanded(!isExpanded)}
         whileHover={{ backgroundColor: "rgba(0,0,0,0.02)" }}
         whileTap={{ scale: 0.995 }}
@@ -129,17 +129,17 @@ const AnalysisBlockCard: React.FC<AnalysisBlockCardProps> = ({ block, icon, colo
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <motion.div
-              className="p-2 bg-white dark:bg-gray-800 rounded-lg shadow-sm"
+              className="p-2 bg-white rounded-lg shadow-sm"
               whileHover={{ scale: 1.1, rotate: 5 }}
               transition={{ type: "spring", stiffness: 300 }}
             >
               {icon}
             </motion.div>
             <div>
-              <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100">
+              <h3 className="text-lg font-bold text-brand-text">
                 {block.block_name}
               </h3>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
+              <p className="text-sm text-brand-text-secondary">
                 Base: {block.base_field} - {formatCurrency(block.base_value)}
               </p>
             </div>
@@ -147,7 +147,7 @@ const AnalysisBlockCard: React.FC<AnalysisBlockCardProps> = ({ block, icon, colo
           <motion.div
             animate={{ rotate: isExpanded ? 0 : -90 }}
             transition={{ duration: 0.2 }}
-            className="text-gray-500"
+            className="text-brand-text-secondary"
           >
             <ChevronDown className="h-5 w-5" />
           </motion.div>
@@ -181,15 +181,15 @@ const AnalysisBlockCard: React.FC<AnalysisBlockCardProps> = ({ block, icon, colo
                   >
                     <div className="flex items-center justify-between text-sm">
                       <div className="flex items-center gap-2">
-                        <span className="text-gray-600 dark:text-gray-400 text-xs px-2 py-0.5 bg-gray-100 dark:bg-gray-800 rounded">
+                        <span className="text-brand-text-secondary text-xs px-2 py-0.5 bg-brand-bg-alt rounded">
                           Línea {field.line_number}
                         </span>
-                        <span className="font-medium text-gray-900 dark:text-gray-100">
+                        <span className="font-medium text-brand-text">
                           {field.field_name}
                         </span>
                       </div>
                       <div className="flex items-center gap-3">
-                        <span className="text-gray-600 dark:text-gray-400">
+                        <span className="text-brand-text-secondary">
                           {formatCurrency(field.value)}
                         </span>
                         <motion.span
@@ -209,7 +209,7 @@ const AnalysisBlockCard: React.FC<AnalysisBlockCardProps> = ({ block, icon, colo
 
                     {/* Progress Bar */}
                     {field.percentage !== null && (
-                      <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5 overflow-hidden">
+                      <div className="w-full bg-brand-bg-alt rounded-full h-2.5 overflow-hidden">
                         <motion.div
                           initial={{ width: 0 }}
                           animate={{ width: `${Math.min(field.percentage, 100)}%` }}
@@ -236,9 +236,9 @@ const AnalysisBlockCard: React.FC<AnalysisBlockCardProps> = ({ block, icon, colo
                 <motion.div
                   initial={{ opacity: 0, scale: 0.9 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  className="mt-4 p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg"
+                  className="mt-4 p-4 bg-warning-bg border border-warning-bg rounded-lg"
                 >
-                  <div className="flex items-center gap-2 text-yellow-800 dark:text-yellow-200">
+                  <div className="flex items-center gap-2 text-warning-foreground">
                     <AlertCircle className="h-5 w-5" />
                     <span className="text-sm font-medium">
                       No se puede calcular análisis vertical (base = 0)
@@ -282,7 +282,7 @@ export const VerticalAnalysisView: React.FC<VerticalAnalysisViewProps> = ({
         {/* Background decorations */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <div className="absolute -top-1/2 -right-1/4 w-64 h-64 bg-white/5 rounded-full blur-3xl" />
-          <div className="absolute -bottom-1/2 -left-1/4 w-64 h-64 bg-blue-400/10 rounded-full blur-3xl" />
+          <div className="absolute -bottom-1/2 -left-1/4 w-64 h-64 bg-brand-indigo/10 rounded-full blur-3xl" />
         </div>
 
         <div className="relative z-10">
@@ -388,32 +388,32 @@ export const VerticalAnalysisView: React.FC<VerticalAnalysisViewProps> = ({
             {/* Patrimonio Block */}
             <AnalysisBlockCard
               block={displayYear.patrimonio_block}
-              icon={<BarChart3 className="h-5 w-5 text-purple-600" />}
-              colorClass="bg-gradient-to-r from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-900/30"
+              icon={<BarChart3 className="h-5 w-5 text-brand-indigo" />}
+              colorClass="bg-brand-indigo/5"
               index={0}
             />
 
             {/* Resultados Block */}
             <AnalysisBlockCard
               block={displayYear.resultados_block}
-              icon={<TrendingUp className="h-5 w-5 text-green-600" />}
-              colorClass="bg-gradient-to-r from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-900/30"
+              icon={<TrendingUp className="h-5 w-5 text-success" />}
+              colorClass="bg-success-bg"
               index={1}
             />
 
             {/* Impuestos Block */}
             <AnalysisBlockCard
               block={displayYear.impuestos_block}
-              icon={<TrendingDown className="h-5 w-5 text-orange-600" />}
-              colorClass="bg-gradient-to-r from-orange-50 to-orange-100 dark:from-orange-900/20 dark:to-orange-900/30"
+              icon={<TrendingDown className="h-5 w-5 text-warning" />}
+              colorClass="bg-warning-bg"
               index={2}
             />
 
             {/* Pagos y Saldos Block */}
             <AnalysisBlockCard
               block={displayYear.pagos_saldos_block}
-              icon={<BarChart3 className="h-5 w-5 text-blue-600" />}
-              colorClass="bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-900/30"
+              icon={<BarChart3 className="h-5 w-5 text-brand-indigo" />}
+              colorClass="bg-brand-indigo/5"
               index={3}
             />
           </motion.div>
@@ -424,7 +424,7 @@ export const VerticalAnalysisView: React.FC<VerticalAnalysisViewProps> = ({
       {displayYear.key_insights && displayYear.key_insights.length > 0 && (
         <motion.div
           variants={itemVariants}
-          className="bg-white dark:bg-gray-900 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 p-6 overflow-hidden"
+          className="bg-white rounded-xl shadow-lg border border-brand-border p-6 overflow-hidden"
         >
           <motion.div
             initial={{ opacity: 0, x: -20 }}
@@ -432,12 +432,12 @@ export const VerticalAnalysisView: React.FC<VerticalAnalysisViewProps> = ({
             className="flex items-center gap-3 mb-4"
           >
             <motion.div
-              className="p-2 bg-yellow-100 dark:bg-yellow-900/30 rounded-full"
+              className="p-2 bg-warning-bg rounded-full"
               whileHover={{ scale: 1.1, rotate: 10 }}
             >
-              <Info className="h-5 w-5 text-yellow-600" />
+              <Info className="h-5 w-5 text-warning" />
             </motion.div>
-            <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100">
+            <h3 className="text-lg font-bold text-brand-text">
               💡 Insights Clave
             </h3>
           </motion.div>
@@ -453,17 +453,17 @@ export const VerticalAnalysisView: React.FC<VerticalAnalysisViewProps> = ({
                   stiffness: 100
                 }}
                 whileHover={{ x: 5, backgroundColor: "rgba(59, 130, 246, 0.05)" }}
-                className="flex items-start gap-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg transition-colors cursor-default"
+                className="flex items-start gap-2 p-3 bg-brand-bg rounded-lg transition-colors cursor-default"
               >
                 <motion.span
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
                   transition={{ delay: idx * 0.1 + 0.2, type: "spring" }}
-                  className="text-blue-600 font-bold"
+                  className="text-brand-indigo font-bold"
                 >
                   ✓
                 </motion.span>
-                <p className="text-sm text-gray-700 dark:text-gray-300">{insight}</p>
+                <p className="text-sm text-brand-text">{insight}</p>
               </motion.div>
             ))}
           </div>
@@ -474,12 +474,12 @@ export const VerticalAnalysisView: React.FC<VerticalAnalysisViewProps> = ({
       {structureComparison && structureComparison.cambios_significativos.length > 0 && (
         <motion.div
           variants={itemVariants}
-          className="bg-white dark:bg-gray-900 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden"
+          className="bg-white rounded-xl shadow-lg border border-brand-border overflow-hidden"
         >
           <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-gradient-to-r from-slate-600 via-indigo-700 to-purple-700 px-6 py-4 border-b border-gray-200 dark:border-gray-700"
+            className="bg-gradient-to-r from-slate-600 via-indigo-700 to-purple-700 px-6 py-4 border-b border-brand-border"
           >
             <div className="flex items-center gap-3">
               <motion.div
@@ -492,7 +492,7 @@ export const VerticalAnalysisView: React.FC<VerticalAnalysisViewProps> = ({
                 <h3 className="text-xl font-bold text-white">
                   📊 Cambios Significativos en Estructura
                 </h3>
-                <p className="text-sm text-indigo-200">
+                <p className="text-sm text-white/80">
                   {structureComparison.criterio_significancia} • {structureComparison.total_cambios_identificados} cambios detectados
                 </p>
               </div>
@@ -506,14 +506,14 @@ export const VerticalAnalysisView: React.FC<VerticalAnalysisViewProps> = ({
                   <motion.tr
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
-                    className="border-b-2 border-gray-200 dark:border-gray-700"
+                    className="border-b-2 border-brand-border"
                   >
-                    <th className="text-left py-3 px-4 font-semibold text-gray-800 dark:text-gray-200">Campo</th>
-                    <th className="text-center py-3 px-4 font-semibold text-gray-800 dark:text-gray-200">Línea</th>
-                    <th className="text-right py-3 px-4 font-semibold text-gray-800 dark:text-gray-200">% Anterior</th>
-                    <th className="text-right py-3 px-4 font-semibold text-gray-800 dark:text-gray-200">% Actual</th>
-                    <th className="text-right py-3 px-4 font-semibold text-gray-800 dark:text-gray-200">Cambio</th>
-                    <th className="text-left py-3 px-4 font-semibold text-gray-800 dark:text-gray-200">Interpretación</th>
+                    <th className="text-left py-3 px-4 font-semibold text-brand-text">Campo</th>
+                    <th className="text-center py-3 px-4 font-semibold text-brand-text">Línea</th>
+                    <th className="text-right py-3 px-4 font-semibold text-brand-text">% Anterior</th>
+                    <th className="text-right py-3 px-4 font-semibold text-brand-text">% Actual</th>
+                    <th className="text-right py-3 px-4 font-semibold text-brand-text">Cambio</th>
+                    <th className="text-left py-3 px-4 font-semibold text-brand-text">Interpretación</th>
                   </motion.tr>
                 </thead>
                 <tbody>
@@ -533,20 +533,20 @@ export const VerticalAnalysisView: React.FC<VerticalAnalysisViewProps> = ({
                             ? "rgba(34, 197, 94, 0.05)"
                             : "rgba(239, 68, 68, 0.05)"
                         }}
-                        className="border-b border-gray-100 dark:border-gray-800 transition-colors"
+                        className="border-b border-brand-border transition-colors"
                       >
-                        <td className="py-3 px-4 font-medium text-gray-900 dark:text-gray-100">
+                        <td className="py-3 px-4 font-medium text-brand-text">
                           {change.campo}
                         </td>
                         <td className="py-3 px-4 text-center">
-                          <span className="px-2 py-0.5 bg-gray-100 dark:bg-gray-800 rounded text-gray-600 dark:text-gray-400 text-sm">
+                          <span className="px-2 py-0.5 bg-brand-bg-alt rounded text-brand-text-secondary text-sm">
                             {change.linea}
                           </span>
                         </td>
-                        <td className="py-3 px-4 text-right text-gray-600 dark:text-gray-400">
+                        <td className="py-3 px-4 text-right text-brand-text-secondary">
                           {change.porcentaje_anterior}
                         </td>
-                        <td className="py-3 px-4 text-right font-semibold text-gray-900 dark:text-gray-100">
+                        <td className="py-3 px-4 text-right font-semibold text-brand-text">
                           {change.porcentaje_actual}
                         </td>
                         <td className="py-3 px-4 text-right">
@@ -557,14 +557,14 @@ export const VerticalAnalysisView: React.FC<VerticalAnalysisViewProps> = ({
                             className={cn(
                               "font-bold px-2 py-1 rounded inline-block",
                               isPositive
-                                ? "text-green-700 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/30 dark:to-emerald-900/30 dark:text-green-400"
-                                : "text-red-700 bg-gradient-to-r from-red-50 to-rose-50 dark:from-red-900/30 dark:to-rose-900/30 dark:text-red-400"
+                                ? "text-success-foreground bg-success-bg"
+                                : "text-error-foreground bg-error-bg"
                             )}
                           >
                             {change.cambio_puntos_porcentuales}
                           </motion.span>
                         </td>
-                        <td className="py-3 px-4 text-sm text-gray-600 dark:text-gray-400">
+                        <td className="py-3 px-4 text-sm text-brand-text-secondary">
                           {change.interpretacion}
                         </td>
                       </motion.tr>
@@ -581,13 +581,13 @@ export const VerticalAnalysisView: React.FC<VerticalAnalysisViewProps> = ({
       {displayTaxCoherence && (
         <motion.div
           variants={itemVariants}
-          className="bg-white dark:bg-gray-900 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden"
+          className="bg-white rounded-xl shadow-lg border border-brand-border overflow-hidden"
         >
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             className={cn(
-              "px-6 py-4 border-b border-gray-200 dark:border-gray-700",
+              "px-6 py-4 border-b border-brand-border",
               displayTaxCoherence.riesgo_global === 'BAJO' && "bg-gradient-to-r from-green-500 to-emerald-600",
               displayTaxCoherence.riesgo_global === 'MEDIO' && "bg-gradient-to-r from-yellow-500 to-amber-600",
               displayTaxCoherence.riesgo_global === 'ALTO' && "bg-gradient-to-r from-orange-500 to-red-500",
@@ -618,10 +618,10 @@ export const VerticalAnalysisView: React.FC<VerticalAnalysisViewProps> = ({
                 transition={{ delay: 0.3, type: "spring" }}
                 className={cn(
                   "px-4 py-2 rounded-full font-bold text-sm",
-                  displayTaxCoherence.riesgo_global === 'BAJO' && "bg-white text-green-700",
-                  displayTaxCoherence.riesgo_global === 'MEDIO' && "bg-white text-yellow-700",
-                  displayTaxCoherence.riesgo_global === 'ALTO' && "bg-white text-orange-700",
-                  displayTaxCoherence.riesgo_global === 'CRITICO' && "bg-white text-red-700"
+                  displayTaxCoherence.riesgo_global === 'BAJO' && "bg-white text-success-foreground",
+                  displayTaxCoherence.riesgo_global === 'MEDIO' && "bg-white text-warning-foreground",
+                  displayTaxCoherence.riesgo_global === 'ALTO' && "bg-white text-warning",
+                  displayTaxCoherence.riesgo_global === 'CRITICO' && "bg-white text-error-foreground"
                 )}
               >
                 {displayTaxCoherence.riesgo_global}
@@ -637,18 +637,18 @@ export const VerticalAnalysisView: React.FC<VerticalAnalysisViewProps> = ({
               transition={{ delay: 0.2 }}
               className={cn(
                 "p-4 rounded-lg border",
-                displayTaxCoherence.riesgo_global === 'BAJO' && "bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800",
-                displayTaxCoherence.riesgo_global === 'MEDIO' && "bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-800",
-                displayTaxCoherence.riesgo_global === 'ALTO' && "bg-orange-50 dark:bg-orange-900/20 border-orange-200 dark:border-orange-800",
-                displayTaxCoherence.riesgo_global === 'CRITICO' && "bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800"
+                displayTaxCoherence.riesgo_global === 'BAJO' && "bg-success-bg border-success-bg",
+                displayTaxCoherence.riesgo_global === 'MEDIO' && "bg-warning-bg border-warning-bg",
+                displayTaxCoherence.riesgo_global === 'ALTO' && "bg-warning-bg border-warning-bg",
+                displayTaxCoherence.riesgo_global === 'CRITICO' && "bg-error-bg border-error-bg"
               )}
             >
               <p className={cn(
                 "text-sm font-medium",
-                displayTaxCoherence.riesgo_global === 'BAJO' && "text-green-800 dark:text-green-200",
-                displayTaxCoherence.riesgo_global === 'MEDIO' && "text-yellow-800 dark:text-yellow-200",
-                displayTaxCoherence.riesgo_global === 'ALTO' && "text-orange-800 dark:text-orange-200",
-                displayTaxCoherence.riesgo_global === 'CRITICO' && "text-red-800 dark:text-red-200"
+                displayTaxCoherence.riesgo_global === 'BAJO' && "text-success-foreground",
+                displayTaxCoherence.riesgo_global === 'MEDIO' && "text-warning-foreground",
+                displayTaxCoherence.riesgo_global === 'ALTO' && "text-warning-foreground",
+                displayTaxCoherence.riesgo_global === 'CRITICO' && "text-error-foreground"
               )}>
                 {displayTaxCoherence.resumen_ejecutivo}
               </p>
@@ -660,7 +660,7 @@ export const VerticalAnalysisView: React.FC<VerticalAnalysisViewProps> = ({
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.3 }}
-                className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-4"
+                className="text-lg font-bold text-brand-text mb-4"
               >
                 Evaluaciones de Índices
               </motion.h4>
@@ -678,10 +678,10 @@ export const VerticalAnalysisView: React.FC<VerticalAnalysisViewProps> = ({
                     whileHover={{ scale: 1.02, y: -2 }}
                     className={cn(
                       "p-4 rounded-lg border transition-shadow hover:shadow-md",
-                      evaluation.nivel_riesgo === 'BAJO' && "bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800",
-                      evaluation.nivel_riesgo === 'MEDIO' && "bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-800",
-                      evaluation.nivel_riesgo === 'ALTO' && "bg-orange-50 dark:bg-orange-900/20 border-orange-200 dark:border-orange-800",
-                      evaluation.nivel_riesgo === 'CRITICO' && "bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800"
+                      evaluation.nivel_riesgo === 'BAJO' && "bg-success-bg border-success-bg",
+                      evaluation.nivel_riesgo === 'MEDIO' && "bg-warning-bg border-warning-bg",
+                      evaluation.nivel_riesgo === 'ALTO' && "bg-warning-bg border-warning-bg",
+                      evaluation.nivel_riesgo === 'CRITICO' && "bg-error-bg border-error-bg"
                     )}
                   >
                     <div className="flex items-start gap-3">
@@ -694,30 +694,30 @@ export const VerticalAnalysisView: React.FC<VerticalAnalysisViewProps> = ({
                         {evaluation.icono}
                       </motion.span>
                       <div className="flex-1">
-                        <h5 className="font-semibold text-gray-900 dark:text-gray-100 mb-1">
+                        <h5 className="font-semibold text-brand-text mb-1">
                           {evaluation.indice}
                         </h5>
                         <div className="space-y-1 text-sm">
-                          <p className="text-gray-700 dark:text-gray-300">
+                          <p className="text-brand-text">
                             <span className="font-medium">Contribuyente:</span> {evaluation.valor_contribuyente}
                           </p>
                           {evaluation.valor_sector && (
-                            <p className="text-gray-700 dark:text-gray-300">
+                            <p className="text-brand-text">
                               <span className="font-medium">Sector:</span> {evaluation.valor_sector}
                             </p>
                           )}
                           {evaluation.diferencia && (
                             <p className={cn(
                               "font-semibold",
-                              evaluation.nivel_riesgo === 'BAJO' && "text-green-700 dark:text-green-400",
-                              evaluation.nivel_riesgo === 'MEDIO' && "text-yellow-700 dark:text-yellow-400",
-                              evaluation.nivel_riesgo === 'ALTO' && "text-orange-700 dark:text-orange-400",
-                              evaluation.nivel_riesgo === 'CRITICO' && "text-red-700 dark:text-red-400"
+                              evaluation.nivel_riesgo === 'BAJO' && "text-success-foreground",
+                              evaluation.nivel_riesgo === 'MEDIO' && "text-warning-foreground",
+                              evaluation.nivel_riesgo === 'ALTO' && "text-warning-foreground",
+                              evaluation.nivel_riesgo === 'CRITICO' && "text-error-foreground"
                             )}>
                               <span className="font-medium">Diferencia:</span> {evaluation.diferencia}
                             </p>
                           )}
-                          <p className="text-gray-600 dark:text-gray-400 italic">
+                          <p className="text-brand-text-secondary italic">
                             {evaluation.explicacion}
                           </p>
                         </div>
@@ -735,7 +735,7 @@ export const VerticalAnalysisView: React.FC<VerticalAnalysisViewProps> = ({
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.5 }}
-                  className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-4"
+                  className="text-lg font-bold text-brand-text mb-4"
                 >
                   📋 Recomendaciones
                 </motion.h4>
@@ -751,16 +751,16 @@ export const VerticalAnalysisView: React.FC<VerticalAnalysisViewProps> = ({
                         stiffness: 100
                       }}
                       whileHover={{ x: 5, backgroundColor: "rgba(59, 130, 246, 0.1)" }}
-                      className="flex items-start gap-2 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800 transition-colors cursor-default"
+                      className="flex items-start gap-2 p-3 bg-brand-indigo/5 rounded-lg border border-brand-indigo/20 transition-colors cursor-default"
                     >
                       <motion.div
                         initial={{ scale: 0 }}
                         animate={{ scale: 1 }}
                         transition={{ delay: idx * 0.1 + 0.7, type: "spring" }}
                       >
-                        <CheckCircle className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                        <CheckCircle className="h-5 w-5 text-brand-indigo flex-shrink-0 mt-0.5" />
                       </motion.div>
-                      <p className="text-sm text-blue-900 dark:text-blue-100">{rec}</p>
+                      <p className="text-sm text-brand-indigo">{rec}</p>
                     </motion.div>
                   ))}
                 </div>

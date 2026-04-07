@@ -130,7 +130,7 @@ export function FileUpload({
       <div
         className={cn(
           "relative border-2 border-dashed rounded-lg p-8 text-center transition-colors duration-200",
-          dragActive ? "border-blue-500 bg-blue-50 dark:bg-blue-900/20" : "border-gray-300 dark:border-gray-600",
+          dragActive ? "border-brand-indigo bg-brand-indigo/5" : "border-brand-border",
           isUploading && "opacity-50 pointer-events-none"
         )}
         onDragEnter={handleDrag}
@@ -148,18 +148,18 @@ export function FileUpload({
         />
 
         <div className="space-y-4">
-          <div className="mx-auto h-12 w-12 text-gray-400">
+          <div className="mx-auto h-12 w-12 text-brand-text-secondary">
             <Upload className="h-full w-full" />
           </div>
 
           <div className="space-y-2">
-            <h3 className="text-lg font-semibold text-foreground">
+            <h3 className="text-lg font-semibold text-brand-text">
               {title}
             </h3>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-brand-text-secondary">
               {description}
             </p>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-xs text-brand-text-secondary">
               PDF e imágenes (JPG, PNG) - Máximo {maxFileSize}MB por archivo
             </p>
           </div>
@@ -178,7 +178,7 @@ export function FileUpload({
       {errors.length > 0 && (
         <div className="space-y-2">
           {errors.map((error, index) => (
-            <div key={index} className="flex items-center gap-2 text-sm text-red-600 bg-red-50 dark:bg-red-900/20 p-2 rounded">
+            <div key={index} className="flex items-center gap-2 text-sm text-error bg-error-bg p-2 rounded">
               <AlertCircle className="h-4 w-4 flex-shrink-0" />
               <span>{error}</span>
             </div>
@@ -189,7 +189,7 @@ export function FileUpload({
       {/* File List */}
       {files.length > 0 && (
         <div className="space-y-3">
-          <h4 className="font-medium text-foreground">
+          <h4 className="font-medium text-brand-text">
             Archivos seleccionados ({files.length})
           </h4>
 
@@ -197,23 +197,23 @@ export function FileUpload({
             {files.map((file) => (
               <div
                 key={file.id}
-                className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg"
+                className="flex items-center gap-3 p-3 bg-brand-bg rounded-lg"
               >
                 <div className="flex-shrink-0">
                   {file.type === 'application/pdf' ? (
-                    <FileText className="h-6 w-6 text-red-500" />
+                    <FileText className="h-6 w-6 text-error" />
                   ) : (
-                    <div className="h-6 w-6 bg-blue-100 dark:bg-blue-900 rounded flex items-center justify-center">
-                      <span className="text-xs font-medium text-blue-600 dark:text-blue-400">IMG</span>
+                    <div className="h-6 w-6 bg-brand-indigo/10 rounded flex items-center justify-center">
+                      <span className="text-xs font-medium text-brand-indigo">IMG</span>
                     </div>
                   )}
                 </div>
 
                 <div className="flex-1 min-w-0">
-                  <p className="font-medium text-sm text-foreground truncate">
+                  <p className="font-medium text-sm text-brand-text truncate">
                     {file.name}
                   </p>
-                  <p className="text-xs text-muted-foreground">
+                  <p className="text-xs text-brand-text-secondary">
                     {formatFileSize(file.size)}
                   </p>
                 </div>
@@ -222,7 +222,7 @@ export function FileUpload({
                   type="button"
                   onClick={() => removeFile(file.id)}
                   disabled={isUploading}
-                  className="p-1 text-gray-400 hover:text-red-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="p-1 text-brand-text-secondary hover:text-error transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <X className="h-4 w-4" />
                 </button>

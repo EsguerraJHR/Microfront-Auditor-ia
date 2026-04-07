@@ -13,7 +13,7 @@ interface MainLayoutProps {
 // Memoizar el área de contenido para evitar re-renders cuando cambia el sidebar
 const MainContent = memo(function MainContent({ children }: { children: React.ReactNode }) {
   return (
-    <main className="min-h-[calc(100vh-8rem)] p-4 lg:p-6">
+    <main className="min-h-[calc(100vh-8rem)] p-4 lg:p-6 bg-brand-bg">
       <div className="max-w-7xl mx-auto">
         {children}
       </div>

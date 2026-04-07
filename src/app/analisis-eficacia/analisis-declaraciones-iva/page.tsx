@@ -294,7 +294,7 @@ export default function AnalisisDeclaracionesIvaPage() {
         <motion.div variants={itemVariants} className="space-y-4">
           <Link
             href="/analisis-eficacia"
-            className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+            className="inline-flex items-center gap-2 text-sm text-brand-text-secondary hover:text-brand-text transition-colors"
           >
             <ArrowLeft className="h-4 w-4" />
             Volver a Análisis de Eficacia
@@ -306,10 +306,10 @@ export default function AnalisisDeclaracionesIvaPage() {
                 <Receipt className="h-6 w-6 text-white" />
               </div>
               <div>
-                <h1 className="text-2xl md:text-3xl font-bold text-foreground">
+                <h1 className="text-2xl md:text-3xl font-bold text-brand-text">
                   Análisis Declaración de IVA
                 </h1>
-                <p className="text-muted-foreground">
+                <p className="text-brand-text-secondary">
                   Extracción y validación de declaraciones de IVA con documentos de soporte
                 </p>
               </div>
@@ -324,11 +324,11 @@ export default function AnalisisDeclaracionesIvaPage() {
               initial={{ opacity: 0, y: -10, height: 0 }}
               animate={{ opacity: 1, y: 0, height: 'auto' }}
               exit={{ opacity: 0, y: -10, height: 0 }}
-              className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-4"
+              className="bg-error-bg border border-error-bg rounded-xl p-4"
             >
               <div className="flex gap-3">
-                <AlertCircle className="h-5 w-5 text-red-600 flex-shrink-0" />
-                <p className="text-sm text-red-800 dark:text-red-200">{error}</p>
+                <AlertCircle className="h-5 w-5 text-error flex-shrink-0" />
+                <p className="text-sm text-error-foreground">{error}</p>
               </div>
             </motion.div>
           )}
@@ -340,7 +340,7 @@ export default function AnalisisDeclaracionesIvaPage() {
             {/* IVA Declarations Upload */}
             <motion.div
               variants={itemVariants}
-              className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl overflow-hidden shadow-sm"
+              className="bg-white border border-brand-border rounded-2xl overflow-hidden shadow-sm"
             >
               <div className="bg-gradient-to-r from-brand-navy to-brand-indigo px-6 py-4">
                 <div className="flex items-center gap-3">
@@ -349,7 +349,7 @@ export default function AnalisisDeclaracionesIvaPage() {
                   </div>
                   <div>
                     <h2 className="text-lg font-semibold text-white">Declaraciones de IVA</h2>
-                    <p className="text-indigo-100 text-sm">Formularios 300 - Declaración bimestral</p>
+                    <p className="text-white/80 text-sm">Formularios 300 - Declaración bimestral</p>
                   </div>
                 </div>
               </div>
@@ -366,8 +366,8 @@ export default function AnalisisDeclaracionesIvaPage() {
                   className={cn(
                     "relative border-2 border-dashed rounded-xl p-8 text-center transition-all duration-200 cursor-pointer",
                     dragOverIva
-                      ? "border-brand-indigo bg-indigo-50 dark:bg-indigo-900/20"
-                      : "border-gray-300 dark:border-gray-700 hover:border-brand-indigo"
+                      ? "border-brand-indigo bg-brand-indigo/5"
+                      : "border-brand-border hover:border-brand-indigo"
                   )}
                 >
                   <input
@@ -380,7 +380,7 @@ export default function AnalisisDeclaracionesIvaPage() {
                   <div className="flex flex-col items-center gap-3">
                     <div className={cn(
                       "w-14 h-14 rounded-xl flex items-center justify-center transition-colors",
-                      dragOverIva ? "bg-brand-indigo" : "bg-indigo-100 dark:bg-indigo-900/30"
+                      dragOverIva ? "bg-brand-indigo" : "bg-brand-indigo/10"
                     )}>
                       <Upload className={cn(
                         "h-7 w-7",
@@ -388,10 +388,10 @@ export default function AnalisisDeclaracionesIvaPage() {
                       )} />
                     </div>
                     <div>
-                      <p className="font-medium text-foreground">
+                      <p className="font-medium text-brand-text">
                         Arrastra tus declaraciones aquí
                       </p>
-                      <p className="text-sm text-muted-foreground mt-1">
+                      <p className="text-sm text-brand-text-secondary mt-1">
                         o haz clic para seleccionar archivos PDF
                       </p>
                     </div>
@@ -408,7 +408,7 @@ export default function AnalisisDeclaracionesIvaPage() {
                       className="space-y-2"
                     >
                       <div className="flex items-center justify-between">
-                        <span className="text-sm font-medium text-foreground">
+                        <span className="text-sm font-medium text-brand-text">
                           {ivaFiles.length} archivo{ivaFiles.length > 1 ? 's' : ''} seleccionado{ivaFiles.length > 1 ? 's' : ''}
                         </span>
                       </div>
@@ -419,16 +419,16 @@ export default function AnalisisDeclaracionesIvaPage() {
                             initial={{ opacity: 0, x: -20 }}
                             animate={{ opacity: 1, x: 0 }}
                             exit={{ opacity: 0, x: 20 }}
-                            className="flex items-center gap-3 p-3 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg border border-indigo-200 dark:border-indigo-800"
+                            className="flex items-center gap-3 p-3 bg-brand-indigo/5 rounded-lg border border-brand-indigo/20"
                           >
                             <FileText className="h-5 w-5 text-brand-indigo flex-shrink-0" />
                             <div className="flex-1 min-w-0">
-                              <p className="text-sm font-medium text-foreground truncate">{file.name}</p>
-                              <p className="text-xs text-muted-foreground">{file.size}</p>
+                              <p className="text-sm font-medium text-brand-text truncate">{file.name}</p>
+                              <p className="text-xs text-brand-text-secondary">{file.size}</p>
                             </div>
                             <button
                               onClick={() => removeIvaFile(file.id)}
-                              className="p-1.5 rounded-lg hover:bg-red-100 dark:hover:bg-red-900/30 text-gray-400 hover:text-red-600 transition-colors"
+                              className="p-1.5 rounded-lg hover:bg-error-bg text-brand-text-secondary hover:text-error transition-colors"
                             >
                               <Trash2 className="h-4 w-4" />
                             </button>
@@ -444,7 +444,7 @@ export default function AnalisisDeclaracionesIvaPage() {
             {/* Related Documents Upload */}
             <motion.div
               variants={itemVariants}
-              className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl overflow-hidden shadow-sm"
+              className="bg-white border border-brand-border rounded-2xl overflow-hidden shadow-sm"
             >
               <div className="bg-gradient-to-r from-purple-500 to-purple-600 px-6 py-4">
                 <div className="flex items-center gap-3">
@@ -453,7 +453,7 @@ export default function AnalisisDeclaracionesIvaPage() {
                   </div>
                   <div>
                     <h2 className="text-lg font-semibold text-white">Documentos Relacionados</h2>
-                    <p className="text-purple-100 text-sm">Facturas, libros auxiliares, soportes</p>
+                    <p className="text-white/80 text-sm">Facturas, libros auxiliares, soportes</p>
                   </div>
                 </div>
               </div>
@@ -470,8 +470,8 @@ export default function AnalisisDeclaracionesIvaPage() {
                   className={cn(
                     "relative border-2 border-dashed rounded-xl p-8 text-center transition-all duration-200 cursor-pointer",
                     dragOverRelated
-                      ? "border-purple-500 bg-purple-50 dark:bg-purple-900/20"
-                      : "border-gray-300 dark:border-gray-700 hover:border-purple-400"
+                      ? "border-brand-indigo bg-brand-indigo/5"
+                      : "border-brand-border hover:border-brand-indigo"
                   )}
                 >
                   <input
@@ -484,18 +484,18 @@ export default function AnalisisDeclaracionesIvaPage() {
                   <div className="flex flex-col items-center gap-3">
                     <div className={cn(
                       "w-14 h-14 rounded-xl flex items-center justify-center transition-colors",
-                      dragOverRelated ? "bg-purple-500" : "bg-purple-100 dark:bg-purple-900/30"
+                      dragOverRelated ? "bg-brand-indigo" : "bg-brand-indigo/10"
                     )}>
                       <Plus className={cn(
                         "h-7 w-7",
-                        dragOverRelated ? "text-white" : "text-purple-600"
+                        dragOverRelated ? "text-white" : "text-brand-indigo"
                       )} />
                     </div>
                     <div>
-                      <p className="font-medium text-foreground">
+                      <p className="font-medium text-brand-text">
                         Documentos de soporte (opcional)
                       </p>
-                      <p className="text-sm text-muted-foreground mt-1">
+                      <p className="text-sm text-brand-text-secondary mt-1">
                         PDF, Excel o CSV con información adicional
                       </p>
                     </div>
@@ -512,7 +512,7 @@ export default function AnalisisDeclaracionesIvaPage() {
                       className="space-y-2"
                     >
                       <div className="flex items-center justify-between">
-                        <span className="text-sm font-medium text-foreground">
+                        <span className="text-sm font-medium text-brand-text">
                           {relatedFiles.length} archivo{relatedFiles.length > 1 ? 's' : ''} de soporte
                         </span>
                       </div>
@@ -523,16 +523,16 @@ export default function AnalisisDeclaracionesIvaPage() {
                             initial={{ opacity: 0, x: -20 }}
                             animate={{ opacity: 1, x: 0 }}
                             exit={{ opacity: 0, x: 20 }}
-                            className="flex items-center gap-3 p-3 bg-purple-50 dark:bg-purple-900/20 rounded-lg border border-purple-200 dark:border-purple-800"
+                            className="flex items-center gap-3 p-3 bg-brand-indigo/5 rounded-lg border border-brand-indigo/20"
                           >
-                            <FileSpreadsheet className="h-5 w-5 text-purple-600 flex-shrink-0" />
+                            <FileSpreadsheet className="h-5 w-5 text-brand-indigo flex-shrink-0" />
                             <div className="flex-1 min-w-0">
-                              <p className="text-sm font-medium text-foreground truncate">{file.name}</p>
-                              <p className="text-xs text-muted-foreground">{file.size}</p>
+                              <p className="text-sm font-medium text-brand-text truncate">{file.name}</p>
+                              <p className="text-xs text-brand-text-secondary">{file.size}</p>
                             </div>
                             <button
                               onClick={() => removeRelatedFile(file.id)}
-                              className="p-1.5 rounded-lg hover:bg-red-100 dark:hover:bg-red-900/30 text-gray-400 hover:text-red-600 transition-colors"
+                              className="p-1.5 rounded-lg hover:bg-error-bg text-brand-text-secondary hover:text-error transition-colors"
                             >
                               <Trash2 className="h-4 w-4" />
                             </button>
@@ -577,7 +577,7 @@ export default function AnalisisDeclaracionesIvaPage() {
                   whileTap={{ scale: 0.98 }}
                   onClick={clearAll}
                   disabled={isAnalyzing}
-                  className="inline-flex items-center gap-2 px-6 py-3 border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 rounded-xl font-medium hover:bg-gray-50 dark:hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                  className="inline-flex items-center gap-2 px-6 py-3 border border-brand-border text-brand-text rounded-xl font-medium hover:bg-brand-bg disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                 >
                   <Trash2 className="h-5 w-5" />
                   Limpiar Todo
@@ -613,8 +613,8 @@ export default function AnalisisDeclaracionesIvaPage() {
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-4">
-                    <div className="w-14 h-14 rounded-xl bg-green-500/20 backdrop-blur-sm flex items-center justify-center border border-green-500/30">
-                      <CheckCircle2 className="h-7 w-7 text-green-400" />
+                    <div className="w-14 h-14 rounded-xl bg-success/20 backdrop-blur-sm flex items-center justify-center border border-success/30">
+                      <CheckCircle2 className="h-7 w-7 text-success" />
                     </div>
                     <div>
                       <h2 className="text-2xl font-bold text-white">
@@ -626,14 +626,14 @@ export default function AnalisisDeclaracionesIvaPage() {
                     </div>
                   </div>
                   <div className="flex gap-4">
-                    <div className="text-center px-4 py-2 bg-green-500/20 rounded-xl border border-green-500/30">
-                      <p className="text-2xl font-bold text-green-400">{extractionResult.successful}</p>
-                      <p className="text-xs text-green-300">Exitosos</p>
+                    <div className="text-center px-4 py-2 bg-success/20 rounded-xl border border-success/30">
+                      <p className="text-2xl font-bold text-success">{extractionResult.successful}</p>
+                      <p className="text-xs text-success">Exitosos</p>
                     </div>
                     {extractionResult.failed > 0 && (
-                      <div className="text-center px-4 py-2 bg-red-500/20 rounded-xl border border-red-500/30">
-                        <p className="text-2xl font-bold text-red-400">{extractionResult.failed}</p>
-                        <p className="text-xs text-red-300">Fallidos</p>
+                      <div className="text-center px-4 py-2 bg-error/20 rounded-xl border border-error/30">
+                        <p className="text-2xl font-bold text-error">{extractionResult.failed}</p>
+                        <p className="text-xs text-error">Fallidos</p>
                       </div>
                     )}
                   </div>
@@ -660,45 +660,45 @@ export default function AnalisisDeclaracionesIvaPage() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.3 }}
-                  className="bg-white dark:bg-gray-900 border-2 border-emerald-200 dark:border-emerald-800 rounded-2xl p-6 shadow-lg"
+                  className="bg-white border-2 border-success-bg rounded-2xl p-6 shadow-lg"
                 >
                   <div className="flex items-start gap-4">
                     <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center shadow-lg shadow-emerald-500/25">
                       <ClipboardCheck className="h-6 w-6 text-white" />
                     </div>
                     <div className="flex-1">
-                      <h3 className="text-lg font-semibold text-foreground mb-1">
+                      <h3 className="text-lg font-semibold text-brand-text mb-1">
                         Checklist de Validación IVA
                       </h3>
-                      <p className="text-muted-foreground text-sm mb-4">
+                      <p className="text-brand-text-secondary text-sm mb-4">
                         Ejecuta 11 validaciones automáticas sobre las declaraciones extraídas para verificar consistencia y cumplimiento.
                       </p>
 
                       {/* Renta data indicator */}
-                      <div className="mb-4 p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
+                      <div className="mb-4 p-3 bg-brand-bg rounded-lg">
                         <label className="flex items-start gap-3 cursor-pointer">
                           <input
                             type="checkbox"
                             checked={useStoredRenta}
                             onChange={(e) => setUseStoredRenta(e.target.checked)}
                             disabled={!rentaData}
-                            className="mt-1 h-4 w-4 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500"
+                            className="mt-1 h-4 w-4 rounded border-brand-border text-brand-indigo focus:ring-brand-indigo"
                           />
                           <div className="flex-1">
-                            <span className="font-medium text-foreground">
+                            <span className="font-medium text-brand-text">
                               Incluir datos de Declaración de Renta
                             </span>
                             {rentaData ? (
                               <div className="flex items-center gap-2 mt-1">
-                                <CheckCircle2 className="h-4 w-4 text-green-500" />
-                                <span className="text-sm text-green-600 dark:text-green-400">
+                                <CheckCircle2 className="h-4 w-4 text-success" />
+                                <span className="text-sm text-success">
                                   {rentaData.declaracion.razon_social} - Año {rentaData.declaracion.ano_gravable}
                                 </span>
                               </div>
                             ) : (
                               <div className="flex items-center gap-2 mt-1">
-                                <Info className="h-4 w-4 text-amber-500" />
-                                <span className="text-sm text-amber-600 dark:text-amber-400">
+                                <Info className="h-4 w-4 text-warning" />
+                                <span className="text-sm text-warning">
                                   No hay datos de renta disponibles. Algunas validaciones se omitirán.
                                 </span>
                               </div>
@@ -714,7 +714,7 @@ export default function AnalisisDeclaracionesIvaPage() {
                             percentage={validationProgress.percentage}
                             message={validationProgress.message}
                           />
-                          <p className="text-sm text-muted-foreground mt-2">
+                          <p className="text-sm text-brand-text-secondary mt-2">
                             Validación {validationProgress.current_validation} de {validationProgress.total_validations}
                           </p>
                         </div>
@@ -756,7 +756,7 @@ export default function AnalisisDeclaracionesIvaPage() {
                   <div className="flex justify-between items-center">
                     <button
                       onClick={clearValidation}
-                      className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+                      className="inline-flex items-center gap-2 text-sm text-brand-text-secondary hover:text-brand-text transition-colors"
                     >
                       <ArrowLeft className="h-4 w-4" />
                       Volver a resultados de extracción
@@ -774,16 +774,16 @@ export default function AnalisisDeclaracionesIvaPage() {
         {/* Info Section - Only show when no results */}
         {!extractionResult && (
           <motion.section variants={itemVariants}>
-            <div className="bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 border border-indigo-200 dark:border-indigo-800 rounded-xl p-6">
+            <div className="bg-gradient-to-r from-brand-indigo/5 to-brand-indigo/5 border border-brand-indigo/20 rounded-xl p-6">
               <div className="flex gap-4">
                 <div className="w-12 h-12 rounded-xl bg-brand-indigo/10 flex items-center justify-center flex-shrink-0">
                   <Sparkles className="h-6 w-6 text-brand-indigo" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-brand-navy dark:text-indigo-100 mb-2">
+                  <h3 className="font-semibold text-brand-navy mb-2">
                     ¿Qué documentos puedo subir?
                   </h3>
-                  <ul className="text-brand-text dark:text-indigo-300 text-sm leading-relaxed space-y-1">
+                  <ul className="text-brand-text text-sm leading-relaxed space-y-1">
                     <li className="flex items-center gap-2">
                       <CheckCircle2 className="h-4 w-4 text-brand-indigo" />
                       <span><strong>Declaraciones de IVA:</strong> Formularios 300 en formato PDF</span>
@@ -827,15 +827,15 @@ function IvaResultCard({ result, index, isExpanded, onToggle, formatCurrency }: 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: index * 0.1 }}
-        className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-4"
+        className="bg-error-bg border border-error-bg rounded-xl p-4"
       >
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-lg bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
-            <AlertCircle className="h-5 w-5 text-red-600" />
+          <div className="w-10 h-10 rounded-lg bg-error-bg flex items-center justify-center">
+            <AlertCircle className="h-5 w-5 text-error" />
           </div>
           <div>
-            <p className="font-medium text-red-800 dark:text-red-200">{result.filename}</p>
-            <p className="text-sm text-red-600 dark:text-red-400">
+            <p className="font-medium text-error-foreground">{result.filename}</p>
+            <p className="text-sm text-error">
               {result.errors?.join(', ') || 'Error en la extracción'}
             </p>
           </div>
@@ -853,22 +853,22 @@ function IvaResultCard({ result, index, isExpanded, onToggle, formatCurrency }: 
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.1 }}
-      className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl overflow-hidden shadow-sm"
+      className="bg-white border border-brand-border rounded-2xl overflow-hidden shadow-sm"
     >
       {/* Card Header - Always visible */}
       <button
         onClick={onToggle}
-        className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
+        className="w-full px-6 py-4 flex items-center justify-between hover:bg-brand-bg transition-colors"
       >
         <div className="flex items-center gap-4">
           <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-brand-navy to-brand-indigo flex items-center justify-center shadow-lg shadow-brand-navy/25">
             <Receipt className="h-6 w-6 text-white" />
           </div>
           <div className="text-left">
-            <h3 className="font-semibold text-foreground">
+            <h3 className="font-semibold text-brand-text">
               {declarante.razon_social || 'Sin razón social'}
             </h3>
-            <div className="flex items-center gap-3 text-sm text-muted-foreground">
+            <div className="flex items-center gap-3 text-sm text-brand-text-secondary">
               <span className="flex items-center gap-1">
                 <Hash className="h-3 w-3" />
                 NIT: {declarante.nit}-{declarante.dv}
@@ -877,7 +877,7 @@ function IvaResultCard({ result, index, isExpanded, onToggle, formatCurrency }: 
                 <Calendar className="h-3 w-3" />
                 Periodo {declarante.periodo}: {periodName} {declarante.ano}
               </span>
-              <span className="px-2 py-0.5 bg-indigo-100 dark:bg-indigo-900/30 text-brand-indigo dark:text-indigo-300 rounded-full text-xs">
+              <span className="px-2 py-0.5 bg-brand-indigo/10 text-brand-indigo rounded-full text-xs">
                 {declarante.periodicidad}
               </span>
             </div>
@@ -887,14 +887,14 @@ function IvaResultCard({ result, index, isExpanded, onToggle, formatCurrency }: 
           {/* Quick Stats */}
           <div className="hidden md:flex items-center gap-4">
             <div className="text-right">
-              <p className="text-xs text-muted-foreground">Total IVA Generado</p>
-              <p className="font-semibold text-green-600">{formatCurrency(data.impuesto_generado.total_impuesto_generado)}</p>
+              <p className="text-xs text-brand-text-secondary">Total IVA Generado</p>
+              <p className="font-semibold text-success">{formatCurrency(data.impuesto_generado.total_impuesto_generado)}</p>
             </div>
             <div className="text-right">
-              <p className="text-xs text-muted-foreground">Saldo</p>
+              <p className="text-xs text-brand-text-secondary">Saldo</p>
               <p className={cn(
                 "font-semibold",
-                data.liquidacion_privada.total_saldo_pagar > 0 ? "text-red-600" : "text-brand-indigo"
+                data.liquidacion_privada.total_saldo_pagar > 0 ? "text-error" : "text-brand-indigo"
               )}>
                 {data.liquidacion_privada.total_saldo_pagar > 0
                   ? `A pagar: ${formatCurrency(data.liquidacion_privada.total_saldo_pagar)}`
@@ -904,9 +904,9 @@ function IvaResultCard({ result, index, isExpanded, onToggle, formatCurrency }: 
             </div>
           </div>
           {isExpanded ? (
-            <ChevronUp className="h-5 w-5 text-muted-foreground" />
+            <ChevronUp className="h-5 w-5 text-brand-text-secondary" />
           ) : (
-            <ChevronDown className="h-5 w-5 text-muted-foreground" />
+            <ChevronDown className="h-5 w-5 text-brand-text-secondary" />
           )}
         </div>
       </button>
@@ -921,36 +921,36 @@ function IvaResultCard({ result, index, isExpanded, onToggle, formatCurrency }: 
             transition={{ duration: 0.3 }}
             className="overflow-hidden"
           >
-            <div className="px-6 pb-6 space-y-6 border-t border-gray-200 dark:border-gray-800 pt-4">
+            <div className="px-6 pb-6 space-y-6 border-t border-brand-border pt-4">
               {/* Summary Cards */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <SummaryCard
-                  icon={<TrendingUp className="h-5 w-5 text-green-600" />}
+                  icon={<TrendingUp className="h-5 w-5 text-success" />}
                   label="Total Ingresos"
                   value={formatCurrency(data.ingresos.total_ingresos_netos_periodo)}
-                  bgColor="bg-green-50 dark:bg-green-900/20"
-                  borderColor="border-green-200 dark:border-green-800"
+                  bgColor="bg-success-bg"
+                  borderColor="border-success-bg"
                 />
                 <SummaryCard
-                  icon={<TrendingDown className="h-5 w-5 text-red-600" />}
+                  icon={<TrendingDown className="h-5 w-5 text-error" />}
                   label="Total Compras"
                   value={formatCurrency(data.compras_nacionales.total_compras_netas_periodo)}
-                  bgColor="bg-red-50 dark:bg-red-900/20"
-                  borderColor="border-red-200 dark:border-red-800"
+                  bgColor="bg-error-bg"
+                  borderColor="border-error-bg"
                 />
                 <SummaryCard
                   icon={<DollarSign className="h-5 w-5 text-brand-indigo" />}
                   label="IVA Generado"
                   value={formatCurrency(data.impuesto_generado.total_impuesto_generado)}
-                  bgColor="bg-indigo-50 dark:bg-indigo-900/20"
-                  borderColor="border-indigo-200 dark:border-indigo-800"
+                  bgColor="bg-brand-indigo/5"
+                  borderColor="border-brand-indigo/20"
                 />
                 <SummaryCard
-                  icon={<DollarSign className="h-5 w-5 text-purple-600" />}
+                  icon={<DollarSign className="h-5 w-5 text-brand-indigo" />}
                   label="IVA Descontable"
                   value={formatCurrency(data.impuesto_descontable.total_impuestos_descontables)}
-                  bgColor="bg-purple-50 dark:bg-purple-900/20"
-                  borderColor="border-purple-200 dark:border-purple-800"
+                  bgColor="bg-brand-indigo/5"
+                  borderColor="border-brand-indigo/20"
                 />
               </div>
 
@@ -993,40 +993,40 @@ function IvaResultCard({ result, index, isExpanded, onToggle, formatCurrency }: 
               </div>
 
               {/* Liquidación */}
-              <div className="bg-gradient-to-r from-slate-50 to-slate-100 dark:from-slate-800/50 dark:to-slate-900/50 rounded-xl p-5 border border-slate-200 dark:border-slate-700">
-                <h4 className="font-semibold text-foreground mb-4 flex items-center gap-2">
+              <div className="bg-gradient-to-r from-brand-bg to-brand-bg-alt rounded-xl p-5 border border-brand-border">
+                <h4 className="font-semibold text-brand-text mb-4 flex items-center gap-2">
                   <Building className="h-5 w-5 text-slate-600" />
                   Liquidación Privada
                 </h4>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   <div>
-                    <p className="text-xs text-muted-foreground">Saldo a pagar periodo</p>
-                    <p className="font-semibold text-foreground">{formatCurrency(data.liquidacion_privada.saldo_pagar_periodo_fiscal)}</p>
+                    <p className="text-xs text-brand-text-secondary">Saldo a pagar periodo</p>
+                    <p className="font-semibold text-brand-text">{formatCurrency(data.liquidacion_privada.saldo_pagar_periodo_fiscal)}</p>
                   </div>
                   <div>
-                    <p className="text-xs text-muted-foreground">Saldo a favor anterior</p>
-                    <p className="font-semibold text-foreground">{formatCurrency(data.liquidacion_privada.saldo_favor_periodo_anterior)}</p>
+                    <p className="text-xs text-brand-text-secondary">Saldo a favor anterior</p>
+                    <p className="font-semibold text-brand-text">{formatCurrency(data.liquidacion_privada.saldo_favor_periodo_anterior)}</p>
                   </div>
                   <div>
-                    <p className="text-xs text-muted-foreground">Retenciones IVA</p>
-                    <p className="font-semibold text-foreground">{formatCurrency(data.liquidacion_privada.retenciones_iva_practicaron)}</p>
+                    <p className="text-xs text-brand-text-secondary">Retenciones IVA</p>
+                    <p className="font-semibold text-brand-text">{formatCurrency(data.liquidacion_privada.retenciones_iva_practicaron)}</p>
                   </div>
                   <div>
-                    <p className="text-xs text-muted-foreground">Sanciones</p>
-                    <p className="font-semibold text-foreground">{formatCurrency(data.liquidacion_privada.sanciones)}</p>
+                    <p className="text-xs text-brand-text-secondary">Sanciones</p>
+                    <p className="font-semibold text-brand-text">{formatCurrency(data.liquidacion_privada.sanciones)}</p>
                   </div>
                 </div>
-                <div className="mt-4 pt-4 border-t border-slate-200 dark:border-slate-700 grid grid-cols-2 gap-4">
+                <div className="mt-4 pt-4 border-t border-brand-border grid grid-cols-2 gap-4">
                   <div className={cn(
                     "p-4 rounded-xl",
                     data.liquidacion_privada.total_saldo_pagar > 0
-                      ? "bg-red-100 dark:bg-red-900/30 border border-red-200 dark:border-red-800"
-                      : "bg-gray-100 dark:bg-gray-800"
+                      ? "bg-error-bg border border-error-bg"
+                      : "bg-brand-bg-alt"
                   )}>
-                    <p className="text-sm text-muted-foreground">Total Saldo a Pagar</p>
+                    <p className="text-sm text-brand-text-secondary">Total Saldo a Pagar</p>
                     <p className={cn(
                       "text-2xl font-bold",
-                      data.liquidacion_privada.total_saldo_pagar > 0 ? "text-red-600" : "text-gray-400"
+                      data.liquidacion_privada.total_saldo_pagar > 0 ? "text-error" : "text-brand-text-secondary"
                     )}>
                       {formatCurrency(data.liquidacion_privada.total_saldo_pagar)}
                     </p>
@@ -1034,13 +1034,13 @@ function IvaResultCard({ result, index, isExpanded, onToggle, formatCurrency }: 
                   <div className={cn(
                     "p-4 rounded-xl",
                     data.liquidacion_privada.total_saldo_favor > 0
-                      ? "bg-indigo-100 dark:bg-indigo-900/30 border border-indigo-200 dark:border-indigo-800"
-                      : "bg-gray-100 dark:bg-gray-800"
+                      ? "bg-brand-indigo/10 border border-brand-indigo/20"
+                      : "bg-brand-bg-alt"
                   )}>
-                    <p className="text-sm text-muted-foreground">Total Saldo a Favor</p>
+                    <p className="text-sm text-brand-text-secondary">Total Saldo a Favor</p>
                     <p className={cn(
                       "text-2xl font-bold",
-                      data.liquidacion_privada.total_saldo_favor > 0 ? "text-brand-indigo" : "text-gray-400"
+                      data.liquidacion_privada.total_saldo_favor > 0 ? "text-brand-indigo" : "text-brand-text-secondary"
                     )}>
                       {formatCurrency(data.liquidacion_privada.total_saldo_favor)}
                     </p>
@@ -1049,7 +1049,7 @@ function IvaResultCard({ result, index, isExpanded, onToggle, formatCurrency }: 
               </div>
 
               {/* Metadata */}
-              <div className="text-xs text-muted-foreground flex items-center gap-4 pt-2">
+              <div className="text-xs text-brand-text-secondary flex items-center gap-4 pt-2">
                 <span>Formulario: {declarante.numero_formulario}</span>
                 <span>•</span>
                 <span>Campos extraídos: {data.metadatos.campos_extraidos}</span>
@@ -1076,9 +1076,9 @@ function SummaryCard({ icon, label, value, bgColor, borderColor }: {
     <div className={cn("p-4 rounded-xl border", bgColor, borderColor)}>
       <div className="flex items-center gap-2 mb-2">
         {icon}
-        <span className="text-xs font-medium text-muted-foreground">{label}</span>
+        <span className="text-xs font-medium text-brand-text-secondary">{label}</span>
       </div>
-      <p className="text-lg font-bold text-foreground">{value}</p>
+      <p className="text-lg font-bold text-brand-text">{value}</p>
     </div>
   )
 }
@@ -1089,8 +1089,8 @@ function DetailSection({ title, icon, children }: {
   children: React.ReactNode
 }) {
   return (
-    <div className="bg-gray-50 dark:bg-gray-800/50 rounded-xl p-4">
-      <h4 className="font-semibold text-foreground mb-3 flex items-center gap-2 text-sm">
+    <div className="bg-brand-bg rounded-xl p-4">
+      <h4 className="font-semibold text-brand-text mb-3 flex items-center gap-2 text-sm">
         {icon}
         {title}
       </h4>
@@ -1109,16 +1109,16 @@ function DetailRow({ label, value, highlight = false }: {
   return (
     <div className={cn(
       "flex justify-between items-center text-sm",
-      highlight && "pt-2 mt-2 border-t border-gray-200 dark:border-gray-700"
+      highlight && "pt-2 mt-2 border-t border-brand-border"
     )}>
       <span className={cn(
-        highlight ? "font-semibold text-foreground" : "text-muted-foreground"
+        highlight ? "font-semibold text-brand-text" : "text-brand-text-secondary"
       )}>
         {label}
       </span>
       <span className={cn(
         "font-mono",
-        highlight ? "font-bold text-foreground" : "text-foreground"
+        highlight ? "font-bold text-brand-text" : "text-brand-text"
       )}>
         {value}
       </span>

@@ -155,7 +155,7 @@ export default function AnalisisDeclaracionesRentaPage() {
       <div className="space-y-4">
         <Link
           href="/analisis-eficacia"
-          className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+          className="inline-flex items-center gap-2 text-sm text-brand-text-secondary hover:text-brand-text transition-colors"
         >
           <ArrowLeft className="h-4 w-4" />
           Volver a Análisis de Eficacia
@@ -183,7 +183,7 @@ export default function AnalisisDeclaracionesRentaPage() {
 
         <button
           onClick={handleViewCompleteGrandesContribuyentes}
-          className="flex items-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors font-medium"
+          className="flex items-center gap-2 px-4 py-2 bg-brand-indigo hover:bg-brand-indigo-hover text-white rounded-lg transition-colors font-medium"
         >
           <Building className="h-4 w-4" />
           Calendario Grandes Contribuyentes
@@ -191,7 +191,7 @@ export default function AnalisisDeclaracionesRentaPage() {
 
         <button
           onClick={handleViewCompletePersonasJuridicas}
-          className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors font-medium"
+          className="flex items-center gap-2 px-4 py-2 bg-brand-indigo hover:bg-brand-indigo-hover text-white rounded-lg transition-colors font-medium"
         >
           <Users className="h-4 w-4" />
           Calendario Personas Jurídicas
@@ -200,25 +200,25 @@ export default function AnalisisDeclaracionesRentaPage() {
 
       {/* Tax Calendar Section */}
       {extractionResult && taxCalendar && (
-        <div className="bg-white dark:bg-gray-900 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
+        <div className="bg-white rounded-xl shadow-lg border border-brand-border overflow-hidden">
           {/* Calendar Header */}
-          <div className="bg-gradient-to-r from-orange-50 to-yellow-50 dark:from-orange-900/20 dark:to-yellow-900/20 px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+          <div className="bg-gradient-to-r from-warning-bg to-warning-bg px-6 py-4 border-b border-brand-border">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-orange-100 dark:bg-orange-900/30 rounded-full">
-                <Calendar className="h-6 w-6 text-orange-600" />
+              <div className="p-2 bg-warning-bg rounded-full">
+                <Calendar className="h-6 w-6 text-warning" />
               </div>
               <div>
-                <h3 className="text-xl font-bold text-orange-700 dark:text-orange-300">
+                <h3 className="text-xl font-bold text-warning">
                   Calendario Tributario {declaracion?.ano_gravable ? declaracion.ano_gravable + 1 : ''}
                 </h3>
-                <p className="text-sm text-orange-600 dark:text-orange-400">
+                <p className="text-sm text-warning">
                   {extractionResult.es_gran_contribuyente ? 'Grandes Contribuyentes' : 'Personas Jurídicas'}
                   {' '}| Último dígito NIT: {declaracion?.nit.slice(-1)}
                 </p>
               </div>
               {isLoadingCalendar && (
                 <div className="ml-auto">
-                  <Loader2 className="h-5 w-5 animate-spin text-orange-600" />
+                  <Loader2 className="h-5 w-5 animate-spin text-warning" />
                 </div>
               )}
             </div>
@@ -230,11 +230,11 @@ export default function AnalisisDeclaracionesRentaPage() {
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead>
-                    <tr className="border-b border-gray-200 dark:border-gray-700">
-                      <th className="text-left py-3 px-4 font-semibold text-gray-800 dark:text-gray-200">
+                    <tr className="border-b border-brand-border">
+                      <th className="text-left py-3 px-4 font-semibold text-brand-text">
                         Obligación
                       </th>
-                      <th className="text-left py-3 px-4 font-semibold text-gray-800 dark:text-gray-200">
+                      <th className="text-left py-3 px-4 font-semibold text-brand-text">
                         Fecha Límite
                       </th>
                     </tr>
@@ -245,29 +245,29 @@ export default function AnalisisDeclaracionesRentaPage() {
                       <>
                         {(taxCalendar as GranContribuyenteResponse).calendarios.map((calendar, index) => (
                           <React.Fragment key={index}>
-                            <tr className="border-b border-gray-100 dark:border-gray-800">
+                            <tr className="border-b border-brand-border">
                               <td className="py-3 px-4 font-medium">Pago Primera Cuota</td>
                               <td className="py-3 px-4">
                                 <div className="flex items-center gap-2">
-                                  <Clock className="h-4 w-4 text-gray-500" />
+                                  <Clock className="h-4 w-4 text-brand-text-secondary" />
                                   {formatDate(calendar.fecha_pago_primera_cuota)}
                                 </div>
                               </td>
                             </tr>
-                            <tr className="border-b border-gray-100 dark:border-gray-800">
+                            <tr className="border-b border-brand-border">
                               <td className="py-3 px-4 font-medium">Declaración Segunda Cuota</td>
                               <td className="py-3 px-4">
                                 <div className="flex items-center gap-2">
-                                  <Clock className="h-4 w-4 text-gray-500" />
+                                  <Clock className="h-4 w-4 text-brand-text-secondary" />
                                   {formatDate(calendar.fecha_declaracion_segunda_cuota)}
                                 </div>
                               </td>
                             </tr>
-                            <tr className="border-b border-gray-100 dark:border-gray-800">
+                            <tr className="border-b border-brand-border">
                               <td className="py-3 px-4 font-medium">Pago Tercera Cuota</td>
                               <td className="py-3 px-4">
                                 <div className="flex items-center gap-2">
-                                  <Clock className="h-4 w-4 text-gray-500" />
+                                  <Clock className="h-4 w-4 text-brand-text-secondary" />
                                   {formatDate(calendar.fecha_pago_tercera_cuota)}
                                 </div>
                               </td>
@@ -280,20 +280,20 @@ export default function AnalisisDeclaracionesRentaPage() {
                       <>
                         {(taxCalendar as PersonaJuridicaResponse).calendarios.map((calendar, index) => (
                           <React.Fragment key={index}>
-                            <tr className="border-b border-gray-100 dark:border-gray-800">
+                            <tr className="border-b border-brand-border">
                               <td className="py-3 px-4 font-medium">Declaración Primera Cuota</td>
                               <td className="py-3 px-4">
                                 <div className="flex items-center gap-2">
-                                  <Clock className="h-4 w-4 text-gray-500" />
+                                  <Clock className="h-4 w-4 text-brand-text-secondary" />
                                   {formatDate(calendar.fecha_declaracion_primera_cuota)}
                                 </div>
                               </td>
                             </tr>
-                            <tr className="border-b border-gray-100 dark:border-gray-800">
+                            <tr className="border-b border-brand-border">
                               <td className="py-3 px-4 font-medium">Pago Segunda Cuota</td>
                               <td className="py-3 px-4">
                                 <div className="flex items-center gap-2">
-                                  <Clock className="h-4 w-4 text-gray-500" />
+                                  <Clock className="h-4 w-4 text-brand-text-secondary" />
                                   {formatDate(calendar.fecha_pago_segunda_cuota)}
                                 </div>
                               </td>
@@ -306,15 +306,15 @@ export default function AnalisisDeclaracionesRentaPage() {
                 </table>
               </div>
             ) : (
-              <div className="text-center py-8 text-gray-500 dark:text-gray-400">
-                <Calendar className="h-12 w-12 mx-auto mb-3 text-gray-300" />
+              <div className="text-center py-8 text-brand-text-secondary">
+                <Calendar className="h-12 w-12 mx-auto mb-3 text-brand-text-secondary" />
                 <p>No se encontraron fechas del calendario tributario para este contribuyente.</p>
               </div>
             )}
 
             {/* Calendar Info */}
-            <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-              <div className="text-sm text-gray-600 dark:text-gray-400">
+            <div className="mt-4 pt-4 border-t border-brand-border">
+              <div className="text-sm text-brand-text-secondary">
                 <span>Total de registros: {taxCalendar.total_registros}</span>
                 <span className="mx-2">•</span>
                 <span>Último dígito NIT: {taxCalendar.filtros_aplicados.ultimo_digito_nit}</span>
@@ -328,18 +328,18 @@ export default function AnalisisDeclaracionesRentaPage() {
 
       {/* Payment Analysis Section */}
       {extractionResult?.tiene_pagos && extractionResult?.analisis_pagos && (
-        <div className="bg-white dark:bg-gray-900 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
+        <div className="bg-white rounded-xl shadow-lg border border-brand-border overflow-hidden">
           {/* Header */}
-          <div className="bg-gradient-to-r from-blue-50 to-green-50 dark:from-blue-900/20 dark:to-green-900/20 px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+          <div className="bg-gradient-to-r from-brand-indigo/5 to-success-bg px-6 py-4 border-b border-brand-border">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-full">
-                <DollarSign className="h-6 w-6 text-blue-600" />
+              <div className="p-2 bg-brand-indigo/10 rounded-full">
+                <DollarSign className="h-6 w-6 text-brand-indigo" />
               </div>
               <div>
-                <h3 className="text-xl font-bold text-blue-700 dark:text-blue-300">
+                <h3 className="text-xl font-bold text-brand-indigo">
                   Análisis de Pagos
                 </h3>
-                <p className="text-sm text-blue-600 dark:text-blue-400">
+                <p className="text-sm text-brand-indigo">
                   Comparación entre lo declarado y lo pagado
                 </p>
               </div>
@@ -350,65 +350,65 @@ export default function AnalisisDeclaracionesRentaPage() {
           <div className="p-6 space-y-6">
             {/* Summary Cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              <div className="bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-900/30 p-4 rounded-lg border border-purple-200 dark:border-purple-800">
+              <div className="bg-gradient-to-br from-brand-indigo/5 to-brand-indigo/10 p-4 rounded-lg border border-brand-indigo/20">
                 <div className="flex items-center gap-2 mb-2">
-                  <FileText className="h-5 w-5 text-purple-600" />
-                  <span className="text-sm font-medium text-purple-700 dark:text-purple-300">Saldo a Pagar</span>
+                  <FileText className="h-5 w-5 text-brand-indigo" />
+                  <span className="text-sm font-medium text-brand-indigo">Saldo a Pagar</span>
                 </div>
-                <p className="text-2xl font-bold text-purple-900 dark:text-purple-100">
+                <p className="text-2xl font-bold text-brand-text">
                   {formatCurrency(extractionResult.declaracion.saldo_pagar_impuesto)}
                 </p>
               </div>
 
-              <div className="bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-900/30 p-4 rounded-lg border border-green-200 dark:border-green-800">
+              <div className="bg-gradient-to-br from-success-bg to-success-bg p-4 rounded-lg border border-success-bg">
                 <div className="flex items-center gap-2 mb-2">
-                  <CheckCircle className="h-5 w-5 text-green-600" />
-                  <span className="text-sm font-medium text-green-700 dark:text-green-300">Total Pagado</span>
+                  <CheckCircle className="h-5 w-5 text-success" />
+                  <span className="text-sm font-medium text-success-foreground">Total Pagado</span>
                 </div>
-                <p className="text-2xl font-bold text-green-900 dark:text-green-100">
+                <p className="text-2xl font-bold text-success-foreground">
                   {formatCurrency(extractionResult.analisis_pagos.total_pagado)}
                 </p>
               </div>
 
-              <div className="bg-gradient-to-br from-orange-50 to-orange-100 dark:from-orange-900/20 dark:to-orange-900/30 p-4 rounded-lg border border-orange-200 dark:border-orange-800">
+              <div className="bg-gradient-to-br from-warning-bg to-warning-bg p-4 rounded-lg border border-warning-bg">
                 <div className="flex items-center gap-2 mb-2">
-                  <AlertTriangle className="h-5 w-5 text-orange-600" />
-                  <span className="text-sm font-medium text-orange-700 dark:text-orange-300">Pendiente</span>
+                  <AlertTriangle className="h-5 w-5 text-warning" />
+                  <span className="text-sm font-medium text-warning-foreground">Pendiente</span>
                 </div>
-                <p className="text-2xl font-bold text-orange-900 dark:text-orange-100">
+                <p className="text-2xl font-bold text-warning-foreground">
                   {formatCurrency(extractionResult.analisis_pagos.saldo_pendiente)}
                 </p>
               </div>
 
               <div className={`bg-gradient-to-br p-4 rounded-lg border ${
                 extractionResult.analisis_pagos.estado_pago === 'PAGADO_COMPLETO'
-                  ? 'from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-900/30 border-green-200 dark:border-green-800'
+                  ? 'from-success-bg to-success-bg border-success-bg'
                   : extractionResult.analisis_pagos.estado_pago === 'PAGO_PARCIAL'
-                  ? 'from-yellow-50 to-yellow-100 dark:from-yellow-900/20 dark:to-yellow-900/30 border-yellow-200 dark:border-yellow-800'
-                  : 'from-red-50 to-red-100 dark:from-red-900/20 dark:to-red-900/30 border-red-200 dark:border-red-800'
+                  ? 'from-warning-bg to-warning-bg border-warning-bg'
+                  : 'from-error-bg to-error-bg border-error-bg'
               }`}>
                 <div className="flex items-center gap-2 mb-2">
                   {extractionResult.analisis_pagos.estado_pago === 'PAGADO_COMPLETO' ? (
-                    <CheckCircle className="h-5 w-5 text-green-600" />
+                    <CheckCircle className="h-5 w-5 text-success" />
                   ) : (
                     <AlertTriangle className={`h-5 w-5 ${
-                      extractionResult.analisis_pagos.estado_pago === 'PAGO_PARCIAL' ? 'text-yellow-600' : 'text-red-600'
+                      extractionResult.analisis_pagos.estado_pago === 'PAGO_PARCIAL' ? 'text-warning' : 'text-error'
                     }`} />
                   )}
                   <span className={`text-sm font-medium ${
                     extractionResult.analisis_pagos.estado_pago === 'PAGADO_COMPLETO'
-                      ? 'text-green-700 dark:text-green-300'
+                      ? 'text-success-foreground'
                       : extractionResult.analisis_pagos.estado_pago === 'PAGO_PARCIAL'
-                      ? 'text-yellow-700 dark:text-yellow-300'
-                      : 'text-red-700 dark:text-red-300'
+                      ? 'text-warning-foreground'
+                      : 'text-error-foreground'
                   }`}>Estado</span>
                 </div>
                 <p className={`text-xl font-bold ${
                   extractionResult.analisis_pagos.estado_pago === 'PAGADO_COMPLETO'
-                    ? 'text-green-900 dark:text-green-100'
+                    ? 'text-success-foreground'
                     : extractionResult.analisis_pagos.estado_pago === 'PAGO_PARCIAL'
-                    ? 'text-yellow-900 dark:text-yellow-100'
-                    : 'text-red-900 dark:text-red-100'
+                    ? 'text-warning-foreground'
+                    : 'text-error-foreground'
                 }`}>
                   {extractionResult.analisis_pagos.estado_pago.replace('_', ' ')}
                 </p>
@@ -418,24 +418,24 @@ export default function AnalisisDeclaracionesRentaPage() {
             {/* Payment Details Table */}
             {extractionResult.analisis_pagos.pagos_detalle && extractionResult.analisis_pagos.pagos_detalle.length > 0 && (
               <div>
-                <h4 className="text-lg font-bold text-gray-800 dark:text-gray-200 mb-4">Detalle de Pagos</h4>
+                <h4 className="text-lg font-bold text-brand-text mb-4">Detalle de Pagos</h4>
                 <div className="overflow-x-auto">
                   <table className="w-full">
                     <thead>
-                      <tr className="border-b-2 border-gray-200 dark:border-gray-700">
-                        <th className="text-left py-3 px-4 font-semibold text-gray-800 dark:text-gray-200">Formulario</th>
-                        <th className="text-left py-3 px-4 font-semibold text-gray-800 dark:text-gray-200">Fecha Pago</th>
-                        <th className="text-left py-3 px-4 font-semibold text-gray-800 dark:text-gray-200">Cuota</th>
-                        <th className="text-right py-3 px-4 font-semibold text-gray-800 dark:text-gray-200">Impuesto</th>
-                        <th className="text-right py-3 px-4 font-semibold text-gray-800 dark:text-gray-200">Intereses</th>
-                        <th className="text-right py-3 px-4 font-semibold text-gray-800 dark:text-gray-200">Sanción</th>
-                        <th className="text-right py-3 px-4 font-semibold text-gray-800 dark:text-gray-200">Total</th>
-                        <th className="text-left py-3 px-4 font-semibold text-gray-800 dark:text-gray-200">Concepto</th>
+                      <tr className="border-b-2 border-brand-border">
+                        <th className="text-left py-3 px-4 font-semibold text-brand-text">Formulario</th>
+                        <th className="text-left py-3 px-4 font-semibold text-brand-text">Fecha Pago</th>
+                        <th className="text-left py-3 px-4 font-semibold text-brand-text">Cuota</th>
+                        <th className="text-right py-3 px-4 font-semibold text-brand-text">Impuesto</th>
+                        <th className="text-right py-3 px-4 font-semibold text-brand-text">Intereses</th>
+                        <th className="text-right py-3 px-4 font-semibold text-brand-text">Sanción</th>
+                        <th className="text-right py-3 px-4 font-semibold text-brand-text">Total</th>
+                        <th className="text-left py-3 px-4 font-semibold text-brand-text">Concepto</th>
                       </tr>
                     </thead>
                     <tbody>
                       {extractionResult.analisis_pagos.pagos_detalle.map((pago: PagoDetalle, index: number) => (
-                        <tr key={index} className="border-b border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/50">
+                        <tr key={index} className="border-b border-brand-border hover:bg-brand-bg">
                           <td className="py-3 px-4 font-medium">{pago.numero_formulario}</td>
                           <td className="py-3 px-4">{formatDate(pago.fecha_pago)}</td>
                           <td className="py-3 px-4">Cuota {pago.cuota_numero}</td>
@@ -443,7 +443,7 @@ export default function AnalisisDeclaracionesRentaPage() {
                           <td className="py-3 px-4 text-right">{formatCurrency(pago.valor_intereses)}</td>
                           <td className="py-3 px-4 text-right">{formatCurrency(pago.valor_sancion)}</td>
                           <td className="py-3 px-4 text-right font-semibold">{formatCurrency(pago.total_pago)}</td>
-                          <td className="py-3 px-4 text-sm text-gray-600 dark:text-gray-400">{pago.concepto}</td>
+                          <td className="py-3 px-4 text-sm text-brand-text-secondary">{pago.concepto}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -455,47 +455,47 @@ export default function AnalisisDeclaracionesRentaPage() {
             {/* Compliance Analysis */}
             {extractionResult.analisis_pagos.cumplimiento_fechas?.analisis_disponible &&
              extractionResult.analisis_pagos.cumplimiento_fechas.pagos_analizados && (
-              <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
-                <h4 className="text-lg font-bold text-gray-800 dark:text-gray-200 mb-4">Análisis de Cumplimiento de Fechas</h4>
+              <div className="mt-6 pt-6 border-t border-brand-border">
+                <h4 className="text-lg font-bold text-brand-text mb-4">Análisis de Cumplimiento de Fechas</h4>
                 <div className="space-y-4">
                   {extractionResult.analisis_pagos.cumplimiento_fechas.pagos_analizados.map((pago, index) => (
                     <div
                       key={index}
                       className={`p-4 rounded-lg border ${
                         pago.pago_oportuno
-                          ? 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800'
-                          : 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800'
+                          ? 'bg-success-bg border-success-bg'
+                          : 'bg-error-bg border-error-bg'
                       }`}
                     >
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
                           <div className="flex items-center gap-2 mb-2">
                             {pago.pago_oportuno ? (
-                              <CheckCircle className="h-5 w-5 text-green-600" />
+                              <CheckCircle className="h-5 w-5 text-success" />
                             ) : (
-                              <AlertTriangle className="h-5 w-5 text-red-600" />
+                              <AlertTriangle className="h-5 w-5 text-error" />
                             )}
                             <span className={`font-semibold ${
                               pago.pago_oportuno
-                                ? 'text-green-700 dark:text-green-300'
-                                : 'text-red-700 dark:text-red-300'
+                                ? 'text-success-foreground'
+                                : 'text-error-foreground'
                             }`}>
                               Cuota {pago.cuota}
                             </span>
                           </div>
                           <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-sm">
                             <div>
-                              <span className="text-gray-600 dark:text-gray-400">Fecha límite:</span>
+                              <span className="text-brand-text-secondary">Fecha límite:</span>
                               <p className="font-medium">{formatDate(pago.fecha_limite)}</p>
                             </div>
                             <div>
-                              <span className="text-gray-600 dark:text-gray-400">Fecha pago:</span>
+                              <span className="text-brand-text-secondary">Fecha pago:</span>
                               <p className="font-medium">{formatDate(pago.fecha_pago)}</p>
                             </div>
                             <div>
-                              <span className="text-gray-600 dark:text-gray-400">Días de mora:</span>
+                              <span className="text-brand-text-secondary">Días de mora:</span>
                               <p className={`font-bold ${
-                                (pago.dias_mora ?? 0) > 0 ? 'text-red-600' : 'text-green-600'
+                                (pago.dias_mora ?? 0) > 0 ? 'text-error' : 'text-success'
                               }`}>
                                 {pago.dias_mora ?? 0} {(pago.dias_mora ?? 0) === 1 ? 'día' : 'días'}
                               </p>
@@ -516,26 +516,26 @@ export default function AnalisisDeclaracionesRentaPage() {
       {showUploadModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
           <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={handleCloseUploadModal} />
-          <div className="relative z-10 bg-white dark:bg-gray-900 rounded-xl shadow-2xl border border-gray-200 dark:border-gray-700 p-6 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+          <div className="relative z-10 bg-white rounded-xl shadow-2xl border border-brand-border p-6 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
             <div className="space-y-6">
               <div className="flex items-center justify-between">
-                <h2 className="text-xl font-bold text-foreground">Extracción de Declaración de Renta</h2>
+                <h2 className="text-xl font-bold text-brand-text">Extracción de Declaración de Renta</h2>
                 <button
                   onClick={handleCloseUploadModal}
                   disabled={isUploading}
-                  className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 disabled:opacity-50"
+                  className="text-brand-text-secondary hover:text-brand-text disabled:opacity-50"
                 >
                   <X className="h-5 w-5" />
                 </button>
               </div>
 
               {error && (
-                <div className="p-4 bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-200 dark:border-red-800">
+                <div className="p-4 bg-error-bg rounded-lg border border-error-bg">
                   <div className="flex items-center gap-2">
-                    <AlertTriangle className="h-4 w-4 text-red-600" />
-                    <span className="font-medium text-red-800 dark:text-red-200">Error</span>
+                    <AlertTriangle className="h-4 w-4 text-error" />
+                    <span className="font-medium text-error-foreground">Error</span>
                   </div>
-                  <p className="text-sm text-red-700 dark:text-red-300 mt-1">{error}</p>
+                  <p className="text-sm text-error mt-1">{error}</p>
                 </div>
               )}
 
@@ -581,9 +581,9 @@ export default function AnalisisDeclaracionesRentaPage() {
                       <span>Procesando archivos...</span>
                       <span>{uploadProgress.percentage}%</span>
                     </div>
-                    <div className="w-full bg-gray-200 rounded-full h-2">
+                    <div className="w-full bg-brand-bg-alt rounded-full h-2">
                       <div
-                        className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                        className="bg-brand-indigo h-2 rounded-full transition-all duration-300"
                         style={{ width: `${uploadProgress.percentage}%` }}
                       ></div>
                     </div>
@@ -592,7 +592,7 @@ export default function AnalisisDeclaracionesRentaPage() {
 
                 {/* Mensaje genérico si no hay progreso disponible aún */}
                 {isUploading && !sseProgress && !uploadProgress && (
-                  <div className="flex items-center gap-3 text-sm text-muted-foreground">
+                  <div className="flex items-center gap-3 text-sm text-brand-text-secondary">
                     <Loader2 className="h-4 w-4 animate-spin" />
                     <span>Iniciando extracción...</span>
                   </div>
@@ -620,7 +620,7 @@ export default function AnalisisDeclaracionesRentaPage() {
                     <button
                       onClick={handleCloseUploadModal}
                       disabled={isUploading}
-                      className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50"
+                      className="px-4 py-2 border border-brand-border text-brand-text rounded-lg hover:bg-brand-bg transition-colors disabled:opacity-50"
                     >
                       Cancelar
                     </button>

@@ -40,34 +40,34 @@ export function NotificationModal({
       case 'success':
         return {
           icon: CheckCircle,
-          iconColor: 'text-green-600',
-          iconBg: 'bg-green-100 dark:bg-green-900/30',
-          borderColor: 'border-green-200 dark:border-green-800',
-          bgColor: 'bg-green-50 dark:bg-green-900/20'
+          iconColor: 'text-success',
+          iconBg: 'bg-success-bg',
+          borderColor: 'border-success-bg',
+          bgColor: 'bg-success-bg'
         }
       case 'error':
         return {
           icon: XCircle,
-          iconColor: 'text-red-600',
-          iconBg: 'bg-red-100 dark:bg-red-900/30',
-          borderColor: 'border-red-200 dark:border-red-800',
-          bgColor: 'bg-red-50 dark:bg-red-900/20'
+          iconColor: 'text-error',
+          iconBg: 'bg-error-bg',
+          borderColor: 'border-error-bg',
+          bgColor: 'bg-error-bg'
         }
       case 'warning':
         return {
           icon: AlertTriangle,
-          iconColor: 'text-yellow-600',
-          iconBg: 'bg-yellow-100 dark:bg-yellow-900/30',
-          borderColor: 'border-yellow-200 dark:border-yellow-800',
-          bgColor: 'bg-yellow-50 dark:bg-yellow-900/20'
+          iconColor: 'text-warning',
+          iconBg: 'bg-warning-bg',
+          borderColor: 'border-warning-bg',
+          bgColor: 'bg-warning-bg'
         }
       default: // info
         return {
           icon: Info,
-          iconColor: 'text-blue-600',
-          iconBg: 'bg-blue-100 dark:bg-blue-900/30',
-          borderColor: 'border-blue-200 dark:border-blue-800',
-          bgColor: 'bg-blue-50 dark:bg-blue-900/20'
+          iconColor: 'text-brand-indigo',
+          iconBg: 'bg-brand-indigo/10',
+          borderColor: 'border-brand-indigo/20',
+          bgColor: 'bg-brand-indigo/5'
         }
     }
   }
@@ -84,7 +84,7 @@ export function NotificationModal({
       />
 
       {/* Modal */}
-      <div className="relative z-10 bg-white dark:bg-gray-900 rounded-xl shadow-2xl border border-gray-200 dark:border-gray-700 p-6 max-w-md w-full mx-4 transform transition-all animate-in fade-in-0 zoom-in-95 duration-200">
+      <div className="relative z-10 bg-white rounded-xl shadow-2xl border border-brand-border p-6 max-w-md w-full mx-4 transform transition-all animate-in fade-in-0 zoom-in-95 duration-200">
         <div className="space-y-4">
           {/* Header */}
           <div className="flex items-start justify-between">
@@ -92,13 +92,13 @@ export function NotificationModal({
               <div className={`p-2 rounded-full ${config.iconBg}`}>
                 <Icon className={`h-6 w-6 ${config.iconColor}`} />
               </div>
-              <h3 className="text-lg font-semibold text-foreground">
+              <h3 className="text-lg font-semibold text-brand-text">
                 {title}
               </h3>
             </div>
             <button
               onClick={onClose}
-              className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+              className="text-brand-text-secondary hover:text-brand-text transition-colors"
             >
               <X className="h-5 w-5" />
             </button>
@@ -106,7 +106,7 @@ export function NotificationModal({
 
           {/* Message */}
           <div className={`p-4 rounded-lg border ${config.borderColor} ${config.bgColor}`}>
-            <p className="text-sm text-foreground leading-relaxed">
+            <p className="text-sm text-brand-text leading-relaxed">
               {message}
             </p>
           </div>
@@ -115,7 +115,7 @@ export function NotificationModal({
           <div className="flex justify-end">
             <button
               onClick={onClose}
-              className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors"
+              className="px-4 py-2 text-sm font-medium text-white bg-brand-indigo hover:bg-brand-indigo-hover rounded-lg transition-colors"
             >
               Entendido
             </button>
@@ -123,9 +123,9 @@ export function NotificationModal({
 
           {/* Auto close progress bar */}
           {autoClose && (
-            <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1 overflow-hidden">
+            <div className="w-full bg-brand-bg-alt rounded-full h-1 overflow-hidden">
               <div
-                className="h-full bg-blue-600 rounded-full transition-all ease-linear"
+                className="h-full bg-brand-indigo rounded-full transition-all ease-linear"
                 style={{
                   animation: `shrink ${autoCloseDelay}ms linear forwards`
                 }}

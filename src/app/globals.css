@@ -4,94 +4,74 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    --background: 240 6% 96%;
+    --foreground: 240 10% 7%;
 
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card-foreground: 240 10% 7%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover-foreground: 240 10% 7%;
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    --primary: 228 56% 23%;
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 240 6% 94%;
+    --secondary-foreground: 228 56% 23%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --muted: 240 6% 94%;
+    --muted-foreground: 240 3% 45%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    --accent: 240 6% 94%;
+    --accent-foreground: 228 56% 23%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 354 36% 40%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    --border: 240 8% 88%;
+    --input: 240 8% 88%;
+    --ring: 249 39% 41%;
 
     --radius: 0.5rem;
 
+    /* Brand tokens */
+    --color-primary: #172D5F;
+    --color-accent: #413D93;
+    --color-gradient: linear-gradient(180deg, #172D5F 0%, #413D93 100%);
+    --color-bg: #F5F5F7;
+    --color-bg-secondary: #EEEEF2;
+    --color-text-primary: #1D1D1F;
+    --color-text-secondary: #6E6E73;
+    --color-border: #E0E0E5;
+
+    /* Semantic */
+    --success: 240 28% 65%;
+    --success-foreground: 249 39% 25%;
+    --success-bg: 240 30% 95%;
+    --warning: 40 45% 56%;
+    --warning-foreground: 40 45% 25%;
+    --warning-bg: 38 40% 93%;
+    --error: 354 36% 40%;
+    --error-foreground: 354 36% 95%;
+    --error-bg: 354 25% 94%;
+    --info: 238 30% 51%;
+    --info-foreground: 238 30% 95%;
+    --info-bg: 235 30% 95%;
+
+    /* Sidebar */
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 240 5.9% 10%;
+    --sidebar-primary: 228 56% 23%;
     --sidebar-primary-foreground: 0 0% 98%;
     --sidebar-accent: 240 4.8% 95.9%;
     --sidebar-accent-foreground: 240 5.9% 10%;
-    --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
-
-    /* Auditor-IA specific colors */
-    --accounting-green-50: 240 253 244;
-    --accounting-green-100: 220 252 231;
-    --accounting-green-600: 22 163 74;
-    --accounting-green-700: 21 128 61;
-  }
-
-  .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-border: 240 8% 88%;
+    --sidebar-ring: 249 39% 41%;
   }
 
   body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-      'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-      sans-serif;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+      'Ubuntu', 'Cantarell', 'Helvetica Neue', sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
@@ -118,7 +98,7 @@
     animation: shimmer 2s linear infinite;
   }
 
-  /* Clases para mejorar la justificación del texto */
+  /* Clases para mejorar la justificacion del texto */
   .text-justify-full {
     text-align: justify;
     hyphens: auto;
@@ -135,13 +115,13 @@
     overflow-wrap: break-word;
   }
 
-  /* Justificación completa para todo el contenido de prose-legal */
+  /* Justificacion completa para todo el contenido de prose-legal */
   .prose-legal,
   .prose-legal * {
     text-align: justify !important;
   }
 
-  /* Excepción para elementos que no deben justificarse */
+  /* Excepcion para elementos que no deben justificarse */
   .prose-legal button,
   .prose-legal .badge,
   .prose-legal code {
@@ -159,23 +139,23 @@
 
   /* Botones principales */
   .btn-primary {
-    @apply bg-brand-indigo hover:bg-brand-indigo-hover text-white px-4 py-2 rounded-lg transition-colors duration-200;
+    @apply bg-brand-indigo hover:bg-brand-indigo-hover text-white px-4 py-2 rounded-md font-medium text-sm transition-colors duration-200;
   }
 
-  /* Cards — sin backdrop-blur, transition solo en shadow y border */
+  /* Cards — Louis Design System */
   .card-base {
-    @apply bg-white dark:bg-gray-900 rounded-3xl shadow-lg border border-gray-100 dark:border-gray-800 hover:shadow-xl hover:border-gray-200 dark:hover:border-gray-700;
-    transition: box-shadow 0.3s ease, border-color 0.3s ease;
+    @apply bg-white rounded-xl shadow-sm border border-brand-border hover:shadow-md;
+    transition: box-shadow 0.2s ease-out, border-color 0.2s ease-out;
   }
 
   /* Navbar — sin backdrop-blur */
   .navbar-base {
-    @apply bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 sticky top-0 z-50;
+    @apply bg-white border-b border-brand-border sticky top-0 z-50;
   }
 
   /* Dropdowns */
   .dropdown-content {
-    @apply w-80 max-h-96 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100;
+    @apply w-80 max-h-96 overflow-y-auto;
   }
 
   /* Contenedores principales */
@@ -183,69 +163,69 @@
     @apply container mx-auto px-4 sm:px-6 lg:px-8;
   }
 
-  /* Gradientes de fondo */
+  /* Background principal Louis */
   .bg-gradient-main {
-    @apply bg-gradient-to-br from-slate-50 via-indigo-50/30 to-purple-50/50;
+    @apply bg-brand-bg;
   }
 
-  /* Gradiente específico para Auditor-IA - Louis Legal brand colors */
+  /* Gradiente especifico para Louis Legal brand */
   .gradient-accounting {
     background: linear-gradient(to right, #172D5F, #413D93);
   }
 
-  /* Elementos decorativos — sin animate-pulse, blur reducido */
+  /* Elementos decorativos */
   .blob-decoration {
     @apply absolute rounded-full blur-2xl opacity-40;
   }
 
-  /* Ícono de calculadora con estilo consistente */
+  /* Icono con estilo consistente */
   .calculator-icon-container {
-    @apply bg-indigo-100 p-2 rounded-lg mt-1;
+    @apply bg-brand-indigo/10 p-2 rounded-lg mt-1;
   }
 
   .calculator-icon {
     @apply h-4 w-4 text-brand-indigo;
   }
 
-  /* Estados de validación para datos contables */
+  /* Estados de validacion — Louis semantic colors */
   .status-valid {
-    @apply bg-green-50 text-green-800 border-green-200;
+    @apply bg-success-bg text-success-foreground;
   }
 
   .status-warning {
-    @apply bg-yellow-50 text-yellow-800 border-yellow-200;
+    @apply bg-warning-bg text-warning-foreground;
   }
 
   .status-error {
-    @apply bg-red-50 text-red-800 border-red-200;
+    @apply bg-error-bg text-error-foreground;
   }
 
   .status-pending {
-    @apply bg-indigo-50 text-brand-indigo border-indigo-200;
+    @apply bg-info-bg text-info-foreground;
   }
 
-  /* Indicadores monetarios */
+  /* Indicadores monetarios — Louis brand colors */
   .amount-positive {
-    @apply text-green-600 font-semibold;
+    @apply text-brand-indigo font-semibold;
   }
 
   .amount-negative {
-    @apply text-red-600 font-semibold;
+    @apply text-destructive font-semibold;
   }
 
   .amount-neutral {
-    @apply text-gray-600 font-semibold;
+    @apply text-brand-text-secondary font-semibold;
   }
 
-  /* Hover effects — GPU-accelerated con will-change y transiciones específicas */
+  /* Hover effects — subtle, no bounce */
   .hover-scale {
-    @apply hover:scale-105;
-    transition: transform 0.3s ease;
+    @apply hover:scale-[1.02];
+    transition: transform 0.2s ease-out;
   }
 
   .hover-lift {
-    @apply hover:-translate-y-1 hover:shadow-lg;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    @apply hover:-translate-y-0.5 hover:shadow-md;
+    transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
   }
 }
 
@@ -267,22 +247,22 @@
   }
 }
 
-/* Tipografía Legal Especializada para documentos de auditoría */
+/* Tipografia Legal Especializada para documentos de auditoria */
 .legalContent {
   max-width: 75ch;
   margin: 0 auto;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   line-height: 1.6;
-  color: #1f2937;
-  font-size: clamp(16px, 1.125rem, 18px);
+  color: #1D1D1F;
+  font-size: clamp(14px, 1rem, 16px);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
 }
 
-/* Jerarquía para reportes contables */
+/* Jerarquia para reportes contables */
 .accountingTitle {
-  font-size: clamp(24px, 1.75rem, 28px);
+  font-size: 24px;
   font-weight: 700;
   color: #172D5F;
   margin: 2.5rem 0 1.5rem 0;
@@ -291,17 +271,16 @@
 }
 
 .accountingSection {
-  font-size: clamp(20px, 1.375rem, 22px);
+  font-size: 18px;
   font-weight: 600;
-  color: #1f2937;
+  color: #1D1D1F;
   margin: 2rem 0 1rem 0;
 }
 
 .accountingParagraph {
-  font-size: clamp(16px, 1.125rem, 18px);
+  font-size: 14px;
   line-height: 1.7;
-  color: #374151;
+  color: #6E6E73;
   margin: 0 0 1.5rem 0;
-  text-align: justify;
   max-width: 75ch;
 }

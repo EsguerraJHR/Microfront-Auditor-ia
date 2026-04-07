@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useState, useEffect, useRef } from "react"
-import { Users, Building, UserCheck, Truck, ChevronDown, Loader2, FileText, CheckCircle, AlertTriangle, Download } from "lucide-react"
+import { Users, Building, UserCheck, Truck, ChevronDown, Loader2, FileText, CheckCircle, AlertTriangle, Download, User } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { rutService, RutExtractionWithClientResponse, UploadProgress, RutDetails } from "@/lib/api/rut-service"
 import { accountingClientService, AccountingClient } from "@/lib/api/accounting-client-service"
@@ -268,12 +268,12 @@ export default function TercerosPage() {
       {/* Header */}
       <div className="space-y-2">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-lg bg-indigo-100 dark:bg-indigo-900/20 flex items-center justify-center">
+          <div className="w-10 h-10 rounded-xl bg-brand-indigo/10 flex items-center justify-center">
             <Users className="h-5 w-5 text-brand-indigo" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-foreground">Gestión de Terceros v2</h1>
-            <p className="text-muted-foreground">
+            <h1 className="text-2xl font-bold tracking-tight text-brand-navy">Gestion de Terceros v2</h1>
+            <p className="text-sm text-brand-text-secondary">
               Nueva versión mejorada para la gestión integral de terceros
             </p>
           </div>
@@ -281,18 +281,18 @@ export default function TercerosPage() {
       </div>
 
       {/* Accounting Client Selector - FIRST ELEMENT */}
-      <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
+      <div className="card-base p-6">
         <div className="space-y-4">
           <div>
-            <h3 className="text-lg font-semibold text-foreground">Cliente de Contabilidad</h3>
-            <p className="text-sm text-muted-foreground">
+            <h3 className="text-lg font-semibold text-brand-text">Cliente de Contabilidad</h3>
+            <p className="text-sm text-brand-text-secondary">
               Selecciona el cliente de contabilidad para el cual realizarás la gestión de terceros
             </p>
           </div>
 
           {accountingError && (
-            <div className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
-              <p className="text-sm text-red-800 dark:text-red-200">{accountingError}</p>
+            <div className="p-3 bg-error-bg border border-error-bg rounded-lg">
+              <p className="text-sm text-error-foreground">{accountingError}</p>
             </div>
           )}
 
@@ -302,8 +302,8 @@ export default function TercerosPage() {
               onChange={handleAccountingClientChange}
               disabled={isLoadingAccountingClients || accountingClients.length === 0}
               className={cn(
-                "w-full px-4 py-3 pr-10 text-sm border border-gray-300 dark:border-gray-600 rounded-lg",
-                "bg-white dark:bg-gray-800 text-foreground",
+                "w-full px-4 py-3 pr-10 text-sm border border-brand-border rounded-lg",
+                "bg-white text-brand-text",
                 "focus:ring-2 focus:ring-brand-indigo focus:border-brand-indigo",
                 "disabled:opacity-50 disabled:cursor-not-allowed",
                 "appearance-none"
@@ -326,22 +326,22 @@ export default function TercerosPage() {
 
             <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
               {isLoadingAccountingClients ? (
-                <Loader2 className="h-4 w-4 animate-spin text-gray-400" />
+                <Loader2 className="h-4 w-4 animate-spin text-brand-text-secondary" />
               ) : (
-                <ChevronDown className="h-4 w-4 text-gray-400" />
+                <ChevronDown className="h-4 w-4 text-brand-text-secondary" />
               )}
             </div>
           </div>
 
           {selectedAccountingClient && (
-            <div className="p-4 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg border border-indigo-200 dark:border-indigo-800">
+            <div className="p-4 bg-brand-indigo/5 rounded-lg border border-brand-indigo/20">
               <div className="flex items-center gap-3 mb-2">
-                <div className="w-8 h-8 rounded-lg bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center">
+                <div className="w-8 h-8 rounded-lg bg-brand-indigo/10 flex items-center justify-center">
                   <Building className="h-4 w-4 text-brand-indigo" />
                 </div>
                 <div>
-                  <p className="font-medium text-foreground">{selectedAccountingClient.razon_social}</p>
-                  <p className="text-xs text-muted-foreground">
+                  <p className="font-medium text-brand-text">{selectedAccountingClient.razon_social}</p>
+                  <p className="text-xs text-brand-text-secondary">
                     NIT: {selectedAccountingClient.nit} • Código: {selectedAccountingClient.codigo_empresa}
                   </p>
                 </div>
@@ -354,24 +354,24 @@ export default function TercerosPage() {
       {/* Tipo de Tercero Selector - Only show if accounting client is selected */}
       {selectedAccountingClient && (
       <>
-      <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
+      <div className="card-base p-6">
         <div className="space-y-4">
           <div>
-            <h3 className="text-lg font-semibold text-foreground">Tipo de Tercero</h3>
-            <p className="text-sm text-muted-foreground">
+            <h3 className="text-lg font-semibold text-brand-text">Tipo de Tercero</h3>
+            <p className="text-sm text-brand-text-secondary">
               Selecciona el tipo de tercero que deseas gestionar
             </p>
           </div>
 
           {/* Segmented Control */}
-          <div className="flex space-x-1 bg-gray-100 dark:bg-gray-800 p-1 rounded-lg w-fit">
+          <div className="flex space-x-1 bg-brand-bg-alt p-1 rounded-lg w-fit">
             <button
               onClick={() => handleTypeChange('cliente')}
               className={cn(
                 "flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-md transition-all duration-200",
                 selectedType === 'cliente'
-                  ? "bg-white dark:bg-gray-700 text-brand-indigo dark:text-indigo-400 shadow-sm"
-                  : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200"
+                  ? "bg-white text-brand-indigo shadow-sm"
+                  : "text-brand-text-secondary hover:text-brand-text"
               )}
             >
               <UserCheck className="h-4 w-4" />
@@ -382,8 +382,8 @@ export default function TercerosPage() {
               className={cn(
                 "flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-md transition-all duration-200",
                 selectedType === 'proveedor'
-                  ? "bg-white dark:bg-gray-700 text-green-600 dark:text-green-400 shadow-sm"
-                  : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200"
+                  ? "bg-white text-brand-indigo shadow-sm"
+                  : "text-brand-text-secondary hover:text-brand-text"
               )}
             >
               <Truck className="h-4 w-4" />
@@ -397,20 +397,20 @@ export default function TercerosPage() {
             <div className={cn(
               "w-8 h-8 rounded-lg flex items-center justify-center",
               selectedType === 'cliente'
-                ? "bg-indigo-100 dark:bg-indigo-900/20"
-                : "bg-green-100 dark:bg-green-900/20"
+                ? "bg-brand-indigo/10"
+                : "bg-brand-indigo/10"
             )}>
               {selectedType === 'cliente' ? (
                 <UserCheck className="h-4 w-4 text-brand-indigo" />
               ) : (
-                <Truck className="h-4 w-4 text-green-600" />
+                <Truck className="h-4 w-4 text-success" />
               )}
             </div>
             <div>
-              <p className="font-medium text-foreground">
+              <p className="font-medium text-brand-text">
                 {selectedType === 'cliente' ? 'Cliente' : 'Proveedor'} seleccionado
               </p>
-              <p className="text-xs text-muted-foreground">
+              <p className="text-xs text-brand-text-secondary">
                 {selectedType === 'cliente'
                   ? 'Gestiona información de tus clientes'
                   : 'Gestiona información de tus proveedores'
@@ -424,14 +424,14 @@ export default function TercerosPage() {
 
       {/* RUT Batch Upload - Only show when type is selected */}
       {selectedAccountingClient && selectedType && (
-        <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
+        <div className="card-base p-6">
           <div className="space-y-6">
             {/* Header */}
             <div>
-              <h3 className="text-lg font-semibold text-foreground">
+              <h3 className="text-lg font-semibold text-brand-text">
                 Carga Masiva de RUTs
               </h3>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-sm text-brand-text-secondary">
                 Sube múltiples archivos RUT para {selectedAccountingClient.razon_social} ({selectedType === 'cliente' ? 'Clientes' : 'Proveedores'})
               </p>
             </div>
@@ -449,7 +449,7 @@ export default function TercerosPage() {
               {/* Extract Button */}
               {selectedFiles.length > 0 && (
                 <div className="flex items-center justify-between">
-                  <div className="text-sm text-muted-foreground">
+                  <div className="text-sm text-brand-text-secondary">
                     {selectedFiles.length} archivo{selectedFiles.length !== 1 ? 's' : ''} seleccionado{selectedFiles.length !== 1 ? 's' : ''}
                   </div>
                   <button
@@ -474,10 +474,10 @@ export default function TercerosPage() {
 
               {/* Extraction Error */}
               {extractionError && (
-                <div className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+                <div className="p-3 bg-error-bg border border-error-bg rounded-lg">
                   <div className="flex items-center gap-2">
-                    <AlertTriangle className="h-4 w-4 text-red-600" />
-                    <p className="text-sm text-red-800 dark:text-red-200">{extractionError}</p>
+                    <AlertTriangle className="h-4 w-4 text-error" />
+                    <p className="text-sm text-error-foreground">{extractionError}</p>
                   </div>
                 </div>
               )}
@@ -485,11 +485,11 @@ export default function TercerosPage() {
               {/* Progress Bar */}
               {isExtracting && extractionProgress && (
                 <div className="space-y-2">
-                  <div className="flex justify-between text-sm text-muted-foreground">
+                  <div className="flex justify-between text-sm text-brand-text-secondary">
                     <span>Procesando archivos...</span>
                     <span>{extractionProgress.percentage}%</span>
                   </div>
-                  <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                  <div className="w-full bg-brand-bg-alt rounded-full h-2">
                     <div
                       className="bg-brand-indigo h-2 rounded-full transition-all duration-300"
                       style={{ width: `${extractionProgress.percentage}%` }}
@@ -501,14 +501,14 @@ export default function TercerosPage() {
               {/* Success Message */}
               {extractionResults && !isExtracting && (
                 <div className="space-y-4">
-                  <div className="p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
+                  <div className="p-3 bg-success-bg border border-success-bg rounded-lg">
                     <div className="flex items-center gap-2">
-                      <CheckCircle className="h-4 w-4 text-green-600" />
+                      <CheckCircle className="h-4 w-4 text-success" />
                       <div className="text-sm">
-                        <p className="text-green-800 dark:text-green-200 font-medium">
+                        <p className="text-success-foreground font-medium">
                           ¡Extracción completada!
                         </p>
-                        <p className="text-green-700 dark:text-green-300">
+                        <p className="text-success-foreground">
                           {extractionResults.successful_extractions} de {extractionResults.total_files} archivos procesados exitosamente
                         </p>
                       </div>
@@ -541,24 +541,24 @@ export default function TercerosPage() {
 
                   {/* Ringana Export Result */}
                   {ringanaExportResult && (
-                    <div className="p-4 bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-800 rounded-lg">
+                    <div className="p-4 bg-brand-indigo/5 border border-brand-indigo/20 rounded-lg">
                       <div className="space-y-3">
                         <div className="flex items-center gap-2">
                           <CheckCircle className="h-5 w-5 text-brand-indigo" />
-                          <span className="font-medium text-brand-navy dark:text-indigo-200">
+                          <span className="font-medium text-brand-navy">
                             Exportación Ringana completada
                           </span>
                         </div>
 
                         <div className="grid grid-cols-2 gap-4 text-sm">
                           <div className="flex items-center gap-2">
-                            <span className="text-2xl">👤</span>
+                            <div className="w-8 h-8 rounded-xl bg-brand-indigo/10 flex items-center justify-center"><User className="h-4 w-4 text-brand-indigo" /></div>
                             <div>
-                              <p className="font-semibold text-emerald-700 dark:text-emerald-300">
+                              <p className="font-semibold text-success-foreground">
                                 {ringanaExportResult.naturales} Personas Naturales
                               </p>
                               {ringanaExportResult.naturales > 0 && (
-                                <p className="text-xs text-muted-foreground">
+                                <p className="text-xs text-brand-text-secondary">
                                   2 archivos generados
                                 </p>
                               )}
@@ -566,13 +566,13 @@ export default function TercerosPage() {
                           </div>
 
                           <div className="flex items-center gap-2">
-                            <span className="text-2xl">🏢</span>
+                            <div className="w-8 h-8 rounded-xl bg-brand-navy/10 flex items-center justify-center"><Building className="h-4 w-4 text-brand-navy" /></div>
                             <div>
-                              <p className="font-semibold text-blue-700 dark:text-blue-300">
+                              <p className="font-semibold text-info-foreground">
                                 {ringanaExportResult.juridicas} Personas Jurídicas
                               </p>
                               {ringanaExportResult.juridicas > 0 && (
-                                <p className="text-xs text-muted-foreground">
+                                <p className="text-xs text-brand-text-secondary">
                                   1 archivo generado
                                 </p>
                               )}
@@ -580,11 +580,11 @@ export default function TercerosPage() {
                           </div>
                         </div>
 
-                        <div className="pt-2 border-t border-indigo-200 dark:border-indigo-700">
-                          <p className="text-xs text-brand-indigo dark:text-indigo-300 font-medium mb-1">
+                        <div className="pt-2 border-t border-brand-indigo/20">
+                          <p className="text-xs text-brand-indigo font-medium mb-1">
                             Archivos descargados:
                           </p>
-                          <ul className="text-xs text-muted-foreground space-y-1">
+                          <ul className="text-xs text-brand-text-secondary space-y-1">
                             {ringanaExportResult.archivos.map((archivo, index) => (
                               <li key={index} className="flex items-center gap-1">
                                 <FileText className="h-3 w-3" />
@@ -599,12 +599,12 @@ export default function TercerosPage() {
 
                   {/* Crossmatch Provisiones Button */}
                   {extractionResults.successful_extractions > 0 && (
-                    <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
+                    <div className="pt-4 border-t border-brand-border">
                       <div className="space-y-2">
-                        <p className="text-sm font-medium text-foreground">
+                        <p className="text-sm font-medium text-brand-text">
                           Cruce con Provisiones
                         </p>
-                        <p className="text-xs text-muted-foreground">
+                        <p className="text-xs text-brand-text-secondary">
                           Sube un archivo Excel de provisiones para cruzar con los RUTs extraídos y obtener el status de cada tercero.
                         </p>
                         <div className="relative">
@@ -618,7 +618,7 @@ export default function TercerosPage() {
                           />
                           <button
                             disabled={isCrossmatchLoading}
-                            className="w-full btn-secondary flex items-center justify-center gap-2 disabled:opacity-50 border-2 border-dashed border-indigo-300 dark:border-indigo-700 hover:border-brand-indigo dark:hover:border-indigo-600 bg-indigo-50 dark:bg-indigo-900/20 text-brand-indigo dark:text-indigo-300"
+                            className="w-full btn-secondary flex items-center justify-center gap-2 disabled:opacity-50 border-2 border-dashed border-brand-indigo/30 hover:border-brand-indigo bg-brand-indigo/5 text-brand-indigo"
                           >
                             {isCrossmatchLoading ? (
                               <>
@@ -653,16 +653,16 @@ export default function TercerosPage() {
 
       {/* Content Area - Currently Empty */}
       {selectedType && (
-      <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 p-8">
+      <div className="card-base p-8">
         <div className="text-center space-y-4">
-          <div className="w-16 h-16 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center mx-auto">
-            <Building className="h-8 w-8 text-gray-400" />
+          <div className="w-16 h-16 rounded-full bg-brand-bg-alt flex items-center justify-center mx-auto">
+            <Building className="h-8 w-8 text-brand-text-secondary" />
           </div>
           <div>
-            <h3 className="text-lg font-semibold text-foreground">
+            <h3 className="text-lg font-semibold text-brand-text">
               Gestión de {selectedType === 'cliente' ? 'Clientes' : 'Proveedores'}
             </h3>
-            <p className="text-muted-foreground">
+            <p className="text-brand-text-secondary">
               Los componentes para gestionar {selectedType === 'cliente' ? 'clientes' : 'proveedores'} se agregarán aquí.
             </p>
           </div>

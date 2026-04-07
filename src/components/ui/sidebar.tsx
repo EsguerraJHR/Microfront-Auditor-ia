@@ -137,7 +137,7 @@ export function Sidebar({ isOpen, onClose, isCollapsed, onToggleCollapse }: Side
                   "flex items-center rounded-lg transition-all duration-200 group",
                   isCollapsed ? "lg:justify-center lg:p-3 gap-3 p-3" : "gap-3 p-3",
                   isActive
-                    ? "bg-indigo-100 dark:bg-indigo-900/20 text-brand-indigo dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800"
+                    ? "bg-brand-indigo/10 text-brand-indigo border border-brand-indigo/20"
                     : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
                 )}
               >
@@ -145,7 +145,7 @@ export function Sidebar({ isOpen, onClose, isCollapsed, onToggleCollapse }: Side
                   className={cn(
                     "p-2 rounded-lg transition-colors flex-shrink-0",
                     isActive
-                      ? "bg-indigo-200 dark:bg-indigo-800"
+                      ? "bg-brand-indigo/20"
                       : "bg-sidebar-accent group-hover:bg-sidebar-accent"
                   )}
                 >
@@ -153,7 +153,7 @@ export function Sidebar({ isOpen, onClose, isCollapsed, onToggleCollapse }: Side
                     className={cn(
                       "h-4 w-4",
                       isActive
-                        ? "text-brand-indigo dark:text-indigo-400"
+                        ? "text-brand-indigo"
                         : "text-sidebar-foreground"
                     )}
                   />
