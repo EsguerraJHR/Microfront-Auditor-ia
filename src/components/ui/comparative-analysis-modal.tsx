@@ -270,10 +270,10 @@ export function ComparativeAnalysisModal({ isOpen, onClose, onAnalysisComplete }
             initial="hidden"
             animate="visible"
             exit="exit"
-            className="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto flex flex-col"
+            className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto flex flex-col"
           >
             {/* Header */}
-            <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
+            <div className="flex items-center justify-between p-6 border-b border-brand-border">
               <div className="flex items-center gap-3">
                 <motion.div
                   initial={{ scale: 0, rotate: -180 }}
@@ -284,8 +284,8 @@ export function ComparativeAnalysisModal({ isOpen, onClose, onAnalysisComplete }
                   <BarChart3 className="h-6 w-6 text-white" />
                 </motion.div>
                 <div>
-                  <h2 className="text-xl font-bold text-foreground">Análisis Comparativo</h2>
-                  <p className="text-sm text-muted-foreground">
+                  <h2 className="text-xl font-bold text-brand-text">Análisis Comparativo</h2>
+                  <p className="text-sm text-brand-text-secondary">
                     Paso {step} de 2 — {step === 1 ? 'Datos del cliente' : 'Subir declaraciones'}
                   </p>
                 </div>
@@ -295,7 +295,7 @@ export function ComparativeAnalysisModal({ isOpen, onClose, onAnalysisComplete }
                 whileTap={{ scale: 0.9 }}
                 onClick={handleClose}
                 disabled={isProcessing}
-                className="w-8 h-8 flex items-center justify-center rounded-full text-gray-500 hover:text-gray-700 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-gray-200 dark:hover:bg-gray-800 disabled:opacity-50 transition-colors"
+                className="w-8 h-8 flex items-center justify-center rounded-full text-brand-text-secondary hover:text-brand-text hover:bg-brand-bg disabled:opacity-50 transition-colors"
               >
                 <X className="h-5 w-5" />
               </motion.button>
@@ -305,15 +305,15 @@ export function ComparativeAnalysisModal({ isOpen, onClose, onAnalysisComplete }
             <div className="px-6 pt-4">
               <div className="flex items-center gap-2">
                 <div className={`flex items-center justify-center w-8 h-8 rounded-full text-sm font-medium ${
-                  step >= 1 ? 'bg-orange-500 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-500'
+                  step >= 1 ? 'bg-brand-indigo text-white' : 'bg-brand-bg-alt text-brand-text-secondary'
                 }`}>
                   {step > 1 ? <CheckCircle2 className="h-5 w-5" /> : '1'}
                 </div>
                 <div className={`flex-1 h-1 rounded-full ${
-                  step >= 2 ? 'bg-orange-500' : 'bg-gray-200 dark:bg-gray-700'
+                  step >= 2 ? 'bg-brand-indigo' : 'bg-brand-bg-alt'
                 }`} />
                 <div className={`flex items-center justify-center w-8 h-8 rounded-full text-sm font-medium ${
-                  step >= 2 ? 'bg-orange-500 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-500'
+                  step >= 2 ? 'bg-brand-indigo text-white' : 'bg-brand-bg-alt text-brand-text-secondary'
                 }`}>
                   2
                 </div>
@@ -336,17 +336,17 @@ export function ComparativeAnalysisModal({ isOpen, onClose, onAnalysisComplete }
                     variants={itemVariants}
                     initial="hidden"
                     animate="visible"
-                    className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-4"
+                    className="bg-brand-bg border border-brand-indigo/20 rounded-xl p-4"
                   >
                     <div className="flex gap-3">
-                      <div className="w-10 h-10 rounded-lg bg-blue-500/10 flex items-center justify-center flex-shrink-0">
-                        <Sparkles className="h-5 w-5 text-blue-600" />
+                      <div className="w-10 h-10 rounded-lg bg-brand-indigo/10 flex items-center justify-center flex-shrink-0">
+                        <Sparkles className="h-5 w-5 text-brand-indigo" />
                       </div>
                       <div className="text-sm">
-                        <p className="font-semibold text-blue-900 dark:text-blue-100 mb-1">
+                        <p className="font-semibold text-brand-indigo mb-1">
                           Datos de la revisión
                         </p>
-                        <p className="text-blue-700 dark:text-blue-300 leading-relaxed">
+                        <p className="text-brand-indigo leading-relaxed">
                           Ingresa los datos del cliente para crear la revisión. Estos datos se asociarán al análisis comparativo.
                         </p>
                       </div>
@@ -357,8 +357,8 @@ export function ComparativeAnalysisModal({ isOpen, onClose, onAnalysisComplete }
                   <div className="space-y-4">
                     {/* Nombre del cliente */}
                     <div className="space-y-2">
-                      <label className="flex items-center gap-2 text-sm font-medium text-foreground">
-                        <User className="h-4 w-4 text-gray-500" />
+                      <label className="flex items-center gap-2 text-sm font-medium text-brand-text">
+                        <User className="h-4 w-4 text-brand-text-secondary" />
                         Nombre del Cliente *
                       </label>
                       <input
@@ -367,14 +367,14 @@ export function ComparativeAnalysisModal({ isOpen, onClose, onAnalysisComplete }
                         onChange={(e) => handleClientDataChange('nombre_cliente', e.target.value)}
                         disabled={isCreatingRevision}
                         placeholder="Ej: Empresa ABC S.A.S"
-                        className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent disabled:opacity-50 transition-all"
+                        className="w-full px-4 py-2.5 border border-brand-border rounded-lg bg-white text-brand-text placeholder:text-brand-text-secondary focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent disabled:opacity-50 transition-all"
                       />
                     </div>
 
                     {/* NIT */}
                     <div className="space-y-2">
-                      <label className="flex items-center gap-2 text-sm font-medium text-foreground">
-                        <Hash className="h-4 w-4 text-gray-500" />
+                      <label className="flex items-center gap-2 text-sm font-medium text-brand-text">
+                        <Hash className="h-4 w-4 text-brand-text-secondary" />
                         NIT *
                       </label>
                       <input
@@ -383,7 +383,7 @@ export function ComparativeAnalysisModal({ isOpen, onClose, onAnalysisComplete }
                         onChange={(e) => handleClientDataChange('nit', e.target.value)}
                         disabled={isCreatingRevision}
                         placeholder="Ej: 900123456"
-                        className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent disabled:opacity-50 transition-all"
+                        className="w-full px-4 py-2.5 border border-brand-border rounded-lg bg-white text-brand-text placeholder:text-brand-text-secondary focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent disabled:opacity-50 transition-all"
                       />
                     </div>
 
@@ -391,15 +391,15 @@ export function ComparativeAnalysisModal({ isOpen, onClose, onAnalysisComplete }
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {/* Mes */}
                       <div className="space-y-2">
-                        <label className="flex items-center gap-2 text-sm font-medium text-foreground">
-                          <Calendar className="h-4 w-4 text-gray-500" />
+                        <label className="flex items-center gap-2 text-sm font-medium text-brand-text">
+                          <Calendar className="h-4 w-4 text-brand-text-secondary" />
                           Mes *
                         </label>
                         <select
                           value={clientData.mes}
                           onChange={(e) => handleClientDataChange('mes', e.target.value)}
                           disabled={isCreatingRevision}
-                          className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-foreground focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent disabled:opacity-50 transition-all"
+                          className="w-full px-4 py-2.5 border border-brand-border rounded-lg bg-white text-brand-text focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent disabled:opacity-50 transition-all"
                         >
                           <option value="">Seleccionar mes</option>
                           {meses.map((mes) => (
@@ -410,8 +410,8 @@ export function ComparativeAnalysisModal({ isOpen, onClose, onAnalysisComplete }
 
                       {/* Fecha de revisión */}
                       <div className="space-y-2">
-                        <label className="flex items-center gap-2 text-sm font-medium text-foreground">
-                          <Calendar className="h-4 w-4 text-gray-500" />
+                        <label className="flex items-center gap-2 text-sm font-medium text-brand-text">
+                          <Calendar className="h-4 w-4 text-brand-text-secondary" />
                           Fecha de Revisión *
                         </label>
                         <input
@@ -419,7 +419,7 @@ export function ComparativeAnalysisModal({ isOpen, onClose, onAnalysisComplete }
                           value={clientData.fecha_revision}
                           onChange={(e) => handleClientDataChange('fecha_revision', e.target.value)}
                           disabled={isCreatingRevision}
-                          className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-foreground focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent disabled:opacity-50 transition-all"
+                          className="w-full px-4 py-2.5 border border-brand-border rounded-lg bg-white text-brand-text focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent disabled:opacity-50 transition-all"
                         />
                       </div>
                     </div>
@@ -432,11 +432,11 @@ export function ComparativeAnalysisModal({ isOpen, onClose, onAnalysisComplete }
                         initial={{ opacity: 0, y: -10, height: 0 }}
                         animate={{ opacity: 1, y: 0, height: 'auto' }}
                         exit={{ opacity: 0, y: -10, height: 0 }}
-                        className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-4"
+                        className="bg-error-bg border border-error-bg rounded-xl p-4"
                       >
                         <div className="flex gap-3">
-                          <AlertCircle className="h-5 w-5 text-red-600 flex-shrink-0" />
-                          <p className="text-sm text-red-800 dark:text-red-200">{error}</p>
+                          <AlertCircle className="h-5 w-5 text-error flex-shrink-0" />
+                          <p className="text-sm text-error-foreground">{error}</p>
                         </div>
                       </motion.div>
                     )}
@@ -456,17 +456,17 @@ export function ComparativeAnalysisModal({ isOpen, onClose, onAnalysisComplete }
                     variants={itemVariants}
                     initial="hidden"
                     animate="visible"
-                    className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-4"
+                    className="bg-brand-bg border border-brand-indigo/20 rounded-xl p-4"
                   >
                     <div className="flex gap-3">
-                      <div className="w-10 h-10 rounded-lg bg-blue-500/10 flex items-center justify-center flex-shrink-0">
-                        <Sparkles className="h-5 w-5 text-blue-600" />
+                      <div className="w-10 h-10 rounded-lg bg-brand-indigo/10 flex items-center justify-center flex-shrink-0">
+                        <Sparkles className="h-5 w-5 text-brand-indigo" />
                       </div>
                       <div className="text-sm">
-                        <p className="font-semibold text-blue-900 dark:text-blue-100 mb-1">
+                        <p className="font-semibold text-brand-indigo mb-1">
                           Subir declaraciones
                         </p>
-                        <p className="text-blue-700 dark:text-blue-300 leading-relaxed">
+                        <p className="text-brand-indigo leading-relaxed">
                           Sube las declaraciones de renta de dos años consecutivos del mismo contribuyente.
                           El sistema analizará las variaciones en patrimonio, ingresos, gastos, renta líquida e impuestos.
                         </p>
@@ -475,12 +475,12 @@ export function ComparativeAnalysisModal({ isOpen, onClose, onAnalysisComplete }
                   </motion.div>
 
                   {/* Client info summary */}
-                  <div className="bg-gray-50 dark:bg-gray-800/50 rounded-xl p-4 border border-gray-200 dark:border-gray-700">
+                  <div className="bg-brand-bg rounded-xl p-4 border border-brand-border">
                     <div className="flex items-center gap-2 mb-2">
-                      <Building className="h-4 w-4 text-orange-500" />
-                      <span className="text-sm font-medium text-foreground">Cliente: {clientData.nombre_cliente}</span>
+                      <Building className="h-4 w-4 text-brand-indigo" />
+                      <span className="text-sm font-medium text-brand-text">Cliente: {clientData.nombre_cliente}</span>
                     </div>
-                    <div className="flex flex-wrap gap-3 text-xs text-muted-foreground">
+                    <div className="flex flex-wrap gap-3 text-xs text-brand-text-secondary">
                       <span>NIT: {clientData.nit}</span>
                       <span>Mes: {clientData.mes}</span>
                       <span>Fecha: {clientData.fecha_revision}</span>
@@ -491,7 +491,7 @@ export function ComparativeAnalysisModal({ isOpen, onClose, onAnalysisComplete }
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {/* Current Year File */}
                     <div className="space-y-3">
-                      <label className="block text-sm font-medium text-foreground">
+                      <label className="block text-sm font-medium text-brand-text">
                         Declaración Año Actual *
                       </label>
                       <motion.div
@@ -503,10 +503,10 @@ export function ComparativeAnalysisModal({ isOpen, onClose, onAnalysisComplete }
                         className={`
                           relative border-2 border-dashed rounded-xl p-6 text-center transition-all duration-200 cursor-pointer
                           ${dragOverCurrent
-                            ? 'border-green-500 bg-green-50 dark:bg-green-900/20 scale-[1.02]'
+                            ? 'border-success bg-success-bg scale-[1.02]'
                             : currentYearFile
-                              ? 'border-green-400 bg-green-50/50 dark:bg-green-900/10'
-                              : 'border-gray-300 dark:border-gray-700 hover:border-green-400 dark:hover:border-green-600'
+                              ? 'border-success bg-success-bg'
+                              : 'border-brand-border hover:border-success'
                           }
                         `}
                       >
@@ -525,20 +525,20 @@ export function ComparativeAnalysisModal({ isOpen, onClose, onAnalysisComplete }
                           <motion.div
                             animate={currentYearFile ? { scale: [1, 1.1, 1] } : {}}
                             className={`w-14 h-14 rounded-xl flex items-center justify-center ${
-                              currentYearFile ? 'bg-green-500' : 'bg-green-100 dark:bg-green-900/30'
+                              currentYearFile ? 'bg-success' : 'bg-success-bg'
                             }`}
                           >
                             {currentYearFile ? (
                               <CheckCircle2 className="h-7 w-7 text-white" />
                             ) : (
-                              <Upload className="h-7 w-7 text-green-600" />
+                              <Upload className="h-7 w-7 text-success" />
                             )}
                           </motion.div>
                           <div>
-                            <p className="text-sm font-medium text-green-700 dark:text-green-300">
+                            <p className="text-sm font-medium text-success-foreground">
                               {currentYearFile ? 'Archivo seleccionado' : 'Arrastra o selecciona'}
                             </p>
-                            <p className="text-xs text-muted-foreground mt-1">
+                            <p className="text-xs text-brand-text-secondary mt-1">
                               Solo archivos PDF (máximo 50MB)
                             </p>
                           </div>
@@ -549,15 +549,15 @@ export function ComparativeAnalysisModal({ isOpen, onClose, onAnalysisComplete }
                               initial={{ opacity: 0, height: 0 }}
                               animate={{ opacity: 1, height: 'auto' }}
                               exit={{ opacity: 0, height: 0 }}
-                              className="mt-3 p-3 bg-green-100 dark:bg-green-900/30 rounded-lg"
+                              className="mt-3 p-3 bg-success-bg rounded-lg"
                             >
                               <div className="flex items-center gap-2 text-sm">
-                                <FileText className="h-4 w-4 text-green-600" />
-                                <span className="font-medium text-green-800 dark:text-green-200 truncate">
+                                <FileText className="h-4 w-4 text-success" />
+                                <span className="font-medium text-success-foreground truncate">
                                   {currentYearFile.name}
                                 </span>
                               </div>
-                              <p className="text-xs text-green-600 dark:text-green-400 mt-1">
+                              <p className="text-xs text-success mt-1">
                                 {(currentYearFile.size / 1024 / 1024).toFixed(2)} MB
                               </p>
                             </motion.div>
@@ -568,7 +568,7 @@ export function ComparativeAnalysisModal({ isOpen, onClose, onAnalysisComplete }
 
                     {/* Previous Year File */}
                     <div className="space-y-3">
-                      <label className="block text-sm font-medium text-foreground">
+                      <label className="block text-sm font-medium text-brand-text">
                         Declaración Año Anterior *
                       </label>
                       <motion.div
@@ -580,10 +580,10 @@ export function ComparativeAnalysisModal({ isOpen, onClose, onAnalysisComplete }
                         className={`
                           relative border-2 border-dashed rounded-xl p-6 text-center transition-all duration-200 cursor-pointer
                           ${dragOverPrevious
-                            ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20 scale-[1.02]'
+                            ? 'border-brand-indigo bg-brand-indigo/5 scale-[1.02]'
                             : previousYearFile
-                              ? 'border-blue-400 bg-blue-50/50 dark:bg-blue-900/10'
-                              : 'border-gray-300 dark:border-gray-700 hover:border-blue-400 dark:hover:border-blue-600'
+                              ? 'border-brand-indigo bg-brand-indigo/5'
+                              : 'border-brand-border hover:border-brand-indigo'
                           }
                         `}
                       >
@@ -602,20 +602,20 @@ export function ComparativeAnalysisModal({ isOpen, onClose, onAnalysisComplete }
                           <motion.div
                             animate={previousYearFile ? { scale: [1, 1.1, 1] } : {}}
                             className={`w-14 h-14 rounded-xl flex items-center justify-center ${
-                              previousYearFile ? 'bg-blue-500' : 'bg-blue-100 dark:bg-blue-900/30'
+                              previousYearFile ? 'bg-brand-indigo' : 'bg-brand-indigo/10'
                             }`}
                           >
                             {previousYearFile ? (
                               <CheckCircle2 className="h-7 w-7 text-white" />
                             ) : (
-                              <Upload className="h-7 w-7 text-blue-600" />
+                              <Upload className="h-7 w-7 text-brand-indigo" />
                             )}
                           </motion.div>
                           <div>
-                            <p className="text-sm font-medium text-blue-700 dark:text-blue-300">
+                            <p className="text-sm font-medium text-brand-indigo">
                               {previousYearFile ? 'Archivo seleccionado' : 'Arrastra o selecciona'}
                             </p>
-                            <p className="text-xs text-muted-foreground mt-1">
+                            <p className="text-xs text-brand-text-secondary mt-1">
                               Solo archivos PDF (máximo 50MB)
                             </p>
                           </div>
@@ -626,15 +626,15 @@ export function ComparativeAnalysisModal({ isOpen, onClose, onAnalysisComplete }
                               initial={{ opacity: 0, height: 0 }}
                               animate={{ opacity: 1, height: 'auto' }}
                               exit={{ opacity: 0, height: 0 }}
-                              className="mt-3 p-3 bg-blue-100 dark:bg-blue-900/30 rounded-lg"
+                              className="mt-3 p-3 bg-brand-indigo/10 rounded-lg"
                             >
                               <div className="flex items-center gap-2 text-sm">
-                                <FileText className="h-4 w-4 text-blue-600" />
-                                <span className="font-medium text-blue-800 dark:text-blue-200 truncate">
+                                <FileText className="h-4 w-4 text-brand-indigo" />
+                                <span className="font-medium text-brand-indigo truncate">
                                   {previousYearFile.name}
                                 </span>
                               </div>
-                              <p className="text-xs text-blue-600 dark:text-blue-400 mt-1">
+                              <p className="text-xs text-brand-indigo mt-1">
                                 {(previousYearFile.size / 1024 / 1024).toFixed(2)} MB
                               </p>
                             </motion.div>
@@ -651,11 +651,11 @@ export function ComparativeAnalysisModal({ isOpen, onClose, onAnalysisComplete }
                         initial={{ opacity: 0, y: -10, height: 0 }}
                         animate={{ opacity: 1, y: 0, height: 'auto' }}
                         exit={{ opacity: 0, y: -10, height: 0 }}
-                        className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-4"
+                        className="bg-error-bg border border-error-bg rounded-xl p-4"
                       >
                         <div className="flex gap-3">
-                          <AlertCircle className="h-5 w-5 text-red-600 flex-shrink-0" />
-                          <p className="text-sm text-red-800 dark:text-red-200">{error}</p>
+                          <AlertCircle className="h-5 w-5 text-error flex-shrink-0" />
+                          <p className="text-sm text-error-foreground">{error}</p>
                         </div>
                       </motion.div>
                     )}
@@ -668,21 +668,21 @@ export function ComparativeAnalysisModal({ isOpen, onClose, onAnalysisComplete }
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -10 }}
-                        className="bg-gradient-to-r from-orange-50 to-yellow-50 dark:from-orange-900/20 dark:to-yellow-900/20 rounded-xl p-6 border border-orange-200 dark:border-orange-800"
+                        className="bg-warning-bg rounded-xl p-6 border border-warning-bg"
                       >
                         <div className="flex items-center gap-4 mb-4">
                           <motion.div
                             animate={{ rotate: 360 }}
                             transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-                            className="w-10 h-10 rounded-full bg-orange-500 flex items-center justify-center"
+                            className="w-10 h-10 rounded-full bg-brand-indigo flex items-center justify-center"
                           >
                             <Loader2 className="h-5 w-5 text-white" />
                           </motion.div>
                           <div>
-                            <p className="font-medium text-orange-800 dark:text-orange-200">
+                            <p className="font-medium text-warning-foreground">
                               Analizando declaraciones...
                             </p>
-                            <p className="text-sm text-orange-600 dark:text-orange-400">
+                            <p className="text-sm text-warning">
                               Esto puede tomar unos momentos
                             </p>
                           </div>
@@ -697,29 +697,29 @@ export function ComparativeAnalysisModal({ isOpen, onClose, onAnalysisComplete }
 
                         {!FEATURES.USE_SSE_PROGRESS && uploadProgress && (
                           <div className="space-y-2">
-                            <div className="flex justify-between text-sm text-muted-foreground">
+                            <div className="flex justify-between text-sm text-brand-text-secondary">
                               <span>Procesando análisis comparativo...</span>
                               <span>{uploadProgress.percentage}%</span>
                             </div>
-                            <div className="w-full bg-orange-200 dark:bg-orange-900 rounded-full h-2 overflow-hidden">
+                            <div className="w-full bg-warning-bg rounded-full h-2 overflow-hidden">
                               <motion.div
                                 initial={{ width: 0 }}
                                 animate={{ width: `${uploadProgress.percentage}%` }}
-                                className="bg-orange-600 h-2 rounded-full"
+                                className="bg-brand-indigo h-2 rounded-full"
                               />
                             </div>
                           </div>
                         )}
 
                         {!sseProgress && !uploadProgress && (
-                          <div className="flex items-center gap-3 text-sm text-orange-700 dark:text-orange-300">
+                          <div className="flex items-center gap-3 text-sm text-warning-foreground">
                             <div className="flex space-x-1">
                               {[0, 1, 2].map((i) => (
                                 <motion.div
                                   key={i}
                                   animate={{ y: [0, -8, 0] }}
                                   transition={{ duration: 0.6, repeat: Infinity, delay: i * 0.1 }}
-                                  className="w-2 h-2 bg-orange-500 rounded-full"
+                                  className="w-2 h-2 bg-brand-indigo rounded-full"
                                 />
                               ))}
                             </div>
@@ -734,7 +734,7 @@ export function ComparativeAnalysisModal({ isOpen, onClose, onAnalysisComplete }
             </AnimatePresence>
 
             {/* Footer */}
-            <div className="flex-shrink-0 flex justify-between gap-3 p-6 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
+            <div className="flex-shrink-0 flex justify-between gap-3 p-6 border-t border-brand-border bg-brand-bg">
               <div>
                 {step === 2 && !isAnalyzing && (
                   <motion.button
@@ -743,7 +743,7 @@ export function ComparativeAnalysisModal({ isOpen, onClose, onAnalysisComplete }
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                     onClick={handleBackToStep1}
-                    className="flex items-center gap-2 px-4 py-2.5 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 font-medium transition-colors"
+                    className="flex items-center gap-2 px-4 py-2.5 rounded-lg text-brand-text hover:bg-brand-bg font-medium transition-colors"
                   >
                     <ArrowLeft className="h-4 w-4" />
                     Atrás
@@ -756,7 +756,7 @@ export function ComparativeAnalysisModal({ isOpen, onClose, onAnalysisComplete }
                   whileTap={{ scale: 0.98 }}
                   onClick={handleClose}
                   disabled={isProcessing}
-                  className="px-5 py-2.5 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 disabled:opacity-50 font-medium transition-colors"
+                  className="px-5 py-2.5 rounded-lg text-brand-text hover:bg-brand-bg disabled:opacity-50 font-medium transition-colors"
                 >
                   Cancelar
                 </motion.button>

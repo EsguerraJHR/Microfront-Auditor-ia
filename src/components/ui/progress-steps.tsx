@@ -28,12 +28,12 @@ export function ProgressSteps({ steps, currentStep }: ProgressStepsProps) {
             {/* Step indicator */}
             <div className={`flex items-center justify-center w-8 h-8 rounded-full border-2 flex-shrink-0 mt-0.5 ${
               isCompleted
-                ? 'bg-green-100 border-green-500 text-green-700'
+                ? 'bg-success-bg border-success text-success-foreground'
                 : isError
-                ? 'bg-red-100 border-red-500 text-red-700'
+                ? 'bg-error-bg border-error text-error-foreground'
                 : isInProgress
-                ? 'bg-blue-100 border-blue-500 text-blue-700'
-                : 'bg-gray-100 border-gray-300 text-gray-500'
+                ? 'bg-info-bg border-info text-info-foreground'
+                : 'bg-brand-bg-alt border-brand-border text-brand-text-secondary'
             }`}>
               {isCompleted ? (
                 <Check className="h-4 w-4" />
@@ -48,23 +48,23 @@ export function ProgressSteps({ steps, currentStep }: ProgressStepsProps) {
             <div className="flex-1 min-w-0">
               <h4 className={`text-sm font-medium ${
                 isCompleted
-                  ? 'text-green-700'
+                  ? 'text-success-foreground'
                   : isError
-                  ? 'text-red-700'
+                  ? 'text-error-foreground'
                   : isInProgress
-                  ? 'text-blue-700'
-                  : 'text-gray-700'
+                  ? 'text-info-foreground'
+                  : 'text-brand-text'
               }`}>
                 {step.title}
               </h4>
               <p className={`text-xs mt-1 ${
                 isCompleted
-                  ? 'text-green-600'
+                  ? 'text-success'
                   : isError
-                  ? 'text-red-600'
+                  ? 'text-error'
                   : isInProgress
-                  ? 'text-blue-600'
-                  : 'text-gray-500'
+                  ? 'text-brand-indigo'
+                  : 'text-brand-text-secondary'
               }`}>
                 {step.description}
               </p>

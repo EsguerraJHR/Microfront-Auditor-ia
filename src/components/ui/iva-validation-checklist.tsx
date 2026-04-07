@@ -34,32 +34,32 @@ const statusConfig: Record<ValidationStatus, {
   textColor: string
 }> = {
   pass: {
-    bg: 'bg-green-50 dark:bg-green-900/20',
-    border: 'border-green-200 dark:border-green-800',
-    icon: <CheckCircle2 className="h-5 w-5 text-green-600" />,
+    bg: 'bg-success-bg',
+    border: 'border-success-bg',
+    icon: <CheckCircle2 className="h-5 w-5 text-success" />,
     label: 'Aprobado',
-    textColor: 'text-green-600'
+    textColor: 'text-success'
   },
   fail: {
-    bg: 'bg-red-50 dark:bg-red-900/20',
-    border: 'border-red-200 dark:border-red-800',
-    icon: <XCircle className="h-5 w-5 text-red-600" />,
+    bg: 'bg-error-bg',
+    border: 'border-error-bg',
+    icon: <XCircle className="h-5 w-5 text-error" />,
     label: 'Fallido',
-    textColor: 'text-red-600'
+    textColor: 'text-error'
   },
   warning: {
-    bg: 'bg-yellow-50 dark:bg-yellow-900/20',
-    border: 'border-yellow-200 dark:border-yellow-800',
-    icon: <AlertTriangle className="h-5 w-5 text-yellow-600" />,
+    bg: 'bg-warning-bg',
+    border: 'border-warning-bg',
+    icon: <AlertTriangle className="h-5 w-5 text-warning" />,
     label: 'Advertencia',
-    textColor: 'text-yellow-600'
+    textColor: 'text-warning'
   },
   skipped: {
-    bg: 'bg-gray-50 dark:bg-gray-800/50',
-    border: 'border-gray-200 dark:border-gray-700',
-    icon: <MinusCircle className="h-5 w-5 text-gray-400" />,
+    bg: 'bg-brand-bg',
+    border: 'border-brand-border',
+    icon: <MinusCircle className="h-5 w-5 text-brand-text-secondary" />,
     label: 'Omitido',
-    textColor: 'text-gray-400'
+    textColor: 'text-brand-text-secondary'
   }
 }
 
@@ -93,7 +93,7 @@ export function IvaValidationChecklist({ result, onClose }: IvaValidationCheckli
         <div className="flex items-center justify-between flex-wrap gap-4">
           <div className="flex items-center gap-4">
             <div className="w-14 h-14 rounded-xl bg-brand-indigo/20 flex items-center justify-center border border-brand-indigo/30">
-              <ClipboardCheck className="h-7 w-7 text-indigo-400" />
+              <ClipboardCheck className="h-7 w-7 text-brand-indigo" />
             </div>
             <div>
               <h2 className="text-2xl font-bold text-white">
@@ -145,10 +145,10 @@ export function IvaValidationChecklist({ result, onClose }: IvaValidationCheckli
                 key={validation.id}
                 className={cn(
                   "flex-1 h-2 rounded-full transition-colors",
-                  validation.status === 'pass' && "bg-green-500",
-                  validation.status === 'fail' && "bg-red-500",
-                  validation.status === 'warning' && "bg-yellow-500",
-                  validation.status === 'skipped' && "bg-gray-500"
+                  validation.status === 'pass' && "bg-success",
+                  validation.status === 'fail' && "bg-error",
+                  validation.status === 'warning' && "bg-warning",
+                  validation.status === 'skipped' && "bg-brand-text-secondary"
                 )}
                 title={`${validation.id}. ${validation.name}`}
               />
@@ -159,20 +159,20 @@ export function IvaValidationChecklist({ result, onClose }: IvaValidationCheckli
 
       {/* Controles */}
       <div className="flex justify-between items-center">
-        <h3 className="text-lg font-semibold text-foreground">
+        <h3 className="text-lg font-semibold text-brand-text">
           Detalle de Validaciones ({result.validations.length})
         </h3>
         <div className="flex gap-2">
           <button
             onClick={expandAll}
-            className="text-sm text-brand-indigo hover:text-brand-indigo-hover dark:text-indigo-400 dark:hover:text-indigo-300"
+            className="text-sm text-brand-indigo hover:text-brand-indigo-hover"
           >
             Expandir todo
           </button>
-          <span className="text-muted-foreground">|</span>
+          <span className="text-brand-text-secondary">|</span>
           <button
             onClick={collapseAll}
-            className="text-sm text-brand-indigo hover:text-brand-indigo-hover dark:text-indigo-400 dark:hover:text-indigo-300"
+            className="text-sm text-brand-indigo hover:text-brand-indigo-hover"
           >
             Colapsar todo
           </button>
@@ -193,7 +193,7 @@ export function IvaValidationChecklist({ result, onClose }: IvaValidationCheckli
       </div>
 
       {/* Footer con timestamp */}
-      <div className="text-center text-xs text-muted-foreground pt-4 border-t border-gray-200 dark:border-gray-800">
+      <div className="text-center text-xs text-brand-text-secondary pt-4 border-t border-brand-border">
         Validación ejecutada el {new Date(result.timestamp).toLocaleString('es-CO')}
       </div>
     </div>
@@ -213,10 +213,10 @@ function SummaryBadge({
   color: 'green' | 'red' | 'yellow' | 'gray'
 }) {
   const colorClasses = {
-    green: 'bg-green-500/20 border-green-500/30 text-green-400',
-    red: 'bg-red-500/20 border-red-500/30 text-red-400',
-    yellow: 'bg-yellow-500/20 border-yellow-500/30 text-yellow-400',
-    gray: 'bg-gray-500/20 border-gray-500/30 text-gray-400'
+    green: 'bg-success/20 border-success/30 text-success',
+    red: 'bg-error/20 border-error/30 text-error',
+    yellow: 'bg-warning/20 border-warning/30 text-warning',
+    gray: 'bg-brand-text-secondary/20 border-brand-text-secondary/30 text-brand-text-secondary'
   }
 
   return (
@@ -257,28 +257,28 @@ function ValidationItemCard({
       {/* Header clickeable */}
       <button
         onClick={onToggle}
-        className="w-full px-4 py-3 flex items-center justify-between hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
+        className="w-full px-4 py-3 flex items-center justify-between hover:bg-black/5 transition-colors"
       >
         <div className="flex items-center gap-3">
-          <span className="text-sm font-medium text-muted-foreground w-6">
+          <span className="text-sm font-medium text-brand-text-secondary w-6">
             {validation.id}.
           </span>
           {config.icon}
-          <span className="font-medium text-foreground">
+          <span className="font-medium text-brand-text">
             {validation.name}
           </span>
           <span className={cn(
             "text-xs px-2 py-0.5 rounded-full font-medium",
-            validation.status === 'pass' && "bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300",
-            validation.status === 'fail' && "bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300",
-            validation.status === 'warning' && "bg-yellow-100 dark:bg-yellow-900/40 text-yellow-700 dark:text-yellow-300",
-            validation.status === 'skipped' && "bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400"
+            validation.status === 'pass' && "bg-success-bg text-success-foreground",
+            validation.status === 'fail' && "bg-error-bg text-error-foreground",
+            validation.status === 'warning' && "bg-warning-bg text-warning-foreground",
+            validation.status === 'skipped' && "bg-brand-bg-alt text-brand-text-secondary"
           )}>
             {config.label}
           </span>
         </div>
         <ChevronDown className={cn(
-          "h-5 w-5 text-muted-foreground transition-transform",
+          "h-5 w-5 text-brand-text-secondary transition-transform",
           isExpanded && "rotate-180"
         )} />
       </button>
@@ -286,11 +286,11 @@ function ValidationItemCard({
       {/* Contenido expandible */}
       {isExpanded && (
         <div className="animate-in fade-in slide-in-from-top-2 duration-200">
-          <div className="px-4 pb-4 space-y-3 border-t border-gray-200/50 dark:border-gray-700/50 pt-3">
+          <div className="px-4 pb-4 space-y-3 border-t border-brand-border pt-3">
               {/* Descripción */}
               <div className="flex items-start gap-2">
-                <Info className="h-4 w-4 text-muted-foreground mt-0.5 flex-shrink-0" />
-                <p className="text-sm text-muted-foreground">
+                <Info className="h-4 w-4 text-brand-text-secondary mt-0.5 flex-shrink-0" />
+                <p className="text-sm text-brand-text-secondary">
                   {validation.description || description?.description}
                 </p>
               </div>
@@ -298,8 +298,8 @@ function ValidationItemCard({
               {/* Fórmula */}
               {(validation.formula || description?.formula) && (
                 <div className="flex items-start gap-2">
-                  <Calculator className="h-4 w-4 text-muted-foreground mt-0.5 flex-shrink-0" />
-                  <code className="text-xs bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded font-mono">
+                  <Calculator className="h-4 w-4 text-brand-text-secondary mt-0.5 flex-shrink-0" />
+                  <code className="text-xs bg-brand-bg-alt px-2 py-1 rounded font-mono">
                     {validation.formula || description?.formula}
                   </code>
                 </div>
@@ -307,11 +307,11 @@ function ValidationItemCard({
 
               {/* Valores */}
               {(validation.expected_value !== undefined || validation.actual_value !== undefined) && (
-                <div className="grid grid-cols-2 gap-4 bg-white/50 dark:bg-black/20 rounded-lg p-3">
+                <div className="grid grid-cols-2 gap-4 bg-white/50 rounded-lg p-3">
                   {validation.expected_value !== undefined && (
                     <div>
-                      <p className="text-xs text-muted-foreground">Valor esperado</p>
-                      <p className="font-mono font-semibold text-foreground">
+                      <p className="text-xs text-brand-text-secondary">Valor esperado</p>
+                      <p className="font-mono font-semibold text-brand-text">
                         {typeof validation.expected_value === 'number'
                           ? validation.expected_value.toLocaleString('es-CO')
                           : validation.expected_value}
@@ -320,11 +320,11 @@ function ValidationItemCard({
                   )}
                   {validation.actual_value !== undefined && (
                     <div>
-                      <p className="text-xs text-muted-foreground">Valor encontrado</p>
+                      <p className="text-xs text-brand-text-secondary">Valor encontrado</p>
                       <p className={cn(
                         "font-mono font-semibold",
-                        validation.status === 'pass' ? "text-green-600" :
-                        validation.status === 'fail' ? "text-red-600" : "text-foreground"
+                        validation.status === 'pass' ? "text-success" :
+                        validation.status === 'fail' ? "text-error" : "text-brand-text"
                       )}>
                         {typeof validation.actual_value === 'number'
                           ? validation.actual_value.toLocaleString('es-CO')
@@ -337,7 +337,7 @@ function ValidationItemCard({
 
               {/* Tolerancia */}
               {validation.tolerance && (
-                <p className="text-xs text-muted-foreground">
+                <p className="text-xs text-brand-text-secondary">
                   Tolerancia: {validation.tolerance}
                 </p>
               )}
@@ -346,7 +346,7 @@ function ValidationItemCard({
               {validation.difference !== undefined && validation.difference !== 0 && (
                 <p className={cn(
                   "text-sm font-medium",
-                  validation.difference > 0 ? "text-red-600" : "text-brand-indigo"
+                  validation.difference > 0 ? "text-error" : "text-brand-indigo"
                 )}>
                   Diferencia: {validation.difference > 0 ? '+' : ''}{validation.difference.toLocaleString('es-CO')}
                 </p>
@@ -354,9 +354,9 @@ function ValidationItemCard({
 
               {/* Detalles adicionales */}
               {validation.details && (
-                <div className="flex items-start gap-2 bg-indigo-50 dark:bg-indigo-900/20 p-3 rounded-lg">
+                <div className="flex items-start gap-2 bg-brand-indigo/5 p-3 rounded-lg">
                   <FileText className="h-4 w-4 text-brand-indigo mt-0.5 flex-shrink-0" />
-                  <p className="text-sm text-brand-navy dark:text-indigo-200">
+                  <p className="text-sm text-brand-navy">
                     {validation.details}
                   </p>
                 </div>
@@ -366,19 +366,19 @@ function ValidationItemCard({
               {validation.status === 'skipped' && (
                 <div className="flex flex-wrap gap-2">
                   {validation.requires_renta && (
-                    <span className="inline-flex items-center gap-1 text-xs px-2 py-1 bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 rounded">
+                    <span className="inline-flex items-center gap-1 text-xs px-2 py-1 bg-warning-bg text-warning-foreground rounded">
                       <AlertTriangle className="h-3 w-3" />
                       Requiere declaración de Renta
                     </span>
                   )}
                   {validation.requires_f490 && (
-                    <span className="inline-flex items-center gap-1 text-xs px-2 py-1 bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 rounded">
+                    <span className="inline-flex items-center gap-1 text-xs px-2 py-1 bg-warning-bg text-warning-foreground rounded">
                       <AlertTriangle className="h-3 w-3" />
                       Requiere formulario F490
                     </span>
                   )}
                   {validation.requires_f350 && (
-                    <span className="inline-flex items-center gap-1 text-xs px-2 py-1 bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 rounded">
+                    <span className="inline-flex items-center gap-1 text-xs px-2 py-1 bg-warning-bg text-warning-foreground rounded">
                       <AlertTriangle className="h-3 w-3" />
                       Requiere formulario F350
                     </span>

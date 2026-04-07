@@ -110,15 +110,15 @@ export function CreateClientProviderModal({
         onClick={handleClose}
       />
 
-      <div className="relative z-10 bg-white dark:bg-gray-900 rounded-xl shadow-2xl border border-gray-200 dark:border-gray-700 p-6 max-w-lg w-full mx-4 max-h-[90vh] overflow-y-auto">
+      <div className="relative z-10 bg-white rounded-xl shadow-2xl border border-brand-border p-6 max-w-lg w-full mx-4 max-h-[90vh] overflow-y-auto">
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Header */}
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-full">
-                <Building className="h-6 w-6 text-blue-600" />
+              <div className="p-2 bg-brand-indigo/10 rounded-full">
+                <Building className="h-6 w-6 text-brand-indigo" />
               </div>
-              <h3 className="text-lg font-semibold text-foreground">
+              <h3 className="text-lg font-semibold text-brand-text">
                 Crear Nuevo {formData.tipo_entidad === 'CLIENTE' ? 'Cliente' : 'Proveedor'}
               </h3>
             </div>
@@ -126,7 +126,7 @@ export function CreateClientProviderModal({
               <button
                 type="button"
                 onClick={handleClose}
-                className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                className="text-brand-text-secondary hover:text-brand-text"
               >
                 <X className="h-5 w-5" />
               </button>
@@ -135,7 +135,7 @@ export function CreateClientProviderModal({
 
           {/* Entity Type Selector */}
           <div className="space-y-3">
-            <label className="text-sm font-medium text-foreground">
+            <label className="text-sm font-medium text-brand-text">
               Tipo de Entidad *
             </label>
             <div className="grid grid-cols-2 gap-3">
@@ -145,8 +145,8 @@ export function CreateClientProviderModal({
                 disabled={isLoading}
                 className={`p-3 rounded-lg border-2 transition-all disabled:opacity-50 ${
                   formData.tipo_entidad === 'CLIENTE'
-                    ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300'
-                    : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
+                    ? 'border-brand-indigo bg-brand-indigo/5 text-brand-indigo'
+                    : 'border-brand-border hover:border-brand-indigo/30'
                 }`}
               >
                 <div className="flex items-center gap-2">
@@ -160,8 +160,8 @@ export function CreateClientProviderModal({
                 disabled={isLoading}
                 className={`p-3 rounded-lg border-2 transition-all disabled:opacity-50 ${
                   formData.tipo_entidad === 'PROVEEDOR'
-                    ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300'
-                    : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
+                    ? 'border-brand-indigo bg-brand-indigo/5 text-brand-indigo'
+                    : 'border-brand-border hover:border-brand-indigo/30'
                 }`}
               >
                 <div className="flex items-center gap-2">
@@ -176,7 +176,7 @@ export function CreateClientProviderModal({
           <div className="space-y-4">
             {/* Nombre Comercial */}
             <div>
-              <label className="block text-sm font-medium text-foreground mb-2">
+              <label className="block text-sm font-medium text-brand-text mb-2">
                 Nombre Comercial *
               </label>
               <input
@@ -184,31 +184,31 @@ export function CreateClientProviderModal({
                 value={formData.nombre_comercial}
                 onChange={(e) => handleInputChange('nombre_comercial', e.target.value)}
                 disabled={isLoading}
-                className={`w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed ${
+                className={`w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-indigo focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed ${
                   errors.nombre_comercial
-                    ? 'border-red-500 bg-red-50 dark:bg-red-900/20'
-                    : 'border-gray-300 dark:border-gray-600'
+                    ? 'border-error bg-error-bg'
+                    : 'border-brand-border'
                 }`}
                 placeholder="Ej: Contadores Asociados Ltda"
               />
               {errors.nombre_comercial && (
-                <p className="text-sm text-red-600 mt-1">{errors.nombre_comercial}</p>
+                <p className="text-sm text-error mt-1">{errors.nombre_comercial}</p>
               )}
             </div>
 
             {/* Categoría */}
             <div>
-              <label className="block text-sm font-medium text-foreground mb-2">
+              <label className="block text-sm font-medium text-brand-text mb-2">
                 Categoría *
               </label>
               <select
                 value={formData.categoria}
                 onChange={(e) => handleInputChange('categoria', e.target.value)}
                 disabled={isLoading}
-                className={`w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed ${
+                className={`w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-indigo focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed ${
                   errors.categoria
-                    ? 'border-red-500 bg-red-50 dark:bg-red-900/20'
-                    : 'border-gray-300 dark:border-gray-600'
+                    ? 'border-error bg-error-bg'
+                    : 'border-brand-border'
                 }`}
               >
                 <option value="">Selecciona una categoría</option>
@@ -219,13 +219,13 @@ export function CreateClientProviderModal({
                 <option value="COOPERATIVA">Cooperativa</option>
               </select>
               {errors.categoria && (
-                <p className="text-sm text-red-600 mt-1">{errors.categoria}</p>
+                <p className="text-sm text-error mt-1">{errors.categoria}</p>
               )}
             </div>
 
             {/* Sector Económico */}
             <div>
-              <label className="block text-sm font-medium text-foreground mb-2">
+              <label className="block text-sm font-medium text-brand-text mb-2">
                 Sector Económico *
               </label>
               <input
@@ -233,28 +233,28 @@ export function CreateClientProviderModal({
                 value={formData.sector_economico}
                 onChange={(e) => handleInputChange('sector_economico', e.target.value)}
                 disabled={isLoading}
-                className={`w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed ${
+                className={`w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-indigo focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed ${
                   errors.sector_economico
-                    ? 'border-red-500 bg-red-50 dark:bg-red-900/20'
-                    : 'border-gray-300 dark:border-gray-600'
+                    ? 'border-error bg-error-bg'
+                    : 'border-brand-border'
                 }`}
                 placeholder="Ej: Servicios profesionales contables"
               />
               {errors.sector_economico && (
-                <p className="text-sm text-red-600 mt-1">{errors.sector_economico}</p>
+                <p className="text-sm text-error mt-1">{errors.sector_economico}</p>
               )}
             </div>
 
             {/* Nivel de Riesgo */}
             <div>
-              <label className="block text-sm font-medium text-foreground mb-2">
+              <label className="block text-sm font-medium text-brand-text mb-2">
                 Nivel de Riesgo
               </label>
               <select
                 value={formData.nivel_riesgo}
                 onChange={(e) => handleInputChange('nivel_riesgo', e.target.value as 'ALTO' | 'MEDIO' | 'BAJO')}
                 disabled={isLoading}
-                className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full p-3 border border-brand-border rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-indigo focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <option value="BAJO">Bajo</option>
                 <option value="MEDIO">Medio</option>
@@ -264,7 +264,7 @@ export function CreateClientProviderModal({
 
             {/* Código Interno */}
             <div>
-              <label className="block text-sm font-medium text-foreground mb-2">
+              <label className="block text-sm font-medium text-brand-text mb-2">
                 Código Interno *
               </label>
               <input
@@ -272,21 +272,21 @@ export function CreateClientProviderModal({
                 value={formData.codigo_interno}
                 onChange={(e) => handleInputChange('codigo_interno', e.target.value)}
                 disabled={isLoading}
-                className={`w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed ${
+                className={`w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-indigo focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed ${
                   errors.codigo_interno
-                    ? 'border-red-500 bg-red-50 dark:bg-red-900/20'
-                    : 'border-gray-300 dark:border-gray-600'
+                    ? 'border-error bg-error-bg'
+                    : 'border-brand-border'
                 }`}
                 placeholder="Ej: PROV-001"
               />
               {errors.codigo_interno && (
-                <p className="text-sm text-red-600 mt-1">{errors.codigo_interno}</p>
+                <p className="text-sm text-error mt-1">{errors.codigo_interno}</p>
               )}
             </div>
 
             {/* Notas */}
             <div>
-              <label className="block text-sm font-medium text-foreground mb-2">
+              <label className="block text-sm font-medium text-brand-text mb-2">
                 Notas
               </label>
               <textarea
@@ -294,26 +294,26 @@ export function CreateClientProviderModal({
                 onChange={(e) => handleInputChange('notas', e.target.value)}
                 disabled={isLoading}
                 rows={3}
-                className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed resize-none"
+                className="w-full p-3 border border-brand-border rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-indigo focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed resize-none"
                 placeholder="Información adicional sobre el cliente/proveedor..."
               />
             </div>
           </div>
 
           {/* Actions */}
-          <div className="flex gap-3 justify-end pt-4 border-t border-gray-200 dark:border-gray-700">
+          <div className="flex gap-3 justify-end pt-4 border-t border-brand-border">
             <button
               type="button"
               onClick={handleClose}
               disabled={isLoading}
-              className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-4 py-2 text-sm font-medium text-brand-text border border-brand-border rounded-lg hover:bg-brand-bg-alt transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Cancelar
             </button>
             <button
               type="submit"
               disabled={isLoading}
-              className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+              className="px-4 py-2 text-sm font-medium text-white bg-brand-indigo hover:bg-brand-indigo/90 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
             >
               {isLoading ? (
                 <>
