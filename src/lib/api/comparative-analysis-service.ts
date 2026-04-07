@@ -1,6 +1,14 @@
 import { getAuthHeaders } from '@/lib/utils/api-helpers'
 import { FEATURES } from '@/config/features'
 
+// URL para SSE (puede ser directa al backend si el gateway no soporta streaming)
+const getSSEBaseUrl = () => {
+  if (FEATURES.SSE_DIRECT_URL) {
+    return `${FEATURES.SSE_DIRECT_URL}/api/v1/compliance`
+  }
+  return `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8005'}/api/v1/compliance`
+}
+
 // Types for SSE Progress Events
 export interface SSEProgressEvent {
   percentage: number
@@ -62,6 +70,69 @@ export interface StructureComparison {
   criterio_significancia: string
 }
 
+export interface TaxCoherenceEvaluation {
+  indice: string
+  valor_contribuyente: string
+  valor_sector: string | null
+  diferencia: string | null
+  nivel_riesgo: 'BAJO' | 'MEDIO' | 'ALTO' | 'CRITICO'
+  explicacion: string
+  icono: string
+}
+
+export interface TaxCoherenceData {
+  ano_gravable: number
+  datos_sectoriales: {
+    codigo_actividad: string
+    nombre_actividad: string
+    anio: number
+    total_ingresos_netos: number
+    renta_liquida_ordinaria: number
+    utilidad_fiscal: number
+  } | null
+  margen_utilidad_fiscal: {
+    valor: number
+    porcentaje: string
+  }
+  absorcion_ingresos: {
+    valor: number
+    porcentaje: string
+    alerta: boolean
+  }
+  tarifa_aplicada: {
+    valor: number
+    porcentaje: string
+    tarifa_esperada: string
+    correcto: boolean
+  }
+  tasa_efectiva: {
+    valor: number
+    porcentaje: string
+  }
+  proporcion_compensaciones: {
+    valor: number
+    porcentaje: string
+    alerta: boolean
+  }
+  proporcion_rentas_exentas: {
+    valor: number
+    porcentaje: string
+    alerta: boolean
+  }
+  nivel_endeudamiento: {
+    valor: number
+    porcentaje: string
+  }
+  retenciones_vs_impuesto: {
+    valor: number
+    porcentaje: string
+  }
+  evaluaciones: TaxCoherenceEvaluation[]
+  riesgo_global: 'BAJO' | 'MEDIO' | 'ALTO' | 'CRITICO'
+  resumen_ejecutivo: string
+  recomendaciones: string[]
+}
+
 export interface ComparativeAnalysisResponse {
   nit: string
   razon_social: string
@@ -79,6 +150,10 @@ export interface ComparativeAnalysisResponse {
   analisis_vertical_declaracion_current?: VerticalAnalysisYear
   analisis_vertical_declaracion_previous?: VerticalAnalysisYear
   estructura_comparacion?: StructureComparison
+
+  // Tax Coherence Fields
+  coherencia_tributaria_current?: TaxCoherenceData
+  coherencia_tributaria_previous?: TaxCoherenceData
 
   analysis_timestamp: string
   message: string
@@ -98,6 +173,33 @@ export interface UploadProgress {
   percentage: number
 }
 
+// Revision Types
+export interface RevisionCreateData {
+  nombre_cliente: string
+  nit: string
+  mes: string
+  fecha_revision: string
+}
+
+export interface RevisionResponse {
+  id: number | string
+  nombre_cliente: string
+  nit: string
+  mes: string
+  fecha_revision: string
+  user_id?: string
+  status: string
+  razon_social?: string
+  current_year?: number
+  previous_year?: number
+  riesgo_global_current?: string
+  riesgo_global_previous?: string
+  analysis_data?: ComparativeAnalysisResponse
+  error_message?: string | null
+  created_at: string
+  updated_at?: string
+}
+
 class ComparativeAnalysisService {
   private baseUrl = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8005'}/api/v1/compliance`
 
@@ -109,6 +211,7 @@ class ComparativeAnalysisService {
   async analyzeDeclarationComparative(
     currentYearFile: File,
     previousYearFile: File,
+    revisionId: string,
     onProgress?: (progress: UploadProgress) => void,
     onSSEProgress?: (progress: SSEProgressEvent) => void
   ): Promise<ComparativeAnalysisResponse> {
@@ -123,6 +226,7 @@ class ComparativeAnalysisService {
     const formData = new FormData()
     formData.append('current_year_file', currentYearFile)
     formData.append('previous_year_file', previousYearFile)
+    formData.append('revision_id', revisionId)
 
     // Elegir endpoint según feature flag
     if (FEATURES.USE_SSE_PROGRESS && onSSEProgress) {
@@ -142,7 +246,11 @@ class ComparativeAnalysisService {
     const authHeaders = getAuthHeaders()
     const { 'Content-Type': _, ...headersWithoutContentType } = authHeaders as Record<string, string>
 
-    const response = await fetch(`${this.baseUrl}/analyze/declaration/comparative/stream`, {
+    // Usar URL directa para SSE si está configurada (bypass del gateway)
+    const sseUrl = getSSEBaseUrl()
+    console.log('Comparative Analysis SSE URL:', `${sseUrl}/analyze/declaration/comparative/stream`)
+
+    const response = await fetch(`${sseUrl}/analyze/declaration/comparative/stream`, {
       method: 'POST',
       body: formData,
       mode: 'cors',
@@ -170,25 +278,43 @@ class ComparativeAnalysisService {
     let buffer = ''
 
     try {
+      let currentEvent: string | null = null
+      let accumulatedData = ''
+
       while (true) {
         const { value, done } = await reader.read()
         if (done) break
 
         buffer += decoder.decode(value, { stream: true })
-        const lines = buffer.split('\n')
 
-        // Mantener la última línea incompleta en el buffer
-        buffer = lines.pop() || ''
+        // Procesar eventos completos separados por doble salto de línea
+        const events = buffer.split('\n\n')
 
-        for (let i = 0; i < lines.length; i++) {
-          const line = lines[i].trim()
+        // El último elemento podría estar incompleto, mantenerlo en el buffer
+        buffer = events.pop() || ''
 
-          if (line.startsWith('event: progress')) {
-            // La siguiente línea contiene el data
-            const dataLine = lines[i + 1]
-            if (dataLine && dataLine.startsWith('data: ')) {
+        for (const eventText of events) {
+          const lines = eventText.split('\n')
+          currentEvent = null
+          accumulatedData = ''
+
+          for (const line of lines) {
+            const trimmedLine = line.trim()
+
+            if (trimmedLine.startsWith('event:')) {
+              currentEvent = trimmedLine.substring(6).trim()
+            } else if (trimmedLine.startsWith('data:')) {
+              // Acumular datos (pueden venir en múltiples líneas data:)
+              accumulatedData += trimmedLine.substring(5).trim()
+            }
+          }
+
+          // Procesar el evento acumulado
+          if (currentEvent && accumulatedData) {
+            if (currentEvent === 'progress') {
               try {
-                const data = JSON.parse(dataLine.substring(6))
+                const data = JSON.parse(accumulatedData)
+                console.log('SSE Progress:', data)
                 onProgress({
                   percentage: data.percentage,
                   message: data.message
@@ -196,21 +322,16 @@ class ComparativeAnalysisService {
               } catch (e) {
                 console.error('Error parsing progress data:', e)
               }
-            }
-          } else if (line.startsWith('event: complete')) {
-            const dataLine = lines[i + 1]
-            if (dataLine && dataLine.startsWith('data: ')) {
+            } else if (currentEvent === 'complete') {
               try {
-                result = JSON.parse(dataLine.substring(6))
+                result = JSON.parse(accumulatedData)
+                console.log('SSE Complete received, result keys:', Object.keys(result || {}))
               } catch (e) {
-                console.error('Error parsing complete data:', e)
+                console.error('Error parsing complete data:', e, 'Data length:', accumulatedData.length)
               }
-            }
-          } else if (line.startsWith('event: error')) {
-            const dataLine = lines[i + 1]
-            if (dataLine && dataLine.startsWith('data: ')) {
+            } else if (currentEvent === 'error') {
               try {
-                const error = JSON.parse(dataLine.substring(6))
+                const error = JSON.parse(accumulatedData)
                 throw new Error(error.error || 'Error en el análisis')
               } catch (e) {
                 if (e instanceof Error) throw e
@@ -271,6 +392,76 @@ class ComparativeAnalysisService {
         throw error
       }
       throw new Error('Error desconocido durante el análisis comparativo')
+    }
+  }
+
+  /**
+   * Crea una nueva revisión con los datos del cliente
+   */
+  async createRevision(data: RevisionCreateData): Promise<RevisionResponse> {
+    const response = await fetch(`${this.baseUrl}/analyze/declaration/comparative/revisions`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(data)
+    })
+
+    if (!response.ok) {
+      let errorText = 'Error desconocido'
+      try {
+        const errorData = await response.json()
+        errorText = errorData.detail || errorData.message || `HTTP ${response.status}`
+      } catch {
+        errorText = `HTTP ${response.status} ${response.statusText}`
+      }
+      throw new Error(`Error al crear revisión: ${errorText}`)
+    }
+
+    return await response.json()
+  }
+
+  /**
+   * Obtiene la lista de revisiones
+   */
+  async listRevisions(): Promise<RevisionResponse[]> {
+    const response = await fetch(`${this.baseUrl}/analyze/declaration/comparative/revisions`, {
+      method: 'GET',
+      headers: getAuthHeaders()
+    })
+
+    if (!response.ok) {
+      throw new Error(`Error al obtener revisiones: HTTP ${response.status}`)
+    }
+
+    return await response.json()
+  }
+
+  /**
+   * Obtiene una revisión por su ID
+   */
+  async getRevision(id: string): Promise<RevisionResponse> {
+    const response = await fetch(`${this.baseUrl}/analyze/declaration/comparative/revisions/${id}`, {
+      method: 'GET',
+      headers: getAuthHeaders()
+    })
+
+    if (!response.ok) {
+      throw new Error(`Error al obtener revisión: HTTP ${response.status}`)
+    }
+
+    return await response.json()
+  }
+
+  /**
+   * Elimina una revisión por su ID
+   */
+  async deleteRevision(id: string): Promise<void> {
+    const response = await fetch(`${this.baseUrl}/analyze/declaration/comparative/revisions/${id}`, {
+      method: 'DELETE',
+      headers: getAuthHeaders()
+    })
+
+    if (!response.ok) {
+      throw new Error(`Error al eliminar revisión: HTTP ${response.status}`)
     }
   }
 

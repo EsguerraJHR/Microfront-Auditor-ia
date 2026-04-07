@@ -100,17 +100,17 @@ export function InvoiceUploadModal({ isOpen, onClose, onSuccess }: InvoiceUpload
         onClick={handleClose}
       />
 
-      <div className="relative z-10 bg-white dark:bg-gray-900 rounded-xl shadow-2xl border border-gray-200 dark:border-gray-700 p-6 max-w-md w-full mx-4">
+      <div className="relative z-10 bg-white rounded-xl shadow-2xl border border-brand-border p-6 max-w-md w-full mx-4">
         <div className="space-y-6">
           {/* Header */}
           <div className="flex items-center justify-between">
-            <h3 className="text-lg font-semibold text-foreground">
+            <h3 className="text-lg font-semibold text-brand-text">
               Subir Factura
             </h3>
             {!isUploading && (
               <button
                 onClick={handleClose}
-                className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                className="text-brand-text-secondary hover:text-brand-text"
               >
                 <X className="h-5 w-5" />
               </button>
@@ -121,9 +121,9 @@ export function InvoiceUploadModal({ isOpen, onClose, onSuccess }: InvoiceUpload
           <div
             className={`relative border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
               dragActive
-                ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
-                : 'border-gray-300 dark:border-gray-600'
-            } ${isUploading ? 'pointer-events-none opacity-50' : 'cursor-pointer hover:border-blue-400'}`}
+                ? 'border-brand-indigo bg-brand-indigo/5'
+                : 'border-brand-border'
+            } ${isUploading ? 'pointer-events-none opacity-50' : 'cursor-pointer hover:border-brand-indigo'}`}
             onDragEnter={handleDrag}
             onDragLeave={handleDrag}
             onDragOver={handleDrag}
@@ -142,26 +142,26 @@ export function InvoiceUploadModal({ isOpen, onClose, onSuccess }: InvoiceUpload
             <div className="space-y-4">
               <div className="flex justify-center">
                 {isUploading ? (
-                  <div className="h-12 w-12 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin" />
+                  <div className="h-12 w-12 border-4 border-brand-indigo/20 border-t-brand-indigo rounded-full animate-spin" />
                 ) : (
-                  <div className="p-3 bg-blue-100 dark:bg-blue-900/30 rounded-full">
-                    <Upload className="h-6 w-6 text-blue-600" />
+                  <div className="p-3 bg-brand-indigo/10 rounded-full">
+                    <Upload className="h-6 w-6 text-brand-indigo" />
                   </div>
                 )}
               </div>
 
               {isUploading ? (
                 <div className="space-y-2">
-                  <p className="text-sm text-foreground">Procesando factura...</p>
+                  <p className="text-sm text-brand-text">Procesando factura...</p>
                   {progress && (
                     <div className="space-y-1">
-                      <div className="w-full bg-gray-200 rounded-full h-2">
+                      <div className="w-full bg-brand-bg-alt rounded-full h-2">
                         <div
-                          className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                          className="bg-brand-indigo h-2 rounded-full transition-all duration-300"
                           style={{ width: `${progress.percentage}%` }}
                         />
                       </div>
-                      <p className="text-xs text-gray-500">
+                      <p className="text-xs text-brand-text-secondary">
                         {progress.percentage}% - {Math.round(progress.loaded / 1024)}KB de {Math.round(progress.total / 1024)}KB
                       </p>
                     </div>
@@ -169,10 +169,10 @@ export function InvoiceUploadModal({ isOpen, onClose, onSuccess }: InvoiceUpload
                 </div>
               ) : (
                 <div className="space-y-2">
-                  <p className="text-sm text-foreground">
+                  <p className="text-sm text-brand-text">
                     <span className="font-medium">Haz clic para subir</span> o arrastra y suelta
                   </p>
-                  <p className="text-xs text-gray-500">
+                  <p className="text-xs text-brand-text-secondary">
                     PDF, JPEG, PNG o WebP (máx. 10MB)
                   </p>
                 </div>
@@ -182,13 +182,13 @@ export function InvoiceUploadModal({ isOpen, onClose, onSuccess }: InvoiceUpload
 
           {/* Error Message */}
           {error && (
-            <div className="flex items-start gap-3 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
-              <AlertCircle className="h-5 w-5 text-red-600 flex-shrink-0 mt-0.5" />
+            <div className="flex items-start gap-3 p-4 bg-error-bg border border-error-bg rounded-lg">
+              <AlertCircle className="h-5 w-5 text-error flex-shrink-0 mt-0.5" />
               <div className="space-y-1">
-                <p className="text-sm font-medium text-red-800 dark:text-red-200">
+                <p className="text-sm font-medium text-error-foreground">
                   Error al procesar factura
                 </p>
-                <p className="text-sm text-red-600 dark:text-red-300">
+                <p className="text-sm text-error">
                   {error}
                 </p>
               </div>
@@ -198,11 +198,11 @@ export function InvoiceUploadModal({ isOpen, onClose, onSuccess }: InvoiceUpload
           {/* Instructions */}
           {!isUploading && !error && (
             <div className="space-y-3">
-              <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+              <div className="flex items-center gap-2 text-sm text-brand-text-secondary">
                 <FileText className="h-4 w-4" />
                 <span>Formatos soportados</span>
               </div>
-              <ul className="text-xs text-gray-500 space-y-1 ml-6">
+              <ul className="text-xs text-brand-text-secondary space-y-1 ml-6">
                 <li>• PDF de facturas electrónicas</li>
                 <li>• Imágenes de facturas (JPEG, PNG, WebP)</li>
                 <li>• Tamaño máximo: 10MB</li>

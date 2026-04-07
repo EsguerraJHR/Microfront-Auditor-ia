@@ -1,13 +1,15 @@
 "use client"
 
 import { cn } from "@/lib/utils"
-import { BarChart3, FileCheck, Users, Receipt, Home, X } from "lucide-react"
+import { BarChart3, FileCheck, Users, Receipt, Home, X, ChevronsLeft, ChevronsRight } from "lucide-react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 
 interface SidebarProps {
   isOpen: boolean
   onClose: () => void
+  isCollapsed: boolean
+  onToggleCollapse: () => void
 }
 
 const menuItems = [
@@ -24,10 +26,10 @@ const menuItems = [
     description: "Evaluación de procesos y resultados"
   },
   {
-    title: "Precrítica",
+    title: "Diagnostico Tributario",
     href: "/precritica",
     icon: FileCheck,
-    description: "Revisión previa de documentos"
+    description: "Análisis y revisión de declaraciones"
   },
   {
     title: "Terceros",
@@ -43,7 +45,7 @@ const menuItems = [
   }
 ]
 
-export function Sidebar({ isOpen, onClose }: SidebarProps) {
+export function Sidebar({ isOpen, onClose, isCollapsed, onToggleCollapse }: SidebarProps) {
   const pathname = usePathname()
 
   return (
@@ -59,22 +61,32 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
       {/* Sidebar */}
       <aside
         className={cn(
-          "fixed top-0 left-0 z-50 h-screen w-80 bg-sidebar border-r border-sidebar-border shadow-lg transition-transform duration-300 ease-in-out flex flex-col",
+          "fixed top-0 left-0 z-50 h-screen bg-sidebar border-r border-sidebar-border shadow-lg transition-all duration-300 ease-in-out flex flex-col",
+          isCollapsed ? "lg:w-20 w-80" : "w-80",
           isOpen ? "translate-x-0" : "-translate-x-full",
           "lg:translate-x-0"
         )}
       >
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-sidebar-border">
-          <div className="flex items-center gap-3">
-            <div className="calculator-icon-container">
+        <div className={cn(
+          "flex items-center border-b border-sidebar-border transition-all duration-300",
+          isCollapsed ? "lg:justify-center lg:p-4 justify-between p-6" : "justify-between p-6"
+        )}>
+          <div className={cn(
+            "flex items-center gap-3",
+            isCollapsed && "lg:justify-center"
+          )}>
+            <div className="calculator-icon-container flex-shrink-0">
               <BarChart3 className="calculator-icon" />
             </div>
-            <div>
-              <h2 className="text-lg font-semibold text-sidebar-foreground">
+            <div className={cn(
+              "overflow-hidden transition-all duration-300",
+              isCollapsed ? "lg:w-0 lg:opacity-0" : "w-auto opacity-100"
+            )}>
+              <h2 className="text-lg font-semibold text-sidebar-foreground whitespace-nowrap">
                 BPO
               </h2>
-              <p className="text-xs text-sidebar-foreground/70">
+              <p className="text-xs text-sidebar-foreground/70 whitespace-nowrap">
                 Business Process Outsourcing
               </p>
             </div>
@@ -87,10 +99,26 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
           >
             <X className="h-5 w-5" />
           </button>
+
+          {/* Collapse toggle for desktop */}
+          <button
+            onClick={onToggleCollapse}
+            className="hidden lg:flex p-2 rounded-lg text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-foreground transition-colors"
+            title={isCollapsed ? "Expandir sidebar" : "Colapsar sidebar"}
+          >
+            {isCollapsed ? (
+              <ChevronsRight className="h-5 w-5" />
+            ) : (
+              <ChevronsLeft className="h-5 w-5" />
+            )}
+          </button>
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
+        <nav className={cn(
+          "flex-1 space-y-2 overflow-y-auto transition-all duration-300",
+          isCollapsed ? "lg:p-2 p-4" : "p-4"
+        )}>
           {menuItems.map((item) => {
             const isActive = pathname === item.href
             const Icon = item.icon
@@ -99,24 +127,25 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
               <Link
                 key={item.href}
                 href={item.href}
-                onClick={(e) => {
-                  // Close sidebar on mobile when clicking a link
+                onClick={() => {
                   if (typeof window !== 'undefined' && window.innerWidth < 1024) {
                     onClose()
                   }
                 }}
+                title={isCollapsed ? item.title : undefined}
                 className={cn(
-                  "flex items-center gap-3 p-3 rounded-lg transition-all duration-200 group",
+                  "flex items-center rounded-lg transition-all duration-200 group",
+                  isCollapsed ? "lg:justify-center lg:p-3 gap-3 p-3" : "gap-3 p-3",
                   isActive
-                    ? "bg-blue-100 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400 border border-blue-200 dark:border-blue-800"
+                    ? "bg-brand-indigo/10 text-brand-indigo border border-brand-indigo/20"
                     : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
                 )}
               >
                 <div
                   className={cn(
-                    "p-2 rounded-lg transition-colors",
+                    "p-2 rounded-lg transition-colors flex-shrink-0",
                     isActive
-                      ? "bg-blue-200 dark:bg-blue-800"
+                      ? "bg-brand-indigo/20"
                       : "bg-sidebar-accent group-hover:bg-sidebar-accent"
                   )}
                 >
@@ -124,19 +153,25 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                     className={cn(
                       "h-4 w-4",
                       isActive
-                        ? "text-blue-700 dark:text-blue-400"
+                        ? "text-brand-indigo"
                         : "text-sidebar-foreground"
                     )}
                   />
                 </div>
-                <div className="flex-1 min-w-0">
+                <div className={cn(
+                  "flex-1 min-w-0 overflow-hidden transition-all duration-300",
+                  isCollapsed ? "lg:w-0 lg:opacity-0" : "w-auto opacity-100"
+                )}>
                   <p className="font-medium truncate">{item.title}</p>
                   <p className="text-xs text-sidebar-foreground/70 truncate">
                     {item.description}
                   </p>
                 </div>
                 {isActive && (
-                  <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                  <div className={cn(
+                    "w-2 h-2 bg-brand-indigo rounded-full flex-shrink-0",
+                    isCollapsed && "lg:hidden"
+                  )}></div>
                 )}
               </Link>
             )
@@ -144,18 +179,28 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
         </nav>
 
         {/* Footer Section */}
-        <div className="mt-auto p-4 border-t border-sidebar-border">
-          <div className="p-3 rounded-lg bg-sidebar-accent">
-            <div className="flex items-center gap-2 mb-2">
-              <div className="h-2 w-2 bg-blue-500 rounded-full animate-pulse"></div>
-              <span className="text-sm font-medium text-sidebar-foreground">
-                Estado del Sistema
-              </span>
+        <div className={cn(
+          "mt-auto border-t border-sidebar-border transition-all duration-300",
+          isCollapsed ? "lg:p-2 p-4" : "p-4"
+        )}>
+          {/* System status - hidden when collapsed on desktop */}
+          <div className={cn(
+            "overflow-hidden transition-all duration-300",
+            isCollapsed ? "lg:h-0 lg:opacity-0 lg:mb-0" : "h-auto opacity-100 mb-3"
+          )}>
+            <div className="p-3 rounded-lg bg-sidebar-accent">
+              <div className="flex items-center gap-2 mb-2">
+                <div className="h-2 w-2 bg-brand-indigo rounded-full"></div>
+                <span className="text-sm font-medium text-sidebar-foreground">
+                  Estado del Sistema
+                </span>
+              </div>
+              <p className="text-xs text-sidebar-foreground/70">
+                Todas las funciones operativas
+              </p>
             </div>
-            <p className="text-xs text-sidebar-foreground/70">
-              Todas las funciones operativas
-            </p>
           </div>
+
         </div>
       </aside>
     </>
