@@ -415,10 +415,10 @@ export class RinganaExcelExportService {
         parseInt(rut.nit) || rut.nit,          // CódRingana
         13,                                      // CódDoc (13 = Cédula según el ejemplo)
         parseInt(rut.nit) || rut.nit,          // No.Documento- NIT
-        apellido1 + (apellido2 ? apellido2 : ''), // Apellidos (concatenados sin espacio según ejemplo)
+        apellido1 + (apellido2 ? ' ' + apellido2 : ''), // Apellidos
         null,                                    // Apellidos2
         nombres,                                 // Nombres
-        rut.direccion_principal?.replace(/\s+/g, ''), // Dirección (sin espacios según ejemplo)
+        rut.direccion_principal, // Dirección
         rut.departamento,                        // Departamento (nombre)
         rut.ciudad_municipio,                    // Ciudad (nombre)
         rut.correo_electronico,                  // Correoelectrónico
