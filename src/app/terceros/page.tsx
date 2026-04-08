@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useState, useEffect, useRef } from "react"
-import { Users, Building, UserCheck, Truck, ChevronDown, Loader2, FileText, CheckCircle, AlertTriangle, Download, User } from "lucide-react"
+import { Users, Building, UserCheck, Truck, ChevronDown, Loader2, FileText, CheckCircle, AlertTriangle, Download, User, History } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { rutService, RutExtractionWithClientResponse, UploadProgress, RutDetails } from "@/lib/api/rut-service"
 import { accountingClientService, AccountingClient } from "@/lib/api/accounting-client-service"
@@ -45,6 +45,14 @@ export default function TercerosPage() {
   // Crossmatch provisions state
   const [isCrossmatchLoading, setIsCrossmatchLoading] = useState(false)
   const crossmatchInputRef = useRef<HTMLInputElement>(null)
+
+  // Historico state
+  const [isHistoricoLoading, setIsHistoricoLoading] = useState(false)
+  const [historicoResult, setHistoricoResult] = useState<{
+    naturales: number
+    juridicas: number
+    archivos: string[]
+  } | null>(null)
 
   const loadAccountingClients = async () => {
     setIsLoadingAccountingClients(true)
@@ -254,6 +262,38 @@ export default function TercerosPage() {
     }
   }
 
+  const handleHistorico = async () => {
+    if (!selectedAccountingClient) return
+
+    setIsHistoricoLoading(true)
+    setHistoricoResult(null)
+    setExtractionError(null)
+
+    try {
+      const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8005'
+      const authHeaders = getAuthHeaders() as Record<string, string>
+      const response = await fetch(
+        `${baseUrl}/api/v1/terceros-codigos-ringana/historico/${selectedAccountingClient.codigo_empresa}`,
+        { headers: authHeaders }
+      )
+
+      if (!response.ok) {
+        const err = await response.json().catch(() => ({}))
+        throw new Error(err.detail || 'Error al obtener historico')
+      }
+
+      const data = await response.json()
+
+      const { RinganaExcelExportService } = await getRinganaExcelExport()
+      const resultado = await RinganaExcelExportService.exportFromHistorico(data, selectedType || 'cliente')
+      setHistoricoResult(resultado)
+    } catch (error) {
+      setExtractionError(error instanceof Error ? error.message : 'Error al generar historico')
+    } finally {
+      setIsHistoricoLoading(false)
+    }
+  }
+
   // Load accounting clients on mount
   useEffect(() => {
     if (!hasFetchedClients.current) {
@@ -334,18 +374,90 @@ export default function TercerosPage() {
           </div>
 
           {selectedAccountingClient && (
-            <div className="p-4 bg-brand-indigo/5 rounded-lg border border-brand-indigo/20">
-              <div className="flex items-center gap-3 mb-2">
-                <div className="w-8 h-8 rounded-lg bg-brand-indigo/10 flex items-center justify-center">
-                  <Building className="h-4 w-4 text-brand-indigo" />
-                </div>
-                <div>
-                  <p className="font-medium text-brand-text">{selectedAccountingClient.razon_social}</p>
-                  <p className="text-xs text-brand-text-secondary">
-                    NIT: {selectedAccountingClient.nit} • Código: {selectedAccountingClient.codigo_empresa}
-                  </p>
+            <div className="space-y-4">
+              <div className="p-4 bg-brand-indigo/5 rounded-lg border border-brand-indigo/20">
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="w-8 h-8 rounded-lg bg-brand-indigo/10 flex items-center justify-center">
+                    <Building className="h-4 w-4 text-brand-indigo" />
+                  </div>
+                  <div>
+                    <p className="font-medium text-brand-text">{selectedAccountingClient.razon_social}</p>
+                    <p className="text-xs text-brand-text-secondary">
+                      NIT: {selectedAccountingClient.nit} • Código: {selectedAccountingClient.codigo_empresa}
+                    </p>
+                  </div>
                 </div>
               </div>
+
+              {/* Historico Button — visible siempre que haya cliente seleccionado */}
+              {selectedAccountingClient.codigo_empresa === RINGANA_CODIGO_EMPRESA && (
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm font-medium text-brand-text">Historico de RUTs</p>
+                      <p className="text-xs text-brand-text-secondary">
+                        Genera los archivos Excel con todos los RUTs historicos asociados a {selectedAccountingClient.razon_social}
+                      </p>
+                    </div>
+                    <button
+                      onClick={handleHistorico}
+                      disabled={isHistoricoLoading}
+                      className="btn-primary flex items-center gap-2 disabled:opacity-50"
+                    >
+                      {isHistoricoLoading ? (
+                        <>
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                          Generando...
+                        </>
+                      ) : (
+                        <>
+                          <History className="h-4 w-4" />
+                          Descargar Historico
+                        </>
+                      )}
+                    </button>
+                  </div>
+
+                  {/* Historico Result */}
+                  {historicoResult && (
+                    <div className="p-4 bg-brand-navy/5 border border-brand-navy/20 rounded-lg">
+                      <div className="space-y-3">
+                        <div className="flex items-center gap-2">
+                          <CheckCircle className="h-5 w-5 text-brand-navy" />
+                          <span className="font-medium text-brand-navy">
+                            Historico exportado exitosamente
+                          </span>
+                        </div>
+                        <div className="grid grid-cols-2 gap-4 text-sm">
+                          <div className="flex items-center gap-2">
+                            <div className="w-8 h-8 rounded-xl bg-brand-indigo/10 flex items-center justify-center">
+                              <User className="h-4 w-4 text-brand-indigo" />
+                            </div>
+                            <p className="font-semibold text-brand-text">{historicoResult.naturales} Personas Naturales</p>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <div className="w-8 h-8 rounded-xl bg-brand-navy/10 flex items-center justify-center">
+                              <Building className="h-4 w-4 text-brand-navy" />
+                            </div>
+                            <p className="font-semibold text-brand-text">{historicoResult.juridicas} Personas Juridicas</p>
+                          </div>
+                        </div>
+                        <div className="pt-2 border-t border-brand-navy/20">
+                          <p className="text-xs text-brand-navy font-medium mb-1">Archivos descargados:</p>
+                          <ul className="text-xs text-brand-text-secondary space-y-1">
+                            {historicoResult.archivos.map((archivo, index) => (
+                              <li key={index} className="flex items-center gap-1">
+                                <FileText className="h-3 w-3" />
+                                {archivo}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           )}
         </div>
@@ -636,6 +748,7 @@ export default function TercerosPage() {
                       </div>
                     </div>
                   )}
+
                 </div>
               )}
             </div>

@@ -53,10 +53,6 @@ export function FileUpload({
         return
       }
 
-      if (files.length + validFiles.length >= maxFiles) {
-        newErrors.push(`Máximo ${maxFiles} archivos permitidos.`)
-        return
-      }
 
       const fileWithPreview: FileWithPreview = Object.assign(file, {
         id: Math.random().toString(36).substring(2),

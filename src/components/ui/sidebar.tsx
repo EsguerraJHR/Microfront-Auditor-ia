@@ -1,7 +1,7 @@
 "use client"
 
 import { cn } from "@/lib/utils"
-import { BarChart3, FileCheck, Users, Receipt, Home, X, ChevronsLeft, ChevronsRight } from "lucide-react"
+import { BarChart3, FileCheck, Users, Receipt, Home, X, ChevronsLeft, ChevronsRight, Hash } from "lucide-react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 
@@ -36,6 +36,12 @@ const menuItems = [
     href: "/terceros",
     icon: Users,
     description: "Gestión de proveedores y clientes"
+  },
+  {
+    title: "Codigos Ringana",
+    href: "/codigos-ringana",
+    icon: Hash,
+    description: "Administracion de codigos Ringana"
   },
   {
     title: "Facturas",

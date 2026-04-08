@@ -93,6 +93,15 @@ export interface DeteccionTipo {
   agente_principal_fallido?: string
 }
 
+export interface CodigoRingana {
+  cod_ringana: number
+  no_documento: string
+  nombres: string
+  apellidos: string
+  correo: string
+  encontrado: boolean
+}
+
 export interface ExtractionResultWithClient {
   filename: string
   success: boolean
@@ -100,8 +109,9 @@ export interface ExtractionResultWithClient {
     rut_data: RutData
     cliente_proveedor: ClientProviderInfo
     asociacion: AsociacionInfo
+    codigo_ringana?: CodigoRingana | null
     message: string
-    deteccion_tipo?: DeteccionTipo | null  // Metadata de detección automática (null si RUT existente)
+    deteccion_tipo?: DeteccionTipo | null
   } | null
   error: string | null
   excel_written: boolean

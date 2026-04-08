@@ -155,7 +155,9 @@ export class RinganaExcelExportService {
     return parseInt(`${year}${month}${day}`)
   }
 
-  // Parsear nombre completo en apellidos y nombres (para personas naturales)
+  // Parsear nombre de persona natural desde razon_social
+  // El backend envia razon_social en formato: "NOMBRE(S) APELLIDO1 APELLIDO2"
+  // Los ultimos 2 tokens son siempre apellidos, todo lo anterior son nombres
   private static parseNombreCompleto(razonSocial: string): { apellido1: string; apellido2: string; nombres: string } {
     if (!razonSocial) return { apellido1: '', apellido2: '', nombres: '' }
 
@@ -164,15 +166,17 @@ export class RinganaExcelExportService {
     if (partes.length === 1) {
       return { apellido1: partes[0], apellido2: '', nombres: '' }
     } else if (partes.length === 2) {
-      return { apellido1: partes[0], apellido2: '', nombres: partes[1] }
+      // 2 partes: NOMBRE APELLIDO
+      return { apellido1: partes[1], apellido2: '', nombres: partes[0] }
     } else if (partes.length === 3) {
-      return { apellido1: partes[0], apellido2: partes[1], nombres: partes[2] }
+      // 3 partes: NOMBRE APELLIDO1 APELLIDO2
+      return { apellido1: partes[1], apellido2: partes[2], nombres: partes[0] }
     } else {
-      // 4 o más partes: primeras 2 son apellidos, resto son nombres
+      // 4+ partes: NOMBRE1 [NOMBRE2...] APELLIDO1 APELLIDO2
       return {
-        apellido1: partes[0],
-        apellido2: partes[1],
-        nombres: partes.slice(2).join(' ')
+        apellido1: partes[partes.length - 2],
+        apellido2: partes[partes.length - 1],
+        nombres: partes.slice(0, partes.length - 2).join(' ')
       }
     }
   }
@@ -273,6 +277,7 @@ export class RinganaExcelExportService {
     results.forEach(result => {
       if (!result.success || !result.data) return
       const rut = result.data.rut_data
+      const codRingana = result.data.codigo_ringana?.cod_ringana || null
       const { apellido1, apellido2, nombres } = this.parseNombreCompleto(rut.razon_social)
       const depCodigo = this.getDepartamentoCodigo(rut.departamento)
       const tipoDoc = this.getTipoDocumento(rut.nit, rut.tipo_contribuyente)
@@ -389,6 +394,7 @@ export class RinganaExcelExportService {
     results.forEach(result => {
       if (!result.success || !result.data) return
       const rut = result.data.rut_data
+      const codRingana = result.data.codigo_ringana?.cod_ringana || null
       const { apellido1, apellido2, nombres } = this.parseNombreCompleto(rut.razon_social)
       const depCodigo = this.getDepartamentoCodigo(rut.departamento)
 
@@ -412,11 +418,11 @@ export class RinganaExcelExportService {
       }
 
       data.push([
-        parseInt(rut.nit) || rut.nit,          // CódRingana
+        codRingana,                              // CódRingana
         13,                                      // CódDoc (13 = Cédula según el ejemplo)
         parseInt(rut.nit) || rut.nit,          // No.Documento- NIT
-        apellido1 + (apellido2 ? ' ' + apellido2 : ''), // Apellidos
-        null,                                    // Apellidos2
+        apellido1,                                // Apellidos (Apellido 1)
+        apellido2 || null,                       // Apellidos2 (Apellido 2)
         nombres,                                 // Nombres
         rut.direccion_principal, // Dirección
         rut.departamento,                        // Departamento (nombre)
@@ -622,4 +628,288 @@ export class RinganaExcelExportService {
       archivos: archivosGenerados
     }
   }
+
+  /**
+   * Exportar desde datos historicos del backend (endpoint /historico/{codigo_empresa})
+   * Los datos ya vienen pre-procesados con apellidos, nombres, cod_ringana, etc.
+   */
+  public static async exportFromHistorico(
+    data: HistoricoResponse,
+    tipoTercero: 'cliente' | 'proveedor'
+  ): Promise<{ naturales: number; juridicas: number; archivos: string[] }> {
+    const archivosGenerados: string[] = []
+    const naturales = data.personas_naturales || []
+    const juridicas = data.personas_juridicas || []
+
+    // Exportar personas naturales
+    if (naturales.length > 0) {
+      this.exportHistoricoNaturalesJHR(naturales, tipoTercero)
+      archivosGenerados.push('CLIENTES_PROVEEDORES_JHR_PersonasNaturales.xlsx')
+
+      this.exportHistoricoParteInformativa(naturales)
+      archivosGenerados.push('PARTE_INFORMATIVA_RUT.xlsx')
+    }
+
+    // Exportar personas juridicas
+    if (juridicas.length > 0) {
+      this.exportHistoricoJuridicasJHR(juridicas, tipoTercero)
+      archivosGenerados.push('Formato_clientes_proveedores_PersonasJuridicas.xlsx')
+    }
+
+    return {
+      naturales: naturales.length,
+      juridicas: juridicas.length,
+      archivos: archivosGenerados
+    }
+  }
+
+  // --- Metodos de exportacion desde historico ---
+
+  private static exportHistoricoNaturalesJHR(
+    personas: HistoricoPersona[],
+    tipoTercero: 'cliente' | 'proveedor'
+  ): void {
+    const workbook = XLSX.utils.book_new()
+    const fechaHoy = this.getTodayFormatted()
+
+    const inicialWs = XLSX.utils.aoa_to_sheet([['Compañía'], [17]])
+    XLSX.utils.book_append_sheet(workbook, inicialWs, 'Inicial')
+
+    const tercerosHeaders = [
+      'Compañía', 'Código del Tercero', 'Numero de documento de identificación del tercero',
+      'Tipo de identificación C=CEDULA N=NIT P=PASAPORTE X=RUC  E=CEDULA EXTRANJERIA',
+      'Tipo de tercero 1=NATURAL 2=JURIDICA', 'Razón social', 'Apellido 1', 'Apellido 2', 'Nombres',
+      'Indicador de tercero cliente 0=No, 1=Si', 'Indicador de tercero proveedor 0=No, 1=Si',
+      'Indicador de tercero empleado 0=No, 1=Si', 'Contacto', 'Dirección 1', 'Dirección 2',
+      'País', 'Departamento', 'Ciudad', 'Teléfono', 'Dirección de correo electrónico',
+      'Fecha nacimiento', 'Código actividad economica', 'Telefono celular'
+    ]
+    const tercerosData: any[][] = [tercerosHeaders]
+
+    const clientesHeaders = [
+      'Compañía', 'Código del cliente', 'Razón social del cliente', 'Condición de pago',
+      'Tipo de cliente', 'Contacto', 'Dirección 1', 'País', 'Departamento', 'Ciudad',
+      'Teléfono', 'Dirección de correo electrónico', 'Fecha de ingreso AAAAMMDD', 'Telefono Celula'
+    ]
+    const clientesData: any[][] = [clientesHeaders]
+
+    const proveedoresHeaders = [
+      'Compañía', 'Código del proveedor', 'Descripción de la sucursal', 'Moneda',
+      'Clase de proveedor', 'Condición de pago', 'Tipo de proveedor', 'Contacto',
+      'Dirección 1', 'Dirección 2', 'País', 'Departamento', 'Ciudad', 'Teléfono',
+      'Dirección de correo electrónico', 'Fecha de ingreso', 'Telefono Celular'
+    ]
+    const proveedoresData: any[][] = [proveedoresHeaders]
+
+    personas.forEach(p => {
+      // Re-parsear razon_social para obtener apellidos/nombres correctos
+      // El backend los envía invertidos (nombres primero, apellidos al final)
+      const { apellido1, apellido2, nombres } = this.parseNombreCompleto(p.razon_social)
+
+      tercerosData.push([
+        17, p.nit, parseInt(p.nit) || p.nit, p.tipo_documento, 1,
+        p.razon_social, apellido1, apellido2, nombres,
+        p.indicador_cliente, p.indicador_proveedor, p.indicador_empleado,
+        p.razon_social, p.direccion_principal, p.direccion_2,
+        p.pais, p.departamento_codigo, p.ciudad_codigo,
+        parseInt(p.telefono_1) || p.telefono_1, p.correo_electronico,
+        fechaHoy, p.actividad_principal_codigo || '0010',
+        parseInt(p.telefono_1) || p.telefono_1
+      ])
+
+      clientesData.push([
+        17, p.nit, p.razon_social, '001', '001',
+        p.razon_social, p.direccion_principal, p.pais,
+        p.departamento_codigo, p.ciudad_codigo,
+        parseInt(p.telefono_1) || p.telefono_1, p.correo_electronico,
+        fechaHoy, null
+      ])
+
+      proveedoresData.push([
+        17, p.nit, p.razon_social, 'COP', '001', '001', '0011',
+        p.razon_social, p.direccion_principal, p.direccion_2,
+        p.pais, p.departamento_codigo, p.ciudad_codigo,
+        parseInt(p.telefono_1) || p.telefono_1, p.correo_electronico,
+        fechaHoy, null
+      ])
+    })
+
+    XLSX.utils.book_append_sheet(workbook, XLSX.utils.aoa_to_sheet(tercerosData), 'Terceros')
+    XLSX.utils.book_append_sheet(workbook, XLSX.utils.aoa_to_sheet(clientesData), 'Clientes')
+    XLSX.utils.book_append_sheet(workbook, XLSX.utils.aoa_to_sheet(proveedoresData), 'Proveedores')
+
+    const finalWs = XLSX.utils.aoa_to_sheet([['Compañía'], [17]])
+    XLSX.utils.book_append_sheet(workbook, finalWs, 'Final')
+
+    XLSX.writeFile(workbook, 'CLIENTES_PROVEEDORES_JHR_PersonasNaturales.xlsx')
+  }
+
+  private static exportHistoricoParteInformativa(personas: HistoricoPersona[]): void {
+    const workbook = XLSX.utils.book_new()
+
+    const headers = [
+      'CódRingana ', 'CódDoc', 'No.Documento- NIT ', 'Apellidos', 'Apellidos2', 'Nombres',
+      'Dirección', 'Departamento', 'Ciudad', 'Correoelectrónico', 'Teléfono1', 'Teléfono2',
+      'Actividad', 'CódResponsabilidad1', 'CódResponsabilidad2', 'CódResponsabilidad3',
+      'CódResponsabilidad4', 'CódResponsabilidad5', 'CódResponsabilidad6',
+      'FechaRUT', 'País', 'Departamento', 'Ciudad'
+    ]
+
+    const data: any[][] = [headers]
+
+    personas.forEach(p => {
+      const { apellido1, apellido2, nombres } = this.parseNombreCompleto(p.razon_social)
+      const resps = p.responsabilidades || []
+      const formatResp = (r?: { codigo: string; descripcion: string }) =>
+        r ? `${r.codigo} - ${r.descripcion}` : null
+
+      let fechaRut: number | string = ''
+      if (p.fecha_generacion_pdf) {
+        const date = new Date(p.fecha_generacion_pdf)
+        if (!isNaN(date.getTime())) {
+          fechaRut = Math.floor((date.getTime() - new Date('1899-12-30').getTime()) / (24 * 60 * 60 * 1000))
+        }
+      }
+
+      data.push([
+        p.cod_ringana, 13, parseInt(p.nit) || p.nit,
+        apellido1, apellido2 || null, nombres,
+        p.direccion_principal, p.departamento_nombre, p.ciudad_municipio,
+        p.correo_electronico, parseInt(p.telefono_1) || p.telefono_1 || null, null,
+        parseInt(p.actividad_principal_codigo) || p.actividad_principal_codigo,
+        formatResp(resps[0]), formatResp(resps[1]), formatResp(resps[2]),
+        formatResp(resps[3]), formatResp(resps[4]), formatResp(resps[5]),
+        fechaRut, 169, p.departamento_codigo, p.ciudad_codigo
+      ])
+    })
+
+    const worksheet = XLSX.utils.aoa_to_sheet(data)
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Hoja1')
+
+    const timestamp = new Date().toISOString().slice(0, 10).replace(/-/g, '')
+    XLSX.writeFile(workbook, `PARTE_INFORMATIVA_RUT_${timestamp}.xlsx`)
+  }
+
+  private static exportHistoricoJuridicasJHR(
+    personas: HistoricoPersona[],
+    tipoTercero: 'cliente' | 'proveedor'
+  ): void {
+    const workbook = XLSX.utils.book_new()
+    const fechaHoy = this.getTodayFormatted()
+
+    const inicialWs = XLSX.utils.aoa_to_sheet([['Compañía'], [17]])
+    XLSX.utils.book_append_sheet(workbook, inicialWs, 'Inicial')
+
+    const tercerosHeaders = [
+      'Compañía', 'Código del Tercero', 'Numero de documento de identificación del tercero',
+      'Tipo de identificación C=CEDULA N=NIT P=PASAPORTE X=RUC  E=CEDULA EXTRANJERIA',
+      'Tipo de tercero 1=NATURAL 2=JURIDICA', 'Razón social', 'Apellido 1', 'Apellido 2', 'Nombres',
+      'Indicador de tercero cliente 0=No, 1=Si', 'Indicador de tercero proveedor 0=No, 1=Si',
+      'Indicador de tercero empleado 0=No, 1=Si', 'Contacto', 'Dirección 1', 'Dirección 2',
+      'País', 'Departamento', 'Ciudad', 'Teléfono', 'Dirección de correo electrónico',
+      'Fecha nacimiento', 'Código actividad economica', 'Telefono celular'
+    ]
+    const tercerosData: any[][] = [tercerosHeaders]
+
+    const clientesHeaders = [
+      'Compañía', 'Código del cliente', 'Razón social del cliente', 'Moneda',
+      'Condición de pago', 'Tipo de cliente', 'Contacto', 'Dirección 1', 'Dirección 2',
+      'País', 'Departamento', 'Ciudad', 'Teléfono', 'Dirección de correo electrónico',
+      'Fecha de ingreso AAAAMMDD', 'Telefono Celula'
+    ]
+    const clientesData: any[][] = [clientesHeaders]
+
+    const proveedoresHeaders = [
+      'Compañía', 'Código del proveedor', 'Descripción de la sucursal', 'Moneda',
+      'Clase de proveedor', 'Condición de pago', 'Tipo de proveedor', 'Contacto',
+      'Dirección 1', 'Dirección 2', 'País', 'Departamento', 'Ciudad', 'Teléfono',
+      'Dirección de correo electrónico', 'Fecha de ingreso', 'Telefono Celular'
+    ]
+    const proveedoresData: any[][] = [proveedoresHeaders]
+
+    personas.forEach(p => {
+      const esCliente = tipoTercero === 'cliente' ? 1 : 0
+      const esProveedor = tipoTercero === 'proveedor' ? 1 : 0
+
+      tercerosData.push([
+        17, p.nit, parseInt(p.nit) || p.nit, 'N', 2,
+        p.razon_social, null, null, null,
+        esCliente, esProveedor, 0,
+        p.razon_social, p.direccion_principal, p.direccion_2,
+        p.pais, p.departamento_codigo, p.ciudad_codigo,
+        parseInt(p.telefono_1) || p.telefono_1, p.correo_electronico,
+        fechaHoy, p.actividad_principal_codigo || '0010',
+        parseInt(p.telefono_1) || p.telefono_1
+      ])
+
+      clientesData.push([
+        17, p.nit, p.razon_social, 'COP', '001', '001',
+        p.razon_social, p.direccion_principal, p.direccion_2,
+        p.pais, p.departamento_codigo, p.ciudad_codigo,
+        parseInt(p.telefono_1) || p.telefono_1, p.correo_electronico,
+        fechaHoy, null
+      ])
+
+      proveedoresData.push([
+        17, p.nit, p.razon_social, 'COP', '001', '001', '0011',
+        p.razon_social, p.direccion_principal, p.direccion_2,
+        p.pais, p.departamento_codigo, p.ciudad_codigo,
+        parseInt(p.telefono_1) || p.telefono_1, p.correo_electronico,
+        fechaHoy, null
+      ])
+    })
+
+    XLSX.utils.book_append_sheet(workbook, XLSX.utils.aoa_to_sheet(tercerosData), 'Terceros')
+    XLSX.utils.book_append_sheet(workbook, XLSX.utils.aoa_to_sheet(clientesData), 'Clientes')
+    XLSX.utils.book_append_sheet(workbook, XLSX.utils.aoa_to_sheet(proveedoresData), 'Proveedores')
+
+    const finalWs = XLSX.utils.aoa_to_sheet([['Compañía'], [17]])
+    XLSX.utils.book_append_sheet(workbook, finalWs, 'Final')
+
+    XLSX.writeFile(workbook, 'Formato_clientes_proveedores_PersonasJuridicas.xlsx')
+  }
+}
+
+// Tipos para el endpoint historico
+export interface HistoricoPersona {
+  compania: string
+  nit: string
+  dv: string
+  tipo_documento: string
+  tipo_tercero: number
+  razon_social: string
+  apellido1: string
+  apellido2: string
+  nombres: string
+  direccion_principal: string
+  direccion_2: string | null
+  pais: string
+  departamento_nombre: string
+  departamento_codigo: string
+  ciudad_municipio: string
+  ciudad_codigo: string
+  telefono_1: string
+  correo_electronico: string
+  actividad_principal_codigo: string
+  fecha_generacion_pdf: string
+  responsabilidades: Array<{ codigo: string; descripcion: string }>
+  cod_ringana: number | null
+  ringana_encontrado: boolean
+  indicador_cliente: number
+  indicador_proveedor: number
+  indicador_empleado: number
+  condicion_pago: string | null
+  tipo_cliente: string | null
+  moneda: string
+  clase_proveedor: string | null
+  tipo_proveedor: string | null
+  fecha_ingreso: string
+}
+
+export interface HistoricoResponse {
+  codigo_empresa: string
+  razon_social_cliente: string
+  total_registros: number
+  personas_naturales: HistoricoPersona[]
+  personas_juridicas: HistoricoPersona[]
 }
