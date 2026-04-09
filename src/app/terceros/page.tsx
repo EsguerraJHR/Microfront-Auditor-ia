@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from "react"
 import { Users, Building, UserCheck, Truck, ChevronDown, Loader2, FileText, CheckCircle, AlertTriangle, Download, User, History } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { rutService, RutExtractionWithClientResponse, UploadProgress, RutDetails } from "@/lib/api/rut-service"
+import { rutService, RutExtractionWithClientResponse, UploadProgress, RutDetails, SSEProgressEvent, SSEFileResultEvent } from "@/lib/api/rut-service"
 import { accountingClientService, AccountingClient } from "@/lib/api/accounting-client-service"
 import { FileUpload } from "@/components/ui/file-upload"
 import { RutResults } from "@/components/ui/rut-results"
@@ -31,6 +31,8 @@ export default function TercerosPage() {
   const [selectedFiles, setSelectedFiles] = useState<File[]>([])
   const [isExtracting, setIsExtracting] = useState(false)
   const [extractionProgress, setExtractionProgress] = useState<UploadProgress | null>(null)
+  const [sseProgress, setSseProgress] = useState<SSEProgressEvent | null>(null)
+  const [fileResults, setFileResults] = useState<SSEFileResultEvent[]>([])
   const [extractionResults, setExtractionResults] = useState<RutExtractionWithClientResponse | null>(null)
   const [extractionError, setExtractionError] = useState<string | null>(null)
 
@@ -106,26 +108,40 @@ export default function TercerosPage() {
 
     setIsExtracting(true)
     setExtractionProgress(null)
+    setSseProgress(null)
+    setFileResults([])
     setExtractionError(null)
     setExtractionResults(null)
 
-    try {
-      const response = await rutService.extractRutFromFilesWithClient(
-        selectedFiles,
-        parseInt(selectedAccountingClient.codigo_empresa),
-        (progress) => {
-          setExtractionProgress(progress)
+    await rutService.extractRutFromFilesWithClientStream(
+      selectedFiles,
+      parseInt(selectedAccountingClient.codigo_empresa),
+      {
+        onProgress: (data) => {
+          setSseProgress(data)
+          setExtractionProgress({
+            loaded: data.files_processed,
+            total: data.total_files,
+            percentage: data.percentage
+          })
+        },
+        onFileResult: (data) => {
+          setFileResults(prev => [...prev, data])
+        },
+        onComplete: (data) => {
+          setExtractionResults(data)
+          setIsExtracting(false)
+          setSseProgress(null)
+          setExtractionProgress(null)
+        },
+        onError: (error) => {
+          setExtractionError(error)
+          setIsExtracting(false)
+          setSseProgress(null)
+          setExtractionProgress(null)
         }
-      )
-
-      setExtractionResults(response)
-    } catch (error) {
-      console.error('Error during RUT extraction:', error)
-      setExtractionError(error instanceof Error ? error.message : 'Error durante la extracción')
-    } finally {
-      setIsExtracting(false)
-      setExtractionProgress(null)
-    }
+      }
+    )
   }
 
   const handleGenerateExcel = async () => {
@@ -594,19 +610,41 @@ export default function TercerosPage() {
                 </div>
               )}
 
-              {/* Progress Bar */}
-              {isExtracting && extractionProgress && (
-                <div className="space-y-2">
+              {/* Progress Bar — SSE streaming */}
+              {isExtracting && (
+                <div className="space-y-3">
                   <div className="flex justify-between text-sm text-brand-text-secondary">
-                    <span>Procesando archivos...</span>
-                    <span>{extractionProgress.percentage}%</span>
+                    <span>{sseProgress?.message || 'Iniciando procesamiento...'}</span>
+                    <span>{sseProgress?.percentage ?? 0}%</span>
                   </div>
                   <div className="w-full bg-brand-bg-alt rounded-full h-2">
                     <div
                       className="bg-brand-indigo h-2 rounded-full transition-all duration-300"
-                      style={{ width: `${extractionProgress.percentage}%` }}
+                      style={{ width: `${sseProgress?.percentage ?? 0}%` }}
                     />
                   </div>
+                  {sseProgress && (
+                    <p className="text-xs text-brand-text-secondary">
+                      Archivo {sseProgress.files_processed} de {sseProgress.total_files}: {sseProgress.current_file}
+                    </p>
+                  )}
+                  {/* Resultados individuales por archivo */}
+                  {fileResults.length > 0 && (
+                    <div className="max-h-40 overflow-y-auto space-y-1">
+                      {fileResults.map((fr, i) => (
+                        <div key={i} className="flex items-center gap-2 text-xs">
+                          {fr.success ? (
+                            <CheckCircle className="h-3 w-3 text-success flex-shrink-0" />
+                          ) : (
+                            <AlertTriangle className="h-3 w-3 text-error flex-shrink-0" />
+                          )}
+                          <span className={fr.success ? 'text-brand-text-secondary' : 'text-error-foreground'}>
+                            {fr.filename}{fr.error ? ` — ${fr.error}` : ''}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               )}
 
