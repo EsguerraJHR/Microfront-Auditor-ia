@@ -137,9 +137,126 @@ export interface UploadProgress {
   percentage: number
 }
 
+// SSE streaming events
+export interface SSEProgressEvent {
+  message: string
+  percentage: number
+  current_file: string
+  files_processed: number
+  total_files: number
+}
+
+export interface SSEFileResultEvent {
+  filename: string
+  success: boolean
+  index: number
+  total: number
+  error: string | null
+}
+
+export interface SSECallbacks {
+  onProgress?: (data: SSEProgressEvent) => void
+  onFileResult?: (data: SSEFileResultEvent) => void
+  onComplete: (data: RutExtractionWithClientResponse) => void
+  onError: (error: string) => void
+}
+
 class RutService {
   private baseUrl = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8005'}/api/v1/contabilidad`
 
+  /**
+   * Extraccion de RUTs via SSE streaming — muestra progreso en tiempo real
+   */
+  async extractRutFromFilesWithClientStream(
+    files: File[],
+    clientProviderId: number,
+    callbacks: SSECallbacks
+  ): Promise<void> {
+    if (!files.length) {
+      callbacks.onError('No se han proporcionado archivos')
+      return
+    }
+
+    if (!clientProviderId) {
+      callbacks.onError('Debe seleccionar un cliente/proveedor')
+      return
+    }
+
+    const formData = new FormData()
+    formData.append('codigo_empresa', clientProviderId.toString())
+    files.forEach((file) => formData.append('files', file))
+
+    try {
+      const authHeaders = getAuthHeaders()
+      const { 'Content-Type': _, ...headersWithoutContentType } = authHeaders as Record<string, string>
+
+      const response = await fetch(`${this.baseUrl}/extraer/rut/lote/con-cliente/stream`, {
+        method: 'POST',
+        body: formData,
+        headers: headersWithoutContentType
+      })
+
+      if (!response.ok) {
+        let errorText = 'Error en el servidor'
+        try {
+          const errorData = await response.json()
+          errorText = errorData.detail || errorData.message || `HTTP ${response.status} ${response.statusText}`
+        } catch {
+          errorText = `HTTP ${response.status} ${response.statusText}`
+        }
+        callbacks.onError(`Error HTTP ${response.status}: ${errorText}`)
+        return
+      }
+
+      const reader = response.body?.getReader()
+      if (!reader) {
+        callbacks.onError('El navegador no soporta streaming')
+        return
+      }
+
+      const decoder = new TextDecoder()
+      let buffer = ''
+
+      while (true) {
+        const { done, value } = await reader.read()
+        if (done) break
+
+        buffer += decoder.decode(value, { stream: true })
+        const lines = buffer.split('\n')
+        buffer = lines.pop() || ''
+
+        let eventType = ''
+        for (const line of lines) {
+          if (line.startsWith('event: ')) {
+            eventType = line.slice(7).trim()
+          } else if (line.startsWith('data: ')) {
+            try {
+              const data = JSON.parse(line.slice(6))
+
+              if (eventType === 'progress') {
+                callbacks.onProgress?.(data)
+              } else if (eventType === 'file_result') {
+                callbacks.onFileResult?.(data)
+              } else if (eventType === 'complete') {
+                callbacks.onComplete(data)
+              } else if (eventType === 'error') {
+                callbacks.onError(data.error || 'Error desconocido')
+              }
+            } catch {
+              // Linea de datos incompleta, ignorar
+            }
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Error en SSE streaming:', error)
+      callbacks.onError(error instanceof Error ? error.message : 'Error de conexion')
+    }
+  }
+
+  /**
+   * Extraccion de RUTs — endpoint legacy sin streaming
+   */
   async extractRutFromFilesWithClient(
     files: File[],
     clientProviderId: number,
@@ -154,11 +271,7 @@ class RutService {
     }
 
     const formData = new FormData()
-
-    // Agregar el código de empresa
     formData.append('codigo_empresa', clientProviderId.toString())
-
-    // Agregar todos los archivos con la misma key 'files'
     files.forEach((file) => {
       formData.append('files', file)
     })
