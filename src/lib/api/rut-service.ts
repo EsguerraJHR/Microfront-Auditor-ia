@@ -161,11 +161,129 @@ export interface SSECallbacks {
   onError: (error: string) => void
 }
 
+// Job polling types
+export interface JobStartResponse {
+  job_id: string
+  status: string
+  total_files: number
+  message: string
+}
+
+export interface JobStatusResponse {
+  job_id: string
+  status: 'pendiente' | 'procesando' | 'completado' | 'error'
+  total_files: number
+  files_processed: number
+  successful: number
+  failed: number
+  percentage: number
+  result: RutExtractionWithClientResponse | null
+  error_message: string | null
+}
+
+export interface JobCallbacks {
+  onProgress?: (status: JobStatusResponse) => void
+  onComplete: (data: RutExtractionWithClientResponse) => void
+  onError: (error: string) => void
+}
+
 class RutService {
   private baseUrl = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8005'}/api/v1/contabilidad`
+  private pollingInterval: ReturnType<typeof setInterval> | null = null
 
   /**
-   * Extraccion de RUTs via SSE streaming — muestra progreso en tiempo real
+   * Extraccion de RUTs via Job polling — metodo principal
+   * 1. POST /start para crear el job
+   * 2. GET /status/{job_id} cada 5s para consultar progreso
+   */
+  async extractRutWithJobPolling(
+    files: File[],
+    clientProviderId: number,
+    callbacks: JobCallbacks
+  ): Promise<void> {
+    if (!files.length) {
+      callbacks.onError('No se han proporcionado archivos')
+      return
+    }
+    if (!clientProviderId) {
+      callbacks.onError('Debe seleccionar un cliente/proveedor')
+      return
+    }
+
+    const formData = new FormData()
+    formData.append('codigo_empresa', clientProviderId.toString())
+    files.forEach((file) => formData.append('files', file))
+
+    try {
+      const authHeaders = getAuthHeaders()
+      const { 'Content-Type': _, ...headersWithoutContentType } = authHeaders as Record<string, string>
+
+      // 1. Iniciar job
+      const startResponse = await fetch(`${this.baseUrl}/extraer/rut/lote/con-cliente/start`, {
+        method: 'POST',
+        body: formData,
+        headers: headersWithoutContentType
+      })
+
+      if (!startResponse.ok) {
+        let errorText = 'Error al iniciar el procesamiento'
+        try {
+          const errorData = await startResponse.json()
+          errorText = errorData.detail || errorData.message || `HTTP ${startResponse.status}`
+        } catch {
+          errorText = `HTTP ${startResponse.status} ${startResponse.statusText}`
+        }
+        callbacks.onError(errorText)
+        return
+      }
+
+      const jobData: JobStartResponse = await startResponse.json()
+      const jobId = jobData.job_id
+
+      // 2. Polling cada 5 segundos
+      this.pollingInterval = setInterval(async () => {
+        try {
+          const statusResponse = await fetch(
+            `${this.baseUrl}/extraer/rut/lote/con-cliente/status/${jobId}`,
+            { headers: authHeaders as Record<string, string> }
+          )
+
+          if (!statusResponse.ok) {
+            this.stopPolling()
+            callbacks.onError(`Error al consultar estado: HTTP ${statusResponse.status}`)
+            return
+          }
+
+          const status: JobStatusResponse = await statusResponse.json()
+          callbacks.onProgress?.(status)
+
+          if (status.status === 'completado' && status.result) {
+            this.stopPolling()
+            callbacks.onComplete(status.result)
+          } else if (status.status === 'error') {
+            this.stopPolling()
+            callbacks.onError(status.error_message || 'Error durante el procesamiento')
+          }
+        } catch (error) {
+          this.stopPolling()
+          callbacks.onError(error instanceof Error ? error.message : 'Error de conexion')
+        }
+      }, 5000)
+
+    } catch (error) {
+      callbacks.onError(error instanceof Error ? error.message : 'Error al iniciar el job')
+    }
+  }
+
+  stopPolling(): void {
+    if (this.pollingInterval) {
+      clearInterval(this.pollingInterval)
+      this.pollingInterval = null
+    }
+  }
+
+  /**
+   * Extraccion de RUTs via SSE streaming — fallback
    */
   async extractRutFromFilesWithClientStream(
     files: File[],
