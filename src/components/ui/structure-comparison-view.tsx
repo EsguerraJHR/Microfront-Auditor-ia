@@ -150,7 +150,7 @@ export const StructureComparisonView: React.FC<StructureComparisonViewProps> = (
                 <tr
                   key={idx}
                   className={cn(
-                    "border-b border-gray-100 hover:bg-gray-50 transition-colors",
+                    "border-b border-brand-border hover:bg-brand-bg-alt transition-colors",
                     getChangeBgColor(change.cambio_puntos_porcentuales)
                   )}
                 >

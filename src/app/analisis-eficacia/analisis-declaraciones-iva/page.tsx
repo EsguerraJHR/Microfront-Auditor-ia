@@ -446,7 +446,7 @@ export default function AnalisisDeclaracionesIvaPage() {
               variants={itemVariants}
               className="bg-white border border-brand-border rounded-2xl overflow-hidden shadow-sm"
             >
-              <div className="bg-gradient-to-r from-purple-500 to-purple-600 px-6 py-4">
+              <div className="bg-gradient-to-r from-brand-navy to-brand-indigo px-6 py-4">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center">
                     <FileSpreadsheet className="h-5 w-5 text-white" />
@@ -609,7 +609,7 @@ export default function AnalisisDeclaracionesIvaPage() {
               {/* Summary Header */}
               <motion.div
                 variants={itemVariants}
-                className="bg-gradient-to-r from-slate-700 via-slate-800 to-slate-900 rounded-2xl p-6 shadow-xl"
+                className="bg-gradient-to-r from-brand-navy to-brand-indigo rounded-2xl p-6 shadow-xl"
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-4">
@@ -620,7 +620,7 @@ export default function AnalisisDeclaracionesIvaPage() {
                       <h2 className="text-2xl font-bold text-white">
                         Extracción Completada
                       </h2>
-                      <p className="text-slate-300">
+                      <p className="text-white/70">
                         {extractionResult.message}
                       </p>
                     </div>
@@ -663,7 +663,7 @@ export default function AnalisisDeclaracionesIvaPage() {
                   className="bg-white border-2 border-success-bg rounded-2xl p-6 shadow-lg"
                 >
                   <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center shadow-lg shadow-emerald-500/25">
+                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-brand-navy to-brand-indigo flex items-center justify-center shadow-lg shadow-brand-navy/25">
                       <ClipboardCheck className="h-6 w-6 text-white" />
                     </div>
                     <div className="flex-1">
@@ -726,7 +726,7 @@ export default function AnalisisDeclaracionesIvaPage() {
                         whileTap={{ scale: 0.98 }}
                         onClick={handleValidate}
                         disabled={isValidating}
-                        className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white rounded-xl font-medium shadow-lg shadow-emerald-500/25 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                        className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-brand-navy to-brand-indigo hover:from-brand-navy/90 hover:to-brand-indigo-hover text-white rounded-xl font-medium shadow-lg shadow-brand-navy/25 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                       >
                         {isValidating ? (
                           <>
@@ -995,7 +995,7 @@ function IvaResultCard({ result, index, isExpanded, onToggle, formatCurrency }: 
               {/* Liquidación */}
               <div className="bg-gradient-to-r from-brand-bg to-brand-bg-alt rounded-xl p-5 border border-brand-border">
                 <h4 className="font-semibold text-brand-text mb-4 flex items-center gap-2">
-                  <Building className="h-5 w-5 text-slate-600" />
+                  <Building className="h-5 w-5 text-brand-text-secondary" />
                   Liquidación Privada
                 </h4>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
