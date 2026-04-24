@@ -89,7 +89,7 @@ export function IvaValidationChecklist({ result, onClose }: IvaValidationCheckli
   return (
     <div className="space-y-6 animate-in fade-in duration-300">
       {/* Header con resumen */}
-      <div className="bg-gradient-to-r from-slate-700 via-slate-800 to-slate-900 rounded-2xl p-6 shadow-xl">
+      <div className="bg-gradient-to-r from-brand-navy to-brand-indigo rounded-2xl p-6 shadow-xl">
         <div className="flex items-center justify-between flex-wrap gap-4">
           <div className="flex items-center gap-4">
             <div className="w-14 h-14 rounded-xl bg-brand-indigo/20 flex items-center justify-center border border-brand-indigo/30">
@@ -99,10 +99,10 @@ export function IvaValidationChecklist({ result, onClose }: IvaValidationCheckli
               <h2 className="text-2xl font-bold text-white">
                 Checklist de Validación IVA
               </h2>
-              <p className="text-slate-300">
+              <p className="text-white/70">
                 {result.razon_social} - NIT: {result.nit}
               </p>
-              <p className="text-slate-400 text-sm">
+              <p className="text-white/60 text-sm">
                 {result.periods_validated.length} período{result.periods_validated.length > 1 ? 's' : ''} validado{result.periods_validated.length > 1 ? 's' : ''} - Año {result.ano_gravable}
               </p>
             </div>
@@ -138,7 +138,7 @@ export function IvaValidationChecklist({ result, onClose }: IvaValidationCheckli
         </div>
 
         {/* Progress bar visual */}
-        <div className="mt-6 pt-4 border-t border-slate-600/50">
+        <div className="mt-6 pt-4 border-t border-white/10">
           <div className="flex gap-1">
             {result.validations.map((validation) => (
               <div

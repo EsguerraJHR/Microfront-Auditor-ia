@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { BarChart3, TrendingUp, TrendingDown, AlertCircle, Info, PieChart, Activity, Shield, CheckCircle, XCircle, ChevronDown, ChevronRight } from 'lucide-react'
+import { BarChart3, TrendingUp, TrendingDown, AlertCircle, AlertTriangle, Info, PieChart, Activity, Shield, CheckCircle, XCircle, ChevronDown, ChevronRight, ClipboardList, Lightbulb } from 'lucide-react'
 import {
   VerticalAnalysisYear,
   VerticalAnalysisBlock,
@@ -220,9 +220,9 @@ const AnalysisBlockCard: React.FC<AnalysisBlockCardProps> = ({ block, icon, colo
                           }}
                           className={cn(
                             "h-2.5 rounded-full",
-                            field.percentage < 10 && "bg-gradient-to-r from-green-400 to-green-500",
-                            field.percentage >= 10 && field.percentage < 30 && "bg-gradient-to-r from-yellow-400 to-yellow-500",
-                            field.percentage >= 30 && "bg-gradient-to-r from-red-400 to-red-500"
+                            field.percentage < 10 && "bg-success",
+                            field.percentage >= 10 && field.percentage < 30 && "bg-warning",
+                            field.percentage >= 30 && "bg-error"
                           )}
                         />
                       </div>
@@ -277,7 +277,7 @@ export const VerticalAnalysisView: React.FC<VerticalAnalysisViewProps> = ({
       {/* Header with Year Tabs */}
       <motion.div
         variants={itemVariants}
-        className="bg-gradient-to-r from-slate-600 via-slate-700 to-blue-800 rounded-xl p-6 border border-slate-500 shadow-xl overflow-hidden relative"
+        className="bg-gradient-to-r from-brand-navy to-brand-indigo rounded-xl p-6 border border-brand-navy/30 shadow-xl overflow-hidden relative"
       >
         {/* Background decorations */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -304,7 +304,7 @@ export const VerticalAnalysisView: React.FC<VerticalAnalysisViewProps> = ({
                 <h2 className="text-2xl font-bold text-white">
                   Análisis Vertical
                 </h2>
-                <p className="text-sm text-slate-300">
+                <p className="text-sm text-white/70">
                   {displayYear.razon_social || displayYear.nit}
                 </p>
               </div>
@@ -323,7 +323,7 @@ export const VerticalAnalysisView: React.FC<VerticalAnalysisViewProps> = ({
                   className={cn(
                     "relative px-4 py-2 rounded-md font-medium transition-colors",
                     selectedYear === 'current'
-                      ? "text-slate-800"
+                      ? "text-brand-text"
                       : "text-white/70 hover:text-white"
                   )}
                 >
@@ -341,7 +341,7 @@ export const VerticalAnalysisView: React.FC<VerticalAnalysisViewProps> = ({
                   className={cn(
                     "relative px-4 py-2 rounded-md font-medium transition-colors",
                     selectedYear === 'previous'
-                      ? "text-slate-800"
+                      ? "text-brand-text"
                       : "text-white/70 hover:text-white"
                   )}
                 >
@@ -363,7 +363,7 @@ export const VerticalAnalysisView: React.FC<VerticalAnalysisViewProps> = ({
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4 }}
-            className="flex items-start gap-2 text-sm text-slate-200"
+            className="flex items-start gap-2 text-sm text-white/80"
           >
             <Info className="h-4 w-4 mt-0.5 flex-shrink-0" />
             <p>
@@ -438,7 +438,7 @@ export const VerticalAnalysisView: React.FC<VerticalAnalysisViewProps> = ({
               <Info className="h-5 w-5 text-warning" />
             </motion.div>
             <h3 className="text-lg font-bold text-brand-text">
-              💡 Insights Clave
+              Insights Clave
             </h3>
           </motion.div>
           <div className="space-y-2">
@@ -455,14 +455,13 @@ export const VerticalAnalysisView: React.FC<VerticalAnalysisViewProps> = ({
                 whileHover={{ x: 5, backgroundColor: "rgba(59, 130, 246, 0.05)" }}
                 className="flex items-start gap-2 p-3 bg-brand-bg rounded-lg transition-colors cursor-default"
               >
-                <motion.span
+                <motion.div
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
                   transition={{ delay: idx * 0.1 + 0.2, type: "spring" }}
-                  className="text-brand-indigo font-bold"
                 >
-                  ✓
-                </motion.span>
+                  <CheckCircle className="h-4 w-4 text-brand-indigo flex-shrink-0 mt-0.5" />
+                </motion.div>
                 <p className="text-sm text-brand-text">{insight}</p>
               </motion.div>
             ))}
@@ -479,7 +478,7 @@ export const VerticalAnalysisView: React.FC<VerticalAnalysisViewProps> = ({
           <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-gradient-to-r from-slate-600 via-indigo-700 to-purple-700 px-6 py-4 border-b border-brand-border"
+            className="bg-gradient-to-r from-brand-navy to-brand-indigo px-6 py-4 border-b border-brand-border"
           >
             <div className="flex items-center gap-3">
               <motion.div
@@ -490,7 +489,7 @@ export const VerticalAnalysisView: React.FC<VerticalAnalysisViewProps> = ({
               </motion.div>
               <div>
                 <h3 className="text-xl font-bold text-white">
-                  📊 Cambios Significativos en Estructura
+                  Cambios Significativos en Estructura
                 </h3>
                 <p className="text-sm text-white/80">
                   {structureComparison.criterio_significancia} • {structureComparison.total_cambios_identificados} cambios detectados
@@ -588,10 +587,10 @@ export const VerticalAnalysisView: React.FC<VerticalAnalysisViewProps> = ({
             animate={{ opacity: 1 }}
             className={cn(
               "px-6 py-4 border-b border-brand-border",
-              displayTaxCoherence.riesgo_global === 'BAJO' && "bg-gradient-to-r from-green-500 to-emerald-600",
-              displayTaxCoherence.riesgo_global === 'MEDIO' && "bg-gradient-to-r from-yellow-500 to-amber-600",
-              displayTaxCoherence.riesgo_global === 'ALTO' && "bg-gradient-to-r from-orange-500 to-red-500",
-              displayTaxCoherence.riesgo_global === 'CRITICO' && "bg-gradient-to-r from-red-600 to-rose-700"
+              displayTaxCoherence.riesgo_global === 'BAJO' && "bg-gradient-to-r from-brand-navy to-brand-indigo",
+              displayTaxCoherence.riesgo_global === 'MEDIO' && "bg-gradient-to-r from-brand-navy to-brand-indigo",
+              displayTaxCoherence.riesgo_global === 'ALTO' && "bg-gradient-to-r from-brand-navy to-brand-indigo",
+              displayTaxCoherence.riesgo_global === 'CRITICO' && "bg-gradient-to-r from-brand-navy to-brand-indigo"
             )}
           >
             <div className="flex items-center justify-between">
@@ -605,7 +604,7 @@ export const VerticalAnalysisView: React.FC<VerticalAnalysisViewProps> = ({
                 </motion.div>
                 <div>
                   <h3 className="text-xl font-bold text-white">
-                    🛡️ Coherencia Tributaria {displayTaxCoherence.ano_gravable}
+                    Coherencia Tributaria {displayTaxCoherence.ano_gravable}
                   </h3>
                   <p className="text-sm text-white/80">
                     Riesgo Global: <span className="font-bold">{displayTaxCoherence.riesgo_global}</span>
@@ -685,14 +684,23 @@ export const VerticalAnalysisView: React.FC<VerticalAnalysisViewProps> = ({
                     )}
                   >
                     <div className="flex items-start gap-3">
-                      <motion.span
+                      <motion.div
                         initial={{ scale: 0 }}
                         animate={{ scale: 1 }}
                         transition={{ delay: idx * 0.1 + 0.5, type: "spring" }}
-                        className="text-2xl"
+                        className={cn(
+                          "w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5",
+                          evaluation.nivel_riesgo === 'BAJO' && "bg-success/20",
+                          evaluation.nivel_riesgo === 'MEDIO' && "bg-warning/20",
+                          evaluation.nivel_riesgo === 'ALTO' && "bg-warning/20",
+                          evaluation.nivel_riesgo === 'CRITICO' && "bg-error/20"
+                        )}
                       >
-                        {evaluation.icono}
-                      </motion.span>
+                        {evaluation.nivel_riesgo === 'BAJO' && <CheckCircle className="h-5 w-5 text-success" />}
+                        {evaluation.nivel_riesgo === 'MEDIO' && <AlertTriangle className="h-5 w-5 text-warning" />}
+                        {evaluation.nivel_riesgo === 'ALTO' && <AlertCircle className="h-5 w-5 text-error" />}
+                        {evaluation.nivel_riesgo === 'CRITICO' && <XCircle className="h-5 w-5 text-error" />}
+                      </motion.div>
                       <div className="flex-1">
                         <h5 className="font-semibold text-brand-text mb-1">
                           {evaluation.indice}
@@ -735,9 +743,10 @@ export const VerticalAnalysisView: React.FC<VerticalAnalysisViewProps> = ({
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.5 }}
-                  className="text-lg font-bold text-brand-text mb-4"
+                  className="text-lg font-bold text-brand-text mb-4 flex items-center gap-2"
                 >
-                  📋 Recomendaciones
+                  <ClipboardList className="h-5 w-5 text-brand-indigo" />
+                  Recomendaciones
                 </motion.h4>
                 <div className="space-y-2">
                   {displayTaxCoherence.recomendaciones.map((rec, idx) => (

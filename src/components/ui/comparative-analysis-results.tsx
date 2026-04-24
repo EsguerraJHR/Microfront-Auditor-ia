@@ -203,7 +203,7 @@ export function ComparativeAnalysisResults({ results, onClose }: ComparativeAnal
   return (
     <div className="space-y-6 animate-in fade-in duration-300">
       {/* Header */}
-      <div className="relative overflow-hidden bg-gradient-to-r from-slate-700 via-slate-800 to-slate-900 rounded-2xl p-6 shadow-xl">
+      <div className="relative overflow-hidden bg-gradient-to-r from-brand-navy to-brand-indigo rounded-2xl p-6 shadow-xl">
         <div className="absolute inset-0 overflow-hidden">
           <div className="absolute -top-1/2 -right-1/4 w-64 h-64 bg-brand-indigo/10 rounded-full blur-2xl" />
           <div className="absolute -bottom-1/2 -left-1/4 w-64 h-64 bg-brand-indigo/10 rounded-full blur-2xl" />
@@ -217,13 +217,13 @@ export function ComparativeAnalysisResults({ results, onClose }: ComparativeAnal
               </div>
               <div>
                 <div className="flex items-center gap-2 mb-1">
-                  <Sparkles className="h-4 w-4 text-brand-indigo" />
-                  <span className="text-brand-indigo text-sm font-medium">Análisis Completado</span>
+                  <Sparkles className="h-4 w-4 text-white/80" />
+                  <span className="text-white/80 text-sm font-medium">Análisis Completado</span>
                 </div>
                 <h2 className="text-2xl font-bold text-white">
                   {results.razon_social}
                 </h2>
-                <p className="text-slate-300 text-sm">
+                <p className="text-white/70 text-sm">
                   NIT: {results.nit}
                 </p>
               </div>
@@ -232,7 +232,7 @@ export function ComparativeAnalysisResults({ results, onClose }: ComparativeAnal
               <button
                 onClick={handleGenerateReport}
                 disabled={isGeneratingReport}
-                className="flex items-center gap-2 px-5 py-2.5 text-sm bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white rounded-xl transition-colors shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex items-center gap-2 px-5 py-2.5 text-sm bg-white/15 hover:bg-white/25 border border-white/30 text-white rounded-xl transition-colors shadow-lg disabled:opacity-50 disabled:cursor-not-allowed backdrop-blur-sm"
               >
                 {isGeneratingReport ? (
                   <>
@@ -258,26 +258,26 @@ export function ComparativeAnalysisResults({ results, onClose }: ComparativeAnal
           </div>
 
           <div className="grid grid-cols-3 gap-4">
-            <div className="bg-brand-indigo/20 rounded-xl p-4 text-center border border-brand-indigo/30">
+            <div className="bg-white/15 rounded-xl p-4 text-center border border-white/30">
               <div className="flex items-center justify-center gap-2 mb-1">
-                <Calendar className="h-5 w-5 text-brand-indigo" />
+                <Calendar className="h-5 w-5 text-white/80" />
                 <span className="text-3xl font-bold text-white">{results.current_year}</span>
               </div>
-              <p className="text-sm text-brand-indigo">Año Actual</p>
+              <p className="text-sm text-white/80">Año Actual</p>
             </div>
 
             <div className="flex items-center justify-center">
-              <div className="w-16 h-16 rounded-full bg-slate-600/50 flex items-center justify-center border border-slate-500/30">
-                <BarChart3 className="h-8 w-8 text-slate-300" />
+              <div className="w-16 h-16 rounded-full bg-white/10 flex items-center justify-center border border-white/20">
+                <BarChart3 className="h-8 w-8 text-white/70" />
               </div>
             </div>
 
-            <div className="bg-slate-600/30 rounded-xl p-4 text-center border border-slate-500/30">
+            <div className="bg-white/10 rounded-xl p-4 text-center border border-white/20">
               <div className="flex items-center justify-center gap-2 mb-1">
-                <Calendar className="h-5 w-5 text-slate-400" />
-                <span className="text-3xl font-bold text-slate-200">{results.previous_year}</span>
+                <Calendar className="h-5 w-5 text-white/60" />
+                <span className="text-3xl font-bold text-white">{results.previous_year}</span>
               </div>
-              <p className="text-sm text-slate-400">Año Anterior</p>
+              <p className="text-sm text-white/60">Año Anterior</p>
             </div>
           </div>
 
@@ -298,7 +298,7 @@ export function ComparativeAnalysisResults({ results, onClose }: ComparativeAnal
             className={cn(
               "relative flex-1 px-4 py-2.5 text-sm font-medium rounded-lg transition-all duration-200 min-w-[120px]",
               selectedTab === tab.key
-                ? "bg-white text-warning shadow-sm"
+                ? "bg-white text-brand-navy shadow-sm"
                 : "text-brand-text-secondary hover:text-brand-text"
             )}
           >
@@ -456,7 +456,7 @@ export function ComparativeAnalysisResults({ results, onClose }: ComparativeAnal
           <div className="bg-white border border-brand-border rounded-2xl overflow-hidden shadow-lg">
             <button
               onClick={() => setIsInfoCollapsed(!isInfoCollapsed)}
-              className="w-full px-6 py-5 bg-gradient-to-r from-blue-600 via-indigo-600 to-brand-indigo border-b border-brand-border text-left cursor-pointer hover:brightness-110 transition-all"
+              className="w-full px-6 py-5 bg-gradient-to-r from-brand-navy to-brand-indigo border-b border-brand-border text-left cursor-pointer hover:brightness-110 transition-all"
             >
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
@@ -577,7 +577,7 @@ export function ComparativeAnalysisResults({ results, onClose }: ComparativeAnal
 
           {/* All Variations Table */}
           <div className="bg-white border border-brand-border rounded-2xl overflow-hidden shadow-lg">
-            <div className="px-6 py-5 bg-gradient-to-r from-slate-700 via-slate-800 to-slate-900 border-b border-brand-border">
+            <div className="px-6 py-5 bg-gradient-to-r from-brand-navy to-brand-indigo border-b border-brand-border">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center">
@@ -585,13 +585,13 @@ export function ComparativeAnalysisResults({ results, onClose }: ComparativeAnal
                   </div>
                   <div>
                     <h3 className="font-bold text-white text-lg">Análisis Detallado de Variaciones</h3>
-                    <p className="text-slate-300 text-sm">{results.all_variations.length} campos analizados</p>
+                    <p className="text-white/70 text-sm">{results.all_variations.length} campos analizados</p>
                   </div>
                 </div>
                 <button
                   onClick={handleExportContexto}
                   disabled={isExporting}
-                  className="flex items-center gap-2 px-5 py-2.5 text-sm bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
+                  className="flex items-center gap-2 px-5 py-2.5 text-sm bg-gradient-to-r from-brand-navy to-brand-indigo hover:from-brand-navy/90 hover:to-brand-indigo-hover text-white rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
                   title="Exportar en formato Contexto.xlsx"
                 >
                   <FileSpreadsheet className="h-4 w-4" />
@@ -624,7 +624,7 @@ export function ComparativeAnalysisResults({ results, onClose }: ComparativeAnal
                         </span>
                       </td>
                       <td className="px-5 py-4 text-center">
-                        <span className="inline-flex items-center justify-center w-10 h-7 bg-slate-100 rounded-lg text-xs font-semibold text-slate-600">
+                        <span className="inline-flex items-center justify-center w-10 h-7 bg-brand-bg-alt rounded-lg text-xs font-semibold text-brand-text-secondary">
                           {variation.line_number}
                         </span>
                       </td>
@@ -655,7 +655,7 @@ export function ComparativeAnalysisResults({ results, onClose }: ComparativeAnal
                       </td>
                       <td className="px-5 py-4 text-right">
                         {variation.variation_percentage && variation.variation_percentage.includes('∞') ? (
-                          <span className="inline-flex px-3 py-1.5 bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-full text-xs font-bold shadow-md">
+                          <span className="inline-flex px-3 py-1.5 bg-gradient-to-r from-brand-navy to-brand-indigo text-white rounded-full text-xs font-bold shadow-md">
                             Nuevo
                           </span>
                         ) : (
@@ -663,9 +663,9 @@ export function ComparativeAnalysisResults({ results, onClose }: ComparativeAnal
                             className={cn(
                               "inline-flex px-3 py-1.5 rounded-full text-xs font-bold shadow-sm",
                               variation.relative_variation > 0
-                                ? "bg-gradient-to-r from-green-500 to-emerald-500 text-white"
+                                ? "bg-success text-white"
                                 : variation.relative_variation < 0
-                                  ? "bg-gradient-to-r from-red-500 to-rose-500 text-white"
+                                  ? "bg-error text-white"
                                   : "bg-brand-bg-alt text-brand-text-secondary"
                             )}
                           >
@@ -709,7 +709,7 @@ export function ComparativeAnalysisResults({ results, onClose }: ComparativeAnal
           <div className="bg-white border border-brand-border rounded-2xl overflow-hidden shadow-lg">
             <button
               onClick={() => setIsVerticalInfoCollapsed(!isVerticalInfoCollapsed)}
-              className="w-full px-6 py-5 bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-700 border-b border-brand-border text-left cursor-pointer hover:brightness-110 transition-all"
+              className="w-full px-6 py-5 bg-gradient-to-r from-brand-navy to-brand-indigo border-b border-brand-border text-left cursor-pointer hover:brightness-110 transition-all"
             >
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
@@ -791,12 +791,12 @@ export function ComparativeAnalysisResults({ results, onClose }: ComparativeAnal
               </div>
 
               {/* Comparación estructural */}
-              <div className="p-4 bg-teal-50 rounded-lg border border-teal-200">
+              <div className="p-4 bg-brand-indigo/5 rounded-lg border border-brand-indigo/20">
                 <div className="flex items-start gap-2">
-                  <BarChart3 className="h-4 w-4 text-teal-600 mt-0.5 flex-shrink-0" />
+                  <BarChart3 className="h-4 w-4 text-brand-indigo mt-0.5 flex-shrink-0" />
                   <div>
-                    <p className="font-semibold text-sm text-teal-800">Comparación estructural</p>
-                    <p className="text-sm text-teal-700 mt-1">
+                    <p className="font-semibold text-sm text-brand-navy">Comparación estructural</p>
+                    <p className="text-sm text-brand-text mt-1">
                       Se compara la estructura vertical del año actual con la del anterior. Se marcan como <strong>cambios significativos</strong> las diferencias mayores a <strong>5 puntos porcentuales</strong>, con interpretación automática (ej: &quot;Reducción significativa en costos/gastos - mejora en eficiencia operativa&quot;).
                     </p>
                   </div>
@@ -806,8 +806,8 @@ export function ComparativeAnalysisResults({ results, onClose }: ComparativeAnal
               {/* Coherencia Tributaria */}
               <div className="border-t border-brand-border pt-6">
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="w-8 h-8 rounded-lg bg-rose-100 flex items-center justify-center">
-                    <Shield className="h-4 w-4 text-rose-600" />
+                  <div className="w-8 h-8 rounded-lg bg-error-bg flex items-center justify-center">
+                    <Shield className="h-4 w-4 text-error" />
                   </div>
                   <div>
                     <p className="font-semibold text-sm text-brand-text">Insights / Coherencia Tributaria</p>
