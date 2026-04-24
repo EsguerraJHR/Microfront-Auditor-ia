@@ -71,7 +71,7 @@ export const StructureComparisonView: React.FC<StructureComparisonViewProps> = (
           </div>
           <div>
             <h3 className="text-xl font-bold text-brand-text">
-              🔄 Cambios Estructurales
+              Cambios Estructurales
             </h3>
             <p className="text-sm text-brand-text-secondary">
               {comparison?.criterio_significancia || 'No se identificaron cambios significativos'}
@@ -103,7 +103,7 @@ export const StructureComparisonView: React.FC<StructureComparisonViewProps> = (
             </div>
             <div>
               <h3 className="text-xl font-bold text-warning-foreground">
-                🔄 Cambios Estructurales Significativos
+                Cambios Estructurales Significativos
               </h3>
               <p className="text-sm text-warning-foreground">
                 {comparison.criterio_significancia}

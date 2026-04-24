@@ -217,8 +217,8 @@ export function ComparativeAnalysisResults({ results, onClose }: ComparativeAnal
               </div>
               <div>
                 <div className="flex items-center gap-2 mb-1">
-                  <Sparkles className="h-4 w-4 text-brand-indigo" />
-                  <span className="text-brand-indigo text-sm font-medium">Análisis Completado</span>
+                  <Sparkles className="h-4 w-4 text-white/80" />
+                  <span className="text-white/80 text-sm font-medium">Análisis Completado</span>
                 </div>
                 <h2 className="text-2xl font-bold text-white">
                   {results.razon_social}
@@ -232,7 +232,7 @@ export function ComparativeAnalysisResults({ results, onClose }: ComparativeAnal
               <button
                 onClick={handleGenerateReport}
                 disabled={isGeneratingReport}
-                className="flex items-center gap-2 px-5 py-2.5 text-sm bg-gradient-to-r from-brand-navy to-brand-indigo hover:from-brand-navy/90 hover:to-brand-indigo-hover text-white rounded-xl transition-colors shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex items-center gap-2 px-5 py-2.5 text-sm bg-white/15 hover:bg-white/25 border border-white/30 text-white rounded-xl transition-colors shadow-lg disabled:opacity-50 disabled:cursor-not-allowed backdrop-blur-sm"
               >
                 {isGeneratingReport ? (
                   <>
@@ -258,12 +258,12 @@ export function ComparativeAnalysisResults({ results, onClose }: ComparativeAnal
           </div>
 
           <div className="grid grid-cols-3 gap-4">
-            <div className="bg-brand-indigo/20 rounded-xl p-4 text-center border border-brand-indigo/30">
+            <div className="bg-white/15 rounded-xl p-4 text-center border border-white/30">
               <div className="flex items-center justify-center gap-2 mb-1">
-                <Calendar className="h-5 w-5 text-brand-indigo" />
+                <Calendar className="h-5 w-5 text-white/80" />
                 <span className="text-3xl font-bold text-white">{results.current_year}</span>
               </div>
-              <p className="text-sm text-brand-indigo">Año Actual</p>
+              <p className="text-sm text-white/80">Año Actual</p>
             </div>
 
             <div className="flex items-center justify-center">
