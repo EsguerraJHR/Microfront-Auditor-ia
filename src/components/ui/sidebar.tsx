@@ -1,7 +1,7 @@
 "use client"
 
 import { cn } from "@/lib/utils"
-import { BarChart3, FileCheck, Users, Receipt, Home, X, ChevronsLeft, ChevronsRight, Hash } from "lucide-react"
+import { BarChart3, FileCheck, Users, Receipt, Home, X, ChevronsLeft, ChevronsRight, Hash, Database, ClipboardCheck, TrendingUp } from "lucide-react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 
@@ -48,6 +48,27 @@ const menuItems = [
     href: "/facturas",
     icon: Receipt,
     description: "Control y seguimiento de facturas"
+  },
+  {
+    title: "Medios Magneticos",
+    href: "https://medios-magneticos-microfrontend.vercel.app/dashboard",
+    icon: Database,
+    description: "Gestion de medios magneticos",
+    external: true
+  },
+  {
+    title: "Concentrix",
+    href: "https://concentrix-microfrontend.vercel.app/revisiones",
+    icon: ClipboardCheck,
+    description: "Revisiones Concentrix",
+    external: true
+  },
+  {
+    title: "Valoracion Lineal",
+    href: "https://micro-frontend-valoracion-lineal.vercel.app/clientes",
+    icon: TrendingUp,
+    description: "Valoracion lineal de clientes",
+    external: true
   }
 ]
 
@@ -128,25 +149,24 @@ export function Sidebar({ isOpen, onClose, isCollapsed, onToggleCollapse }: Side
           {menuItems.map((item) => {
             const isActive = pathname === item.href
             const Icon = item.icon
+            const isExternal = "external" in item && item.external
 
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                onClick={() => {
-                  if (typeof window !== 'undefined' && window.innerWidth < 1024) {
-                    onClose()
-                  }
-                }}
-                title={isCollapsed ? item.title : undefined}
-                className={cn(
-                  "flex items-center rounded-lg transition-all duration-200 group",
-                  isCollapsed ? "lg:justify-center lg:p-3 gap-3 p-3" : "gap-3 p-3",
-                  isActive
-                    ? "bg-brand-indigo/10 text-brand-indigo border border-brand-indigo/20"
-                    : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
-                )}
-              >
+            const handleClick = () => {
+              if (typeof window !== 'undefined' && window.innerWidth < 1024) {
+                onClose()
+              }
+            }
+
+            const linkClassName = cn(
+              "flex items-center rounded-lg transition-all duration-200 group",
+              isCollapsed ? "lg:justify-center lg:p-3 gap-3 p-3" : "gap-3 p-3",
+              isActive
+                ? "bg-brand-indigo/10 text-brand-indigo border border-brand-indigo/20"
+                : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+            )
+
+            const linkContent = (
+              <>
                 <div
                   className={cn(
                     "p-2 rounded-lg transition-colors flex-shrink-0",
@@ -179,6 +199,32 @@ export function Sidebar({ isOpen, onClose, isCollapsed, onToggleCollapse }: Side
                     isCollapsed && "lg:hidden"
                   )}></div>
                 )}
+              </>
+            )
+
+            if (isExternal) {
+              return (
+                <a
+                  key={item.href}
+                  href={item.href}
+                  onClick={handleClick}
+                  title={isCollapsed ? item.title : undefined}
+                  className={linkClassName}
+                >
+                  {linkContent}
+                </a>
+              )
+            }
+
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                onClick={handleClick}
+                title={isCollapsed ? item.title : undefined}
+                className={linkClassName}
+              >
+                {linkContent}
               </Link>
             )
           })}
